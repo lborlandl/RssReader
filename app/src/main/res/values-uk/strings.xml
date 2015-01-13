@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="action_settings">Налаштування</string>
+    <string name="published">Опубліковано</string>
+    <string name="read_on_site">Читати на сайті</string>
+    <string name="not_network">Немає підключення</string>
+    <string name="no_data">Відсутні дані</string>
+    <string name="error_download">Помилка завантаження</string>
+
+</resources>

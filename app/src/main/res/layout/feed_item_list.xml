@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingLeft="15dp"
+    android:paddingRight="15dp">
+
+    <TextView
+        android:id="@+id/feed_date"
+        style="@style/TextSubTitleStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/feed_title"
+        style="@style/TextTitleStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <!--<LinearLayout-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:orientation="horizontal">-->
+
+        <TextView
+            android:id="@+id/feed_tags"
+            style="@style/TextSubTitleStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <!--<RadioButton-->
+            <!--android:id="@+id/radio_button_favourite"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:button="@drawable/checkbox_selector"-->
+            <!--android:text="@null" />-->
+
+    <!--</LinearLayout>-->
+</LinearLayout>
