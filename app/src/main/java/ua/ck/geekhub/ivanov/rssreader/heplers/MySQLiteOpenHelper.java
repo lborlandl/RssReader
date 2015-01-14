@@ -88,7 +88,7 @@ public class MySQLiteOpenHelper extends SQLiteOpenHelper {
     }
 
     public ArrayList<Feed> getAllFeed() {
-        ArrayList<Feed> shopList = new ArrayList<Feed>();
+        ArrayList<Feed> feedList = new ArrayList<Feed>();
         String query = "SELECT * FROM " + TABLE_NAME;
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(query, null);
@@ -103,10 +103,14 @@ public class MySQLiteOpenHelper extends SQLiteOpenHelper {
                         .setAuthorName(cursor.getString(5))
                         .setAuthorLink(cursor.getString(6))
                         .setPubDate(cursor.getString(7));
-                shopList.add(feed);
+                feedList.add(feed);
             } while (cursor.moveToNext());
         }
-        return shopList;
+        ArrayList<Feed> feeds = new ArrayList<Feed>();
+        for (int i = feedList.size() - 1; i >= 0; i--) {
+            feeds.add(feedList.get(i));
+        }
+        return feeds;
     }
 
     public void deleteAll() {

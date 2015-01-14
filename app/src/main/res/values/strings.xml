@@ -13,13 +13,6 @@
     <string name="add_to_favourite">Добавить в избранное</string>
     <string name="delete_all_favourite">Очистить избранное</string>
     <string name="remove_from_favourite">Удалить из избранного</string>
-    <string name="removed_from_favourite">Удалено из избранного</string>
-    <string name="not_removed_from_favourite">Ошибка удаления</string>
-    <string name="added_to_favourite">Добавлено в избранное</string>
-    <string name="not_added_to_favourite">Ошибка добавления</string>
-    <string name="error_added_to_favourite">Ошибка добавления: новость уже добавлена</string>
-    <string name="deleted_success">Удалено успешно</string>
-    <string name="deleted_not_success">Ошибка удаления</string>
     <string name="share">Поделиться</string>
     <string name="share_facebook">Поделиться</string>
     <string name="no_favourite">Нет избранных новостей</string>

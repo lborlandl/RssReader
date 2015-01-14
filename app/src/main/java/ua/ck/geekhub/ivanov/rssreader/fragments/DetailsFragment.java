@@ -82,7 +82,9 @@ public class DetailsFragment extends Fragment {
 
         ActionBar actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
         actionBar.setBackgroundDrawable(mActionBarBackgroundDrawable);
-        mActionBarBackgroundDrawable.setAlpha(200);
+        if (!mIsTable) {
+            mActionBarBackgroundDrawable.setAlpha(200);
+        }
 //        ((NotifyingScrollView) view.findViewById(R.id.scroll_view)).setOnScrollChangedListener(
 //                new NotifyingScrollView.OnScrollChangedListener() {
 //                    @Override

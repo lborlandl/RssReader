@@ -186,9 +186,6 @@ public class ListFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.list, menu);
-        if (mIsTable) {
-            inflater.inflate(R.menu.details, menu);
-        }
     }
 
     @Override
@@ -204,16 +201,6 @@ public class ListFragment extends Fragment {
             itemChangeNotification.setTitle(R.string.off_notification);
         } else {
             itemChangeNotification.setTitle(R.string.on_notification);
-        }
-        if (mIsTable) {
-            MenuItem itemFavourite = menu.findItem(R.id.menu_action_favourite);
-            if (mSpinnerSelected == 2) {
-                itemFavourite.setIcon(android.R.drawable.ic_menu_delete);
-                itemFavourite.setTitle(R.string.remove_from_favourite);
-            } else {
-                itemFavourite.setIcon(android.R.drawable.ic_menu_add);
-                itemFavourite.setTitle(R.string.add_to_favourite);
-            }
         }
     }
 
@@ -279,7 +266,6 @@ public class ListFragment extends Fragment {
 
     private void startDownloadData(String url) {
         if (Utils.isOnline(getActivity())) {
-            mProgressBar.setVisibility(View.VISIBLE);
             mSwipeLayout.setVisibility(View.GONE);
             mSwipeLayout.setRefreshing(true);
             new DownloadStringTask().execute(url);
@@ -333,7 +319,6 @@ public class ListFragment extends Fragment {
         mFeedAdapter = new FeedAdapter(mContext, mFeedList);
         mListView.setAdapter(mFeedAdapter);
         mSwipeLayout.setRefreshing(false);
-        mProgressBar.setVisibility(View.GONE);
         mSwipeLayout.setVisibility(View.VISIBLE);
     }
 
