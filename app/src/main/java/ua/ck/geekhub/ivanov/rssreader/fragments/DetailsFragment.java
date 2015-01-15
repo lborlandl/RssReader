@@ -44,6 +44,8 @@ public class DetailsFragment extends Fragment {
     private Activity mActivity;
     private DatabaseHelper mDb;
     private ShareActionProvider mShareActionProvider;
+    private View mImageProgressBar;
+    private ImageView mImageViewFeed;
 
     public static DetailsFragment newInstance(Feed feed) {
         Bundle args = new Bundle();
@@ -75,6 +77,7 @@ public class DetailsFragment extends Fragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        mImageProgressBar = view.findViewById(R.id.image_progress_bar);
 
         Drawable mActionBarBackgroundDrawable = getResources().getDrawable(
                 R.drawable.ab_solid_toolbarstyle);
@@ -97,8 +100,10 @@ public class DetailsFragment extends Fragment {
 //                    }
 //                });
 
-        ImageView imageViewFeed = (ImageView) view.findViewById(R.id.image_view_feed);
-        new DownloadImageTask(imageViewFeed).execute(mFeed.getImage());
+        mImageViewFeed = (ImageView) view.findViewById(R.id.image_view_feed);
+        mImageViewFeed.setVisibility(View.GONE);
+        mImageProgressBar.setVisibility(View.VISIBLE);
+        new DownloadImageTask(mImageViewFeed).execute(mFeed.getImage());
 
         TextView textViewTitle = (TextView) view.findViewById(R.id.text_view_title);
         textViewTitle.setText(Html.fromHtml(mFeed.getTitle()));
@@ -147,6 +152,8 @@ public class DetailsFragment extends Fragment {
         }
 
         protected void onPostExecute(Bitmap result) {
+            mImageProgressBar.setVisibility(View.GONE);
+            mImageViewFeed.setVisibility(View.VISIBLE);
             bmImage.setImageBitmap(result);
         }
     }
