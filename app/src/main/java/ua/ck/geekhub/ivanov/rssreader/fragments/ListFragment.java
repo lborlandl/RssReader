@@ -114,6 +114,8 @@ public class ListFragment extends Fragment {
                 mSpinnerSelected = position;
                 switch (position) {
                     case 2:
+                        mSwipeLayout.setVisibility(View.VISIBLE);
+                        mProgressBar.setVisibility(View.GONE);
                         updateFavourite();
                         break;
                     default:
@@ -276,6 +278,7 @@ public class ListFragment extends Fragment {
 
     private void updateList() {
         try {
+
             JSONObject rssJSONObject = XML.toJSONObject(mDownloadData);
             JSONObject rss = rssJSONObject.getJSONObject("rss");
             JSONObject channel = rss.getJSONObject("channel");

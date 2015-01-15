@@ -8,7 +8,11 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 
 import ua.ck.geekhub.ivanov.rssreader.R;
 import ua.ck.geekhub.ivanov.rssreader.dummy.Feed;
@@ -52,7 +56,7 @@ public class FeedAdapter extends BaseAdapter {
             mViewHolder = new ViewHolder();
             mViewHolder.mTextViewDate = (TextView) convertView.findViewById(R.id.feed_date);
             mViewHolder.mTextViewTitle = (TextView) convertView.findViewById(R.id.feed_title);
-            mViewHolder.mTextViewTags = (TextView) convertView.findViewById(R.id.feed_tags);
+            mViewHolder.mTextViewAuthor = (TextView) convertView.findViewById(R.id.feed_author);
 
             convertView.setTag(mViewHolder);
         } else {
@@ -61,15 +65,26 @@ public class FeedAdapter extends BaseAdapter {
 
         Feed feed = getFeed(position);
 
+        Date date = new Date();
+        try {
+            SimpleDateFormat incomingDate =
+                    new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss Z", Locale.ENGLISH);
+            date = incomingDate.parse(feed.getPubDate());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM HH:mm");
+
         mViewHolder.mTextViewDate.setText(convertView.getResources()
-                .getString(R.string.published) + " " + feed.getPubDate());
+                .getString(R.string.published) + " " + dateFormat.format(date));
         mViewHolder.mTextViewTitle.setText(Html.fromHtml(feed.getTitle()));
-        mViewHolder.mTextViewTags.setText(feed.getAuthorName());
+        mViewHolder.mTextViewAuthor.setText(", " + feed.getAuthorName());
 
         return convertView;
     }
 
     static class ViewHolder {
-        TextView mTextViewDate, mTextViewTitle, mTextViewTags;
+        TextView mTextViewDate, mTextViewTitle, mTextViewAuthor;
     }
 }
