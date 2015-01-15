@@ -7,7 +7,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -38,7 +37,7 @@ import ua.ck.geekhub.ivanov.rssreader.activities.LoginActivity;
 import ua.ck.geekhub.ivanov.rssreader.adapters.FeedAdapter;
 import ua.ck.geekhub.ivanov.rssreader.dummy.Feed;
 import ua.ck.geekhub.ivanov.rssreader.heplers.Constants;
-import ua.ck.geekhub.ivanov.rssreader.heplers.MySQLiteOpenHelper;
+import ua.ck.geekhub.ivanov.rssreader.heplers.DatabaseHelper;
 import ua.ck.geekhub.ivanov.rssreader.services.UpdateFeedService;
 import ua.ck.geekhub.ivanov.rssreader.task.Utils;
 
@@ -109,7 +108,6 @@ public class ListFragment extends Fragment {
 
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
-        // Set up the dropdown list navigation in the action bar.
         actionBar.setListNavigationCallbacks(adapter, new ActionBar.OnNavigationListener() {
             @Override
             public boolean onNavigationItemSelected(int position, long id) {
@@ -119,6 +117,8 @@ public class ListFragment extends Fragment {
                         updateFavourite();
                         break;
                     default:
+                        mSwipeLayout.setVisibility(View.GONE);
+                        mProgressBar.setVisibility(View.VISIBLE);
                         startDownloadData(getSelectedLink(mSpinnerSelected));
                 }
                 return true;
@@ -126,8 +126,9 @@ public class ListFragment extends Fragment {
         });
         //TODO not working:
         actionBar.setSelectedNavigationItem(mSpinnerSelected);
-
         mProgressBar = view.findViewById(R.id.loading_indicator);
+
+
         mSwipeLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_container);
         mSwipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -160,12 +161,10 @@ public class ListFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if (mIsTable) {
                     Feed feed = mFeedList.get(position);
-
-                    DetailsFragment detailsFragment =
-                            DetailsFragment.newInstance(feed);
-
-                    FragmentManager fm = getFragmentManager();
-                    fm.beginTransaction().replace(R.id.table_content_container, detailsFragment)
+                    DetailsFragment detailsFragment = DetailsFragment.newInstance(feed);
+                    getFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.table_content_container, detailsFragment)
                             .commit();
                 } else {
                     Intent intent = new Intent(getActivity(), DetailsActivity.class);
@@ -178,7 +177,8 @@ public class ListFragment extends Fragment {
         });
         mFeedAdapter = new FeedAdapter(getActivity(), mFeedList);
         mListView.setAdapter(mFeedAdapter);
-        mDownloadData = mSharedPreferences.getString(Constants.FEED_SAVED, null);
+        mSwipeLayout.setVisibility(View.GONE);
+        mProgressBar.setVisibility(View.VISIBLE);
         startDownloadData(getSelectedLink(mSpinnerSelected));
     }
 
@@ -214,8 +214,8 @@ public class ListFragment extends Fragment {
                 startActivity(new Intent(getActivity(), LoginActivity.class));
                 return true;
             case R.id.menu_delete_all_favourite:
-                MySQLiteOpenHelper db = new MySQLiteOpenHelper(getActivity(),
-                        MySQLiteOpenHelper.DATABASE_NAME, null, 1);
+                DatabaseHelper db = new DatabaseHelper(getActivity(),
+                        DatabaseHelper.DATABASE_NAME, null, 1);
                 db.deleteAll();
                 updateFavourite();
                 return true;
@@ -244,8 +244,8 @@ public class ListFragment extends Fragment {
     }
 
     private void updateFavourite() {
-        MySQLiteOpenHelper db = new MySQLiteOpenHelper(getActivity(),
-                MySQLiteOpenHelper.DATABASE_NAME, null, 1);
+        DatabaseHelper db = new DatabaseHelper(getActivity(),
+                DatabaseHelper.DATABASE_NAME, null, 1);
         mFeedList = db.getAllFeed();
         mFeedAdapter = new FeedAdapter(getActivity(), mFeedList);
         mListView.setAdapter(mFeedAdapter);
@@ -266,7 +266,6 @@ public class ListFragment extends Fragment {
 
     private void startDownloadData(String url) {
         if (Utils.isOnline(getActivity())) {
-            mSwipeLayout.setVisibility(View.GONE);
             mSwipeLayout.setRefreshing(true);
             new DownloadStringTask().execute(url);
         } else {
@@ -274,7 +273,6 @@ public class ListFragment extends Fragment {
             mSwipeLayout.setRefreshing(false);
         }
     }
-
 
     private void updateList() {
         try {
@@ -308,9 +306,7 @@ public class ListFragment extends Fragment {
                 newList.add(rssItem);
             }
             mFeedList = newList;
-            saveDownloadData();
         } catch (JSONException e) {
-            mDownloadData = mSharedPreferences.getString(Constants.FEED_SAVED, null);
             if (getActivity() != null) {
                 Toast.makeText(getActivity(), R.string.error_download, Toast.LENGTH_LONG).show();
             }
@@ -319,13 +315,16 @@ public class ListFragment extends Fragment {
         mFeedAdapter = new FeedAdapter(mContext, mFeedList);
         mListView.setAdapter(mFeedAdapter);
         mSwipeLayout.setRefreshing(false);
+        if (mIsTable) {
+            mListView.setSelection(0);
+            DetailsFragment detailsFragment = DetailsFragment.newInstance(mFeedList.get(0));
+            getFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.table_content_container, detailsFragment)
+                    .commit();
+        }
         mSwipeLayout.setVisibility(View.VISIBLE);
-    }
-
-    private void saveDownloadData() {
-        SharedPreferences.Editor editor = mSharedPreferences.edit();
-        editor.putString(Constants.FEED_SAVED, mDownloadData);
-        editor.apply();
+        mProgressBar.setVisibility(View.GONE);
     }
 
     class DownloadStringTask extends AsyncTask<String, Void, Void> {
@@ -345,7 +344,6 @@ public class ListFragment extends Fragment {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
             mDownloadData = stringBuilder.toString();
 
             return null;

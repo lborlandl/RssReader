@@ -47,7 +47,7 @@ public class FeedAdapter extends BaseAdapter {
         ViewHolder mViewHolder;
 
         if (convertView == null) {
-            convertView = mLayoutInflater.inflate(R.layout.feed_item_list, parent, false);
+            convertView = mLayoutInflater.inflate(R.layout.feed_item, parent, false);
 
             mViewHolder = new ViewHolder();
             mViewHolder.mTextViewDate = (TextView) convertView.findViewById(R.id.feed_date);

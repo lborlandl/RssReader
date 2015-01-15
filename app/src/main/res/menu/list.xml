@@ -9,7 +9,8 @@
         android:id="@+id/action_settings"
         android:orderInCategory="200"
         app:showAsAction="never"
-        android:title="@string/action_settings"/>
+        android:title="@string/action_settings"
+        android:visible="false"/>
 
     <item
         android:id="@+id/menu_delete_all_favourite"

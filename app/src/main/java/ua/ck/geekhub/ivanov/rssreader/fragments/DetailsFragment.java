@@ -33,7 +33,7 @@ import java.io.InputStream;
 import ua.ck.geekhub.ivanov.rssreader.R;
 import ua.ck.geekhub.ivanov.rssreader.dummy.Feed;
 import ua.ck.geekhub.ivanov.rssreader.heplers.Constants;
-import ua.ck.geekhub.ivanov.rssreader.heplers.MySQLiteOpenHelper;
+import ua.ck.geekhub.ivanov.rssreader.heplers.DatabaseHelper;
 import ua.ck.geekhub.ivanov.rssreader.task.MyTagHandler;
 
 public class DetailsFragment extends Fragment {
@@ -42,7 +42,7 @@ public class DetailsFragment extends Fragment {
     private boolean mIsTable, mIsFavourite;
     private UiLifecycleHelper mUiHelper;
     private Activity mActivity;
-    private MySQLiteOpenHelper mDb;
+    private DatabaseHelper mDb;
     private ShareActionProvider mShareActionProvider;
 
     public static DetailsFragment newInstance(Feed feed) {
@@ -61,7 +61,7 @@ public class DetailsFragment extends Fragment {
         mUiHelper.onCreate(savedInstanceState);
         mIsTable = (mActivity.findViewById(R.id.table_content_container) != null);
         mFeed = (Feed) getArguments().getSerializable(Constants.EXTRA_FEED);
-        mDb = new MySQLiteOpenHelper(mActivity, MySQLiteOpenHelper.DATABASE_NAME, null, 1);
+        mDb = new DatabaseHelper(mActivity, DatabaseHelper.DATABASE_NAME, null, 1);
         mIsFavourite = mDb.isFeed(mFeed);
     }
 

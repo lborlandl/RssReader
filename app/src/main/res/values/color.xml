@@ -2,4 +2,6 @@
 <resources>
     <color name="sub_title_gray">#ff5a5a5a</color>
     <color name="action_bar_blue">#1FB6F2</color>
+    <color name="list_default">@android:color/background_light</color>
+    <color name="list_selected">#ff89ebff</color>
 </resources>
