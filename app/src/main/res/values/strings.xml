@@ -26,6 +26,7 @@
 
     <string name="news">Новость</string>
     <string name="article">Статья</string>
+    <string name="title_facebook_login">title_facebook_login</string>
 
     <string-array name="spinner_list">
         <item>Новости</item>

@@ -85,6 +85,6 @@ public class FeedAdapter extends BaseAdapter {
     }
 
     static class ViewHolder {
-        TextView mTextViewDate, mTextViewTitle, mTextViewAuthor;
+        TextView mTextViewTitle, mTextViewDate, mTextViewAuthor;
     }
 }

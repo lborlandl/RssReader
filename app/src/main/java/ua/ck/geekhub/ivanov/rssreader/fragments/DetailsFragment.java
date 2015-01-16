@@ -9,10 +9,8 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
-import android.support.v7.widget.ShareActionProvider;
 import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -25,8 +23,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.FacebookException;
+import com.facebook.FacebookOperationCanceledException;
+import com.facebook.Session;
+import com.facebook.SessionState;
 import com.facebook.UiLifecycleHelper;
 import com.facebook.widget.FacebookDialog;
+import com.facebook.widget.WebDialog;
 
 import java.io.InputStream;
 
@@ -43,9 +46,10 @@ public class DetailsFragment extends Fragment {
     private UiLifecycleHelper mUiHelper;
     private Activity mActivity;
     private DatabaseHelper mDb;
-    private ShareActionProvider mShareActionProvider;
     private View mImageProgressBar;
     private ImageView mImageViewFeed;
+
+    private SessionStatusCallback statusCallback = new SessionStatusCallback();
 
     public static DetailsFragment newInstance(Feed feed) {
         Bundle args = new Bundle();
@@ -162,12 +166,6 @@ public class DetailsFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.details, menu);
-        MenuItem shareItem = menu.findItem(R.id.action_share);
-        mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(shareItem);
-        Intent intent = new Intent(Intent.ACTION_SEND);
-        intent.setType("text/plain");
-        intent.putExtra(Intent.EXTRA_TEXT, mFeed.getTitle());
-        mShareActionProvider.setShareIntent(intent);
     }
 
     @Override
@@ -187,25 +185,31 @@ public class DetailsFragment extends Fragment {
         switch (item.getItemId()) {
             case R.id.menu_action_favourite:
                 if (mIsFavourite) {
-                    mDb.deleteFeed(mFeed);
                     item.setIcon(android.R.drawable.btn_star_big_off);
                     item.setTitle(R.string.add_to_favourite);
+                    mDb.deleteFeed(mFeed);
                 } else {
-                    mDb.addFeed(mFeed);
                     item.setIcon(android.R.drawable.btn_star_big_on);
                     item.setTitle(R.string.remove_from_favourite);
+                    mDb.addFeed(mFeed);
                 }
                 mIsFavourite = !mIsFavourite;
                 return true;
             case R.id.menu_share_facebook:
-                FacebookDialog shareDialog = new FacebookDialog.ShareDialogBuilder(mActivity)
-                        .setName(mFeed.getTitle())
-                        .setLink(mFeed.getLink())
-                        .setDescription(mFeed.getDescription())
-                        .setPicture(mFeed.getImage())
-                        .setApplicationName(getString(R.string.app_name))
-                        .build();
-                mUiHelper.trackPendingDialogCall(shareDialog.present());
+                if (FacebookDialog.canPresentShareDialog(mActivity.getApplicationContext(),
+                        FacebookDialog.ShareDialogFeature.SHARE_DIALOG)) {
+                    FacebookDialog shareDialog = new FacebookDialog.ShareDialogBuilder(mActivity)
+                            .setName(Html.fromHtml(mFeed.getTitle()).toString())
+                            .setLink(mFeed.getLink())
+                            .setDescription(Html.fromHtml(mFeed.getDescription()).toString())
+                            .setPicture(mFeed.getImage())
+                            .setApplicationName(getString(R.string.app_name))
+                            .build();
+                    mUiHelper.trackPendingDialogCall(shareDialog.present());
+
+                } else {
+                    login();
+                }
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -228,6 +232,80 @@ public class DetailsFragment extends Fragment {
 
             }
         });
+    }
+
+    private void publishFeedDialog() {
+        Bundle params = new Bundle();
+        params.putString("name", Html.fromHtml(mFeed.getTitle()).toString());
+        params.putString("description", Html.fromHtml(mFeed.getDescription()).toString());
+        params.putString("link", mFeed.getLink());
+        params.putString("picture", mFeed.getImage());
+
+        WebDialog feedDialog = new WebDialog.FeedDialogBuilder(getActivity(),
+                Session.getActiveSession(), params)
+                .setOnCompleteListener(new WebDialog.OnCompleteListener() {
+
+                    @Override
+                    public void onComplete(Bundle values,
+                                           FacebookException error) {
+                        if (error == null) {
+                            // When the story is posted, echo the success
+                            // and the post Id.
+                            final String postId = values.getString("post_id");
+                            if (postId != null) {
+                                Toast.makeText(getActivity(),
+                                        "Posted story, id: " + postId,
+                                        Toast.LENGTH_SHORT).show();
+                            } else {
+                                // User clicked the Cancel button
+                                Toast.makeText(getActivity().getApplicationContext(),
+                                        "Publish cancelled",
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                        } else if (error instanceof FacebookOperationCanceledException) {
+                            // User clicked the "x" button
+                            Toast.makeText(getActivity().getApplicationContext(),
+                                    "Publish cancelled",
+                                    Toast.LENGTH_SHORT).show();
+                        } else {
+                            // Generic, ex: network error
+                            Toast.makeText(getActivity().getApplicationContext(),
+                                    "Error posting story",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                })
+                .build();
+        feedDialog.show();
+    }
+
+    public void login() {
+        Session session = Session.getActiveSession();
+        if (!session.isOpened() && !session.isClosed()) {
+            session.openForRead(new Session.OpenRequest(this).setCallback(statusCallback));
+        } else {
+            Session.openActiveSession(getActivity(), this, true, statusCallback);
+        }
+    }
+
+    private void afterLogin() {
+        publishFeedDialog();
+    }
+
+    private class SessionStatusCallback implements Session.StatusCallback {
+        @Override
+        public void call(Session session, SessionState state, Exception exception) {
+//            if (exception != null) {
+//                handleException(exception);
+//            }
+            if (state.isOpened()) {
+                afterLogin();
+            }
+//            else if (state.isClosed()) {
+//                afterLogout();
+//            }
+        }
     }
 
     @Override
