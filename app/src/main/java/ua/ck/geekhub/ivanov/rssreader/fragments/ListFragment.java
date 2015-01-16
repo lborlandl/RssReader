@@ -46,6 +46,7 @@ public class ListFragment extends Fragment {
     private ListView mListView;
     private SwipeRefreshLayout mSwipeLayout;
     private View mProgressBar;
+    private ActionBar mActionBar;
 
     private ArrayList<Feed> mFeedList = new ArrayList<Feed>();
 
@@ -97,21 +98,24 @@ public class ListFragment extends Fragment {
 
         mContext = getActivity().getApplicationContext();
 
-        ActionBar actionBar = ((ActionBarActivity) getActivity()).getSupportActionBar();
-        actionBar.setDisplayShowTitleEnabled(false);
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+        mActionBar = ((ActionBarActivity) getActivity()).getSupportActionBar();
+        mActionBar.setDisplayShowTitleEnabled(false);
+        mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 
         final String[] dropdownValues = getResources().getStringArray(R.array.spinner_list);
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(actionBar.getThemedContext(),
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(mActionBar.getThemedContext(),
                 android.R.layout.simple_spinner_item, android.R.id.text1, dropdownValues);
 
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
-        actionBar.setListNavigationCallbacks(adapter, new ActionBar.OnNavigationListener() {
+        mActionBar.setListNavigationCallbacks(adapter, new ActionBar.OnNavigationListener() {
             @Override
             public boolean onNavigationItemSelected(int position, long id) {
                 mSpinnerSelected = position;
+                SharedPreferences.Editor editor = mSharedPreferences.edit();
+                editor.putInt(Constants.EXTRA_SPINNER_POSITION, position);
+                editor.apply();
                 switch (position) {
                     case 2:
                         mSwipeLayout.setVisibility(View.VISIBLE);
@@ -127,7 +131,7 @@ public class ListFragment extends Fragment {
             }
         });
         //TODO not working:
-        actionBar.setSelectedNavigationItem(mSpinnerSelected);
+        mActionBar.setSelectedNavigationItem(mSpinnerSelected);
         mProgressBar = view.findViewById(R.id.loading_indicator);
 
 
@@ -173,7 +177,7 @@ public class ListFragment extends Fragment {
                     intent.putExtra(Constants.EXTRA_FEEDS, mFeedList);
                     intent.putExtra(Constants.EXTRA_POSITION, position);
                     intent.putExtra(Constants.EXTRA_STATE, mSpinnerSelected);
-                    startActivity(intent);
+                    startActivityForResult(intent, Constants.REQUEST_FEED);
                 }
             }
         });
@@ -182,6 +186,25 @@ public class ListFragment extends Fragment {
         mSwipeLayout.setVisibility(View.GONE);
         mProgressBar.setVisibility(View.VISIBLE);
         startDownloadData(getSelectedLink(mSpinnerSelected));
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        mSpinnerSelected = mSharedPreferences.getInt(Constants.EXTRA_SPINNER_POSITION, 0);
+        mActionBar.setSelectedNavigationItem(mSpinnerSelected);
+        if (requestCode == Constants.REQUEST_FEED) {
+            Feed feed = (Feed) data.getSerializableExtra(Constants.EXTRA_FEED);
+            int selected = mFeedList.indexOf(feed);
+            if (selected != -1) {
+                mListView.setSelection(selected);
+            }
+            DetailsFragment detailsFragment = DetailsFragment.newInstance(feed);
+            getFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.table_content_container, detailsFragment)
+                    .commit();
+        }
     }
 
     @Override

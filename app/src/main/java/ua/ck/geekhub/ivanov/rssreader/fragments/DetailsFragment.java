@@ -63,10 +63,20 @@ public class DetailsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mActivity = getActivity();
-        mUiHelper = new UiLifecycleHelper(mActivity, null);
-        mUiHelper.onCreate(savedInstanceState);
         mIsTable = (mActivity.findViewById(R.id.table_content_container) != null);
         mFeed = (Feed) getArguments().getSerializable(Constants.EXTRA_FEED);
+//        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE
+//                && !mIsTable) {
+//            Intent data = new Intent();
+//            data.putExtra(Constants.EXTRA_FEED, mFeed);
+//            getActivity().setResult(Constants.REQUEST_FEED, data);
+//            Intent i = new Intent(getActivity(), ListActivity.class);
+//            startActivity(i);
+//            getActivity().finish();
+//            getActivity().finishActivity(Constants.REQUEST_FEED);
+//        }
+        mUiHelper = new UiLifecycleHelper(mActivity, null);
+        mUiHelper.onCreate(savedInstanceState);
         mDb = new DatabaseHelper(mActivity, DatabaseHelper.DATABASE_NAME, null, 1);
         mIsFavourite = mDb.isFeed(mFeed);
     }
