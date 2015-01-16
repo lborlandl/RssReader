@@ -6,6 +6,8 @@
     <string name="action_login">Вход</string>
     <string name="action_settings">Настройки</string>
     <string name="published">Опубликовано</string>
+    <string name="error_published">Ошибка публикации</string>
+    <string name="cancel_published">Публикация отменена</string>
     <string name="author">Автор</string>
     <string name="read_on_site">Прочитать статью в интернете</string>
     <string name="not_network">Нет подключения</string>

@@ -28,4 +28,6 @@
         <item>Статті</item>
         <item>Обране</item>
     </string-array>
+    <string name="cancel_published">Публікація відмінена</string>
+    <string name="error_published">Помилка публікації</string>
 </resources>

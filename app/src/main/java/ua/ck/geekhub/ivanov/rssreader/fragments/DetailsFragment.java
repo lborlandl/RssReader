@@ -249,28 +249,26 @@ public class DetailsFragment extends Fragment {
                     public void onComplete(Bundle values,
                                            FacebookException error) {
                         if (error == null) {
-                            // When the story is posted, echo the success
-                            // and the post Id.
                             final String postId = values.getString("post_id");
                             if (postId != null) {
                                 Toast.makeText(getActivity(),
-                                        "Posted story, id: " + postId,
+                                        getString(R.string.published),
                                         Toast.LENGTH_SHORT).show();
                             } else {
                                 // User clicked the Cancel button
                                 Toast.makeText(getActivity().getApplicationContext(),
-                                        "Publish cancelled",
+                                        getString(R.string.cancel_published),
                                         Toast.LENGTH_SHORT).show();
                             }
                         } else if (error instanceof FacebookOperationCanceledException) {
                             // User clicked the "x" button
                             Toast.makeText(getActivity().getApplicationContext(),
-                                    "Publish cancelled",
+                                    getString(R.string.cancel_published),
                                     Toast.LENGTH_SHORT).show();
                         } else {
                             // Generic, ex: network error
                             Toast.makeText(getActivity().getApplicationContext(),
-                                    "Error posting story",
+                                    getString(R.string.error_published),
                                     Toast.LENGTH_SHORT).show();
                         }
                     }
