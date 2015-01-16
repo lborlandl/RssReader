@@ -188,24 +188,24 @@ public class ListFragment extends Fragment {
         startDownloadData(getSelectedLink(mSpinnerSelected));
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        mSpinnerSelected = mSharedPreferences.getInt(Constants.EXTRA_SPINNER_POSITION, 0);
-        mActionBar.setSelectedNavigationItem(mSpinnerSelected);
-        if (requestCode == Constants.REQUEST_FEED) {
-            Feed feed = (Feed) data.getSerializableExtra(Constants.EXTRA_FEED);
-            int selected = mFeedList.indexOf(feed);
-            if (selected != -1) {
-                mListView.setSelection(selected);
-            }
-            DetailsFragment detailsFragment = DetailsFragment.newInstance(feed);
-            getFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.table_content_container, detailsFragment)
-                    .commit();
-        }
-    }
+//    @Override
+//    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//        mSpinnerSelected = mSharedPreferences.getInt(Constants.EXTRA_SPINNER_POSITION, 0);
+//        mActionBar.setSelectedNavigationItem(mSpinnerSelected);
+//        if (requestCode == Constants.REQUEST_FEED) {
+//            Feed feed = (Feed) data.getSerializableExtra(Constants.EXTRA_FEED);
+//            int selected = mFeedList.indexOf(feed);
+//            if (selected != -1) {
+//                mListView.setSelection(selected);
+//            }
+//            DetailsFragment detailsFragment = DetailsFragment.newInstance(feed);
+//            getFragmentManager()
+//                    .beginTransaction()
+//                    .replace(R.id.table_content_container, detailsFragment)
+//                    .commit();
+//        }
+//    }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
