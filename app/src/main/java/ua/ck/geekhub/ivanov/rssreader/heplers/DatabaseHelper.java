@@ -12,6 +12,8 @@ import ua.ck.geekhub.ivanov.rssreader.dummy.Feed;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
+    private static DatabaseHelper mInstance = null;
+
     public final static int DATABASE_VERSION = 1;
     public final static String DATABASE_NAME = "feeds.db";
     public final static String TABLE_NAME = "feed";
@@ -24,11 +26,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public final static String COLUMN_AUTHOR_LINK = "authorLink";
     public final static String COLUMN_DATE = "pubDate";
 
-    public DatabaseHelper(Context context, String name, SQLiteDatabase.CursorFactory factory,
+    private DatabaseHelper(Context context, String name, SQLiteDatabase.CursorFactory factory,
                           int version) {
         super(context, name, factory, version);
     }
 
+    public static DatabaseHelper getInstance(Context context) {
+        if (mInstance == null) {
+            mInstance = new DatabaseHelper(context.getApplicationContext(), TABLE_NAME, null, 1);
+        }
+        return mInstance;
+    }
     @Override
     public void onCreate(SQLiteDatabase db) {
         String createFeedTable = "CREATE TABLE " + TABLE_NAME + " (" +

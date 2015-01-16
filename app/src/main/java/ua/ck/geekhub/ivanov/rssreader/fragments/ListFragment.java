@@ -39,7 +39,7 @@ import ua.ck.geekhub.ivanov.rssreader.dummy.Feed;
 import ua.ck.geekhub.ivanov.rssreader.heplers.Constants;
 import ua.ck.geekhub.ivanov.rssreader.heplers.DatabaseHelper;
 import ua.ck.geekhub.ivanov.rssreader.services.UpdateFeedService;
-import ua.ck.geekhub.ivanov.rssreader.task.Utils;
+import ua.ck.geekhub.ivanov.rssreader.heplers.Utils;
 
 public class ListFragment extends Fragment {
 
@@ -239,8 +239,7 @@ public class ListFragment extends Fragment {
                 startActivity(new Intent(getActivity(), LoginActivity.class));
                 return true;
             case R.id.menu_delete_all_favourite:
-                DatabaseHelper db = new DatabaseHelper(getActivity(),
-                        DatabaseHelper.DATABASE_NAME, null, 1);
+                DatabaseHelper db = DatabaseHelper.getInstance(getActivity());
                 db.deleteAll();
                 updateFavourite();
                 return true;
@@ -269,8 +268,7 @@ public class ListFragment extends Fragment {
     }
 
     private void updateFavourite() {
-        DatabaseHelper db = new DatabaseHelper(getActivity(),
-                DatabaseHelper.DATABASE_NAME, null, 1);
+        DatabaseHelper db = DatabaseHelper.getInstance(getActivity());
         mFeedList = db.getAllFeed();
         mFeedAdapter = new FeedAdapter(getActivity(), mFeedList);
         mListView.setAdapter(mFeedAdapter);

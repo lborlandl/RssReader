@@ -77,7 +77,7 @@ public class DetailsFragment extends Fragment {
 //        }
         mUiHelper = new UiLifecycleHelper(mActivity, null);
         mUiHelper.onCreate(savedInstanceState);
-        mDb = new DatabaseHelper(mActivity, DatabaseHelper.DATABASE_NAME, null, 1);
+        mDb = DatabaseHelper.getInstance(mActivity);
         mIsFavourite = mDb.isFeed(mFeed);
     }
 

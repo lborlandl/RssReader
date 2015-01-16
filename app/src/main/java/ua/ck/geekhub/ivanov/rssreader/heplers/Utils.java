@@ -1,4 +1,4 @@
-package ua.ck.geekhub.ivanov.rssreader.task;
+package ua.ck.geekhub.ivanov.rssreader.heplers;
 
 import android.app.Activity;
 import android.content.Context;
