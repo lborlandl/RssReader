@@ -15,7 +15,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static DatabaseHelper mInstance = null;
 
     public final static int DATABASE_VERSION = 1;
-    public final static String DATABASE_NAME = "feeds.db";
     public final static String TABLE_NAME = "feed";
     public final static String COLUMN_ID = "_id";
     public final static String COLUMN_TITLE = "title";
