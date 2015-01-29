@@ -81,6 +81,10 @@ public class FeedAdapter extends BaseAdapter {
         mViewHolder.mTextViewTitle.setText(Html.fromHtml(feed.getTitle()));
         mViewHolder.mTextViewAuthor.setText(", " + feed.getAuthorName());
 
+//        if (position == 0) {
+//            convertView
+//                    .setBackgroundColor(convertView.getResources().getColor(R.color.list_selected));
+//        }
         return convertView;
     }
 

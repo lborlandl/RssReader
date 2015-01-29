@@ -18,7 +18,8 @@ public class ListActivity extends ActionBarActivity {
         setContentView(R.layout.activity_list);
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayShowHomeEnabled(true);
-        actionBar.setBackgroundDrawable(getResources().getDrawable(R.drawable.ab_solid_toolbarstyle_list));
+        actionBar.setBackgroundDrawable(getResources()
+                .getDrawable(R.drawable.ab_solid_toolbarstyle_list));
         actionBar.setIcon(getResources().getDrawable(R.drawable.ic_launcher));
 
         if (mFeedFragment == null) {

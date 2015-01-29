@@ -272,7 +272,6 @@ public class ListFragment extends Fragment {
         mFeedList = db.getAllFeed();
         mFeedAdapter = new FeedAdapter(getActivity(), mFeedList);
         mListView.setAdapter(mFeedAdapter);
-//        mListView.setAdapter(mFeedAdapter);
         mSwipeLayout.setRefreshing(false);
         if (!mFeedList.isEmpty() && mIsTable) {
             Feed feed = mFeedList.get(0);
@@ -348,12 +347,12 @@ public class ListFragment extends Fragment {
         mListView.setAdapter(mFeedAdapter);
         mSwipeLayout.setRefreshing(false);
         if (mIsTable) {
-            mListView.setSelection(0);
             DetailsFragment detailsFragment = DetailsFragment.newInstance(mFeedList.get(0));
             getFragmentManager()
                     .beginTransaction()
                     .replace(R.id.table_content_container, detailsFragment)
                     .commit();
+            mListView.setSelection(0);
         }
         mSwipeLayout.setVisibility(View.VISIBLE);
         mProgressBar.setVisibility(View.GONE);
