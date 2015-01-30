@@ -42,7 +42,7 @@ import ua.ck.geekhub.ivanov.rssreader.task.MyTagHandler;
 public class DetailsFragment extends Fragment {
 
     private Feed mFeed;
-    private boolean mIsTable, mIsFavourite;
+    private boolean mIsTableLand, mIsFavourite;
     private UiLifecycleHelper mUiHelper;
     private Activity mActivity;
     private DatabaseHelper mDb;
@@ -63,18 +63,8 @@ public class DetailsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mActivity = getActivity();
-        mIsTable = (mActivity.findViewById(R.id.table_content_container) != null);
+        mIsTableLand = getResources().getBoolean(R.bool.tablet_land);
         mFeed = (Feed) getArguments().getSerializable(Constants.EXTRA_FEED);
-//        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE
-//                && !mIsTable) {
-//            Intent data = new Intent();
-//            data.putExtra(Constants.EXTRA_FEED, mFeed);
-//            getActivity().setResult(Constants.REQUEST_FEED, data);
-//            Intent i = new Intent(getActivity(), ListActivity.class);
-//            startActivity(i);
-//            getActivity().finish();
-//            getActivity().finishActivity(Constants.REQUEST_FEED);
-//        }
         mUiHelper = new UiLifecycleHelper(mActivity, null);
         mUiHelper.onCreate(savedInstanceState);
         mDb = DatabaseHelper.getInstance(mActivity);
@@ -93,13 +83,12 @@ public class DetailsFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         mImageProgressBar = view.findViewById(R.id.image_progress_bar);
 
-        Drawable mActionBarBackgroundDrawable = getResources().getDrawable(
-                R.drawable.ab_solid_toolbarstyle);
-//        mActionBarBackgroundDrawable.setAlpha(0);
 
-        ActionBar actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
-        actionBar.setBackgroundDrawable(mActionBarBackgroundDrawable);
-        if (!mIsTable) {
+        if (!mIsTableLand) {
+            Drawable mActionBarBackgroundDrawable = getResources().getDrawable(
+                    R.drawable.ab_solid_toolbarstyle);
+            ActionBar actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
+            actionBar.setBackgroundDrawable(mActionBarBackgroundDrawable);
             mActionBarBackgroundDrawable.setAlpha(200);
         }
 //        ((NotifyingScrollView) view.findViewById(R.id.scroll_view)).setOnScrollChangedListener(
@@ -140,7 +129,7 @@ public class DetailsFragment extends Fragment {
             }
         });
 
-        if (!mIsTable) {
+        if (!mIsTableLand) {
             getActivity().setTitle(getResources().getString(R.string.news));
         }
     }

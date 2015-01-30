@@ -1,5 +1,6 @@
 package ua.ck.geekhub.ivanov.rssreader.fragments;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -7,6 +8,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -38,8 +40,8 @@ import ua.ck.geekhub.ivanov.rssreader.adapters.FeedAdapter;
 import ua.ck.geekhub.ivanov.rssreader.dummy.Feed;
 import ua.ck.geekhub.ivanov.rssreader.heplers.Constants;
 import ua.ck.geekhub.ivanov.rssreader.heplers.DatabaseHelper;
-import ua.ck.geekhub.ivanov.rssreader.services.UpdateFeedService;
 import ua.ck.geekhub.ivanov.rssreader.heplers.Utils;
+import ua.ck.geekhub.ivanov.rssreader.services.UpdateFeedService;
 
 public class ListFragment extends Fragment {
 
@@ -49,24 +51,18 @@ public class ListFragment extends Fragment {
     private ActionBar mActionBar;
 
     private ArrayList<Feed> mFeedList = new ArrayList<Feed>();
-
-    private String mDownloadData;
+    private Feed mCurrentFeed;
 
     private SharedPreferences mSharedPreferences;
 
-    private boolean mIsTable, mAllowNotification;
+    private boolean mIsTableLand, mAllowNotification, mIsResult = false;
     private int mSpinnerSelected = 0;
     private FeedAdapter mFeedAdapter;
 
     private Context mContext;
+    private Activity mActivity;
 
-//    public static ListFragment newInstance() {
-//        Bundle args = new Bundle();
-//        ListFragment fragment = new ListFragment();
-//        fragment.setArguments(args);
-//        return fragment;
-//    }
-
+    private int mTask = 0;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -81,26 +77,36 @@ public class ListFragment extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        mActivity = getActivity();
+        mContext = mActivity.getApplicationContext();
+        mIsTableLand = getResources().getBoolean(R.bool.tablet_land);
+    }
+
+    @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
         if (savedInstanceState != null) {
             mSpinnerSelected = savedInstanceState.getInt(Constants.EXTRA_SPINNER);
         }
+        mActivity = getActivity();
         mSharedPreferences = PreferenceManager
-                .getDefaultSharedPreferences(getActivity());
+                .getDefaultSharedPreferences(mActivity);
 
-        mAllowNotification = mSharedPreferences.getBoolean(Constants.EXTRA_ALLOW_NOTIFICATION, false);
+        mAllowNotification = mSharedPreferences
+                .getBoolean(Constants.EXTRA_ALLOW_NOTIFICATION, false);
         if (mAllowNotification) {
-            Intent updateServiceIntent = new Intent(getActivity(), UpdateFeedService.class);
-            getActivity().startService(updateServiceIntent);
+            Intent updateServiceIntent = new Intent(mActivity, UpdateFeedService.class);
+            mActivity.startService(updateServiceIntent);
         }
 
-        mContext = getActivity().getApplicationContext();
+        mContext = mActivity.getApplicationContext();
 
-        mActionBar = ((ActionBarActivity) getActivity()).getSupportActionBar();
+        mActionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
         mActionBar.setDisplayShowTitleEnabled(false);
         mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+        mProgressBar = view.findViewById(R.id.loading_indicator);
 
         final String[] dropdownValues = getResources().getStringArray(R.array.spinner_list);
 
@@ -116,11 +122,14 @@ public class ListFragment extends Fragment {
                 SharedPreferences.Editor editor = mSharedPreferences.edit();
                 editor.putInt(Constants.EXTRA_SPINNER_POSITION, position);
                 editor.apply();
+                //TODO
                 switch (position) {
                     case 2:
                         mSwipeLayout.setVisibility(View.VISIBLE);
                         mProgressBar.setVisibility(View.GONE);
-                        updateFavourite();
+                        DatabaseHelper db = DatabaseHelper.getInstance(getActivity());
+                        mFeedList = db.getAllFeed();
+                        updateList();
                         break;
                     default:
                         mSwipeLayout.setVisibility(View.GONE);
@@ -132,8 +141,6 @@ public class ListFragment extends Fragment {
         });
         //TODO not working:
         mActionBar.setSelectedNavigationItem(mSpinnerSelected);
-        mProgressBar = view.findViewById(R.id.loading_indicator);
-
 
         mSwipeLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_container);
         mSwipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -141,7 +148,9 @@ public class ListFragment extends Fragment {
             public void onRefresh() {
                 switch (mSpinnerSelected) {
                     case 2:
-                        updateFavourite();
+                        DatabaseHelper db = DatabaseHelper.getInstance(getActivity());
+                        mFeedList = db.getAllFeed();
+                        updateList();
                         break;
                     default:
                         startDownloadData(getSelectedLink(mSpinnerSelected));
@@ -154,26 +163,15 @@ public class ListFragment extends Fragment {
                 android.R.color.holo_blue_bright,
                 android.R.color.holo_red_light);
 
-        mIsTable = (view.findViewById(R.id.table_content_container) != null);
-
         mListView = (ListView) view.findViewById(R.id.list_feeds);
-//        if (mSpinnerSelected == 2) {
-//            mListView.setEmptyView(view.findViewById(R.id.view_empty_favourite));
-//        } else {
-//            mListView.setEmptyView(view.findViewById(R.id.view_empty_list));
-//        }
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (mIsTable) {
-                    Feed feed = mFeedList.get(position);
-                    DetailsFragment detailsFragment = DetailsFragment.newInstance(feed);
-                    getFragmentManager()
-                            .beginTransaction()
-                            .replace(R.id.table_content_container, detailsFragment)
-                            .commit();
+                if (mIsTableLand) {
+                    mCurrentFeed = mFeedList.get(position);
+                    setCurrentFeed();
                 } else {
-                    Intent intent = new Intent(getActivity(), DetailsActivity.class);
+                    Intent intent = new Intent(mActivity, DetailsActivity.class);
                     intent.putExtra(Constants.EXTRA_FEEDS, mFeedList);
                     intent.putExtra(Constants.EXTRA_POSITION, position);
                     intent.putExtra(Constants.EXTRA_STATE, mSpinnerSelected);
@@ -181,31 +179,29 @@ public class ListFragment extends Fragment {
                 }
             }
         });
-        mFeedAdapter = new FeedAdapter(getActivity(), mFeedList);
+        mFeedAdapter = new FeedAdapter(mActivity, mFeedList);
         mListView.setAdapter(mFeedAdapter);
         mSwipeLayout.setVisibility(View.GONE);
         mProgressBar.setVisibility(View.VISIBLE);
         startDownloadData(getSelectedLink(mSpinnerSelected));
     }
 
-//    @Override
-//    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-//        mSpinnerSelected = mSharedPreferences.getInt(Constants.EXTRA_SPINNER_POSITION, 0);
-//        mActionBar.setSelectedNavigationItem(mSpinnerSelected);
-//        if (requestCode == Constants.REQUEST_FEED) {
-//            Feed feed = (Feed) data.getSerializableExtra(Constants.EXTRA_FEED);
-//            int selected = mFeedList.indexOf(feed);
-//            if (selected != -1) {
-//                mListView.setSelection(selected);
-//            }
-//            DetailsFragment detailsFragment = DetailsFragment.newInstance(feed);
-//            getFragmentManager()
-//                    .beginTransaction()
-//                    .replace(R.id.table_content_container, detailsFragment)
-//                    .commit();
-//        }
-//    }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        mSpinnerSelected = mSharedPreferences.getInt(Constants.EXTRA_SPINNER_POSITION, 0);
+        mActionBar.setSelectedNavigationItem(mSpinnerSelected);
+        if (requestCode == Constants.REQUEST_FEED && data != null) {
+            mIsResult = true;
+            mCurrentFeed = (Feed) data.getSerializableExtra(Constants.EXTRA_FEED);
+            int selected = mFeedList.indexOf(mCurrentFeed);
+            if (selected != -1) {
+                mListView.setSelection(selected);
+            }
+        } else {
+            mIsResult = false;
+        }
+    }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -241,7 +237,8 @@ public class ListFragment extends Fragment {
             case R.id.menu_delete_all_favourite:
                 DatabaseHelper db = DatabaseHelper.getInstance(getActivity());
                 db.deleteAll();
-                updateFavourite();
+                mFeedList = new ArrayList<>();
+                updateList();
                 return true;
             case R.id.menu_change_notification:
                 Intent updateServiceIntent = new Intent(getActivity(), UpdateFeedService.class);
@@ -267,22 +264,6 @@ public class ListFragment extends Fragment {
         outState.putInt(Constants.EXTRA_SPINNER, mSpinnerSelected);
     }
 
-    private void updateFavourite() {
-        DatabaseHelper db = DatabaseHelper.getInstance(getActivity());
-        mFeedList = db.getAllFeed();
-        mFeedAdapter = new FeedAdapter(getActivity(), mFeedList);
-        mListView.setAdapter(mFeedAdapter);
-        mSwipeLayout.setRefreshing(false);
-        if (!mFeedList.isEmpty() && mIsTable) {
-            Feed feed = mFeedList.get(0);
-            DetailsFragment detailsFragment = DetailsFragment.newInstance(feed);
-            getFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.table_content_container, detailsFragment)
-                    .commit();
-        }
-    }
-
     private String getSelectedLink(int pos) {
         switch (pos) {
             case 0:
@@ -295,24 +276,23 @@ public class ListFragment extends Fragment {
     }
 
     private void startDownloadData(String url) {
-        if (Utils.isOnline(getActivity())) {
+        if (Utils.isOnline(mActivity)) {
             mSwipeLayout.setRefreshing(true);
             new DownloadStringTask().execute(url);
         } else {
-            Toast.makeText(getActivity(), R.string.not_network, Toast.LENGTH_SHORT).show();
+            Toast.makeText(mActivity, R.string.not_network, Toast.LENGTH_SHORT).show();
             mSwipeLayout.setRefreshing(false);
         }
     }
 
-    private void updateList() {
+    private ArrayList<Feed> parseJSON(String data) {
         try {
-
-            JSONObject rssJSONObject = XML.toJSONObject(mDownloadData);
+            JSONObject rssJSONObject = XML.toJSONObject(data);
             JSONObject rss = rssJSONObject.getJSONObject("rss");
             JSONObject channel = rss.getJSONObject("channel");
             JSONArray items = channel.getJSONArray("item");
 
-            ArrayList<Feed> newList = new ArrayList<Feed>();
+            ArrayList<Feed> list = new ArrayList<Feed>();
             for (int i = 0; i < items.length(); i++) {
                 JSONObject item = items.getJSONObject(i);
                 JSONObject author = item.getJSONObject("atom:author");
@@ -334,34 +314,51 @@ public class ListFragment extends Fragment {
                         .setAuthorLink(author.optString("uri"))
                         .setPubDate(item.optString("pubDate"));
 
-                newList.add(rssItem);
+                list.add(rssItem);
             }
-            mFeedList = newList;
+            return list;
         } catch (JSONException e) {
-            if (getActivity() != null) {
-                Toast.makeText(getActivity(), R.string.error_download, Toast.LENGTH_LONG).show();
-            }
+//            Toast.makeText(mActivity, R.string.error_download, Toast.LENGTH_LONG).show();
             e.printStackTrace();
+            return new ArrayList<>();
         }
+    }
+
+    private void updateList() {
         mFeedAdapter = new FeedAdapter(mContext, mFeedList);
         mListView.setAdapter(mFeedAdapter);
         mSwipeLayout.setRefreshing(false);
-        if (mIsTable) {
-            DetailsFragment detailsFragment = DetailsFragment.newInstance(mFeedList.get(0));
-            getFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.table_content_container, detailsFragment)
-                    .commit();
-            mListView.setSelection(0);
-        }
+        if (mIsTableLand) {
+            if (mIsResult) {
+                if (mTask++ == 1) {
+                    mIsResult = false;
+                    mTask = 0;
+                }
+            } else {
+                mCurrentFeed = mFeedList.get(0);
+            }
+            setCurrentFeed();
+        } 
         mSwipeLayout.setVisibility(View.VISIBLE);
         mProgressBar.setVisibility(View.GONE);
     }
 
-    class DownloadStringTask extends AsyncTask<String, Void, Void> {
+    private void setCurrentFeed() {
+        Toast.makeText(mContext, "setCurrentFeed()", Toast.LENGTH_SHORT).show();
+        FragmentManager fragmentManager = getFragmentManager();
+        if (fragmentManager != null) {
+            DetailsFragment detailsFragment = DetailsFragment.newInstance(mCurrentFeed);
+            fragmentManager
+                    .beginTransaction()
+                    .replace(R.id.table_content_container, detailsFragment)
+                    .commit();
+        }
 
+    }
+
+    class DownloadStringTask extends AsyncTask<String, String, String> {
         @Override
-        protected Void doInBackground(String... params) {
+        protected String doInBackground(String... params) {
             StringBuilder stringBuilder = new StringBuilder();
 
             try {
@@ -375,14 +372,14 @@ public class ListFragment extends Fragment {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            mDownloadData = stringBuilder.toString();
 
-            return null;
+            return stringBuilder.toString();
         }
 
         @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            mFeedList = parseJSON(s);
             updateList();
         }
     }

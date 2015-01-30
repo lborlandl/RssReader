@@ -1,7 +1,6 @@
 package ua.ck.geekhub.ivanov.rssreader.activities;
 
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 
@@ -24,8 +23,10 @@ public class ListActivity extends ActionBarActivity {
 
         if (mFeedFragment == null) {
             mFeedFragment = new ListFragment();
-            FragmentManager fm = getSupportFragmentManager();
-            fm.beginTransaction().replace(R.id.list_main_container, mFeedFragment).commit();
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.list_main_container, mFeedFragment)
+                    .commit();
         }
     }
 }
