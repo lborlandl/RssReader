@@ -30,4 +30,8 @@
     </string-array>
     <string name="cancel_published">Публікація відмінена</string>
     <string name="error_published">Помилка публікації</string>
+    <string name="title_dialog">Підтвердження</string>
+    <string name="button_yes">Очистити</string>
+    <string name="button_no">Відміна</string>
+    <string name="message_dialog">Ви дійсно бажаєте очистити обране? Цю операцію неможливо відмінити!</string>
 </resources>

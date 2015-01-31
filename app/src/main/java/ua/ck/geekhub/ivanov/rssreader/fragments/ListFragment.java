@@ -1,7 +1,9 @@
 package ua.ck.geekhub.ivanov.rssreader.fragments;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -235,10 +237,24 @@ public class ListFragment extends Fragment {
                 startActivity(new Intent(getActivity(), LoginActivity.class));
                 return true;
             case R.id.menu_delete_all_favourite:
-                DatabaseHelper db = DatabaseHelper.getInstance(getActivity());
-                db.deleteAll();
-                mFeedList = new ArrayList<>();
-                updateList();
+                AlertDialog.Builder alertDialog = new AlertDialog.Builder(mActivity);
+                alertDialog.setTitle(getString(R.string.title_dialog));
+                alertDialog.setMessage(getString(R.string.message_dialog));
+                alertDialog.setPositiveButton(getString(R.string.button_yes), new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int arg1) {
+                        DatabaseHelper db = DatabaseHelper.getInstance(getActivity());
+                        db.deleteAll();
+                        mFeedList = new ArrayList<>();
+                        updateList();
+                    }
+                });
+                alertDialog.setNegativeButton(getString(R.string.button_no), new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int arg1) {
+
+                    }
+                });
+                alertDialog.setCancelable(true);
+                alertDialog.show();
                 return true;
             case R.id.menu_change_notification:
                 Intent updateServiceIntent = new Intent(getActivity(), UpdateFeedService.class);
@@ -335,16 +351,17 @@ public class ListFragment extends Fragment {
                     mTask = 0;
                 }
             } else {
-                mCurrentFeed = mFeedList.get(0);
+                if (!mFeedList.isEmpty()){
+                    mCurrentFeed = mFeedList.get(0);
+                }
             }
             setCurrentFeed();
-        } 
+        }
         mSwipeLayout.setVisibility(View.VISIBLE);
         mProgressBar.setVisibility(View.GONE);
     }
 
     private void setCurrentFeed() {
-        Toast.makeText(mContext, "setCurrentFeed()", Toast.LENGTH_SHORT).show();
         FragmentManager fragmentManager = getFragmentManager();
         if (fragmentManager != null) {
             DetailsFragment detailsFragment = DetailsFragment.newInstance(mCurrentFeed);
