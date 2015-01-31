@@ -20,6 +20,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,9 +35,11 @@ import com.facebook.widget.WebDialog;
 import java.io.InputStream;
 
 import ua.ck.geekhub.ivanov.rssreader.R;
+import ua.ck.geekhub.ivanov.rssreader.activities.DetailsActivity;
 import ua.ck.geekhub.ivanov.rssreader.dummy.Feed;
 import ua.ck.geekhub.ivanov.rssreader.heplers.Constants;
 import ua.ck.geekhub.ivanov.rssreader.heplers.DatabaseHelper;
+import ua.ck.geekhub.ivanov.rssreader.heplers.NotifyingScrollView;
 import ua.ck.geekhub.ivanov.rssreader.task.MyTagHandler;
 
 public class DetailsFragment extends Fragment {
@@ -48,12 +51,24 @@ public class DetailsFragment extends Fragment {
     private DatabaseHelper mDb;
     private View mImageProgressBar;
     private ImageView mImageViewFeed;
+    private Drawable mActionBarBackgroundDrawable;
+    private int mPosition;
+    private static final String EXTRA_POSITION = "EXTRA_POSITION";
 
     private SessionStatusCallback statusCallback = new SessionStatusCallback();
 
     public static DetailsFragment newInstance(Feed feed) {
         Bundle args = new Bundle();
         args.putSerializable(Constants.EXTRA_FEED, feed);
+        DetailsFragment fragment = new DetailsFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    public static DetailsFragment newInstance(Feed feed, int position) {
+        Bundle args = new Bundle();
+        args.putSerializable(Constants.EXTRA_FEED, feed);
+        args.putSerializable(EXTRA_POSITION, position);
         DetailsFragment fragment = new DetailsFragment();
         fragment.setArguments(args);
         return fragment;
@@ -83,26 +98,30 @@ public class DetailsFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         mImageProgressBar = view.findViewById(R.id.image_progress_bar);
 
-
         if (!mIsTableLand) {
-            Drawable mActionBarBackgroundDrawable = getResources().getDrawable(
-                    R.drawable.ab_solid_toolbarstyle);
-            ActionBar actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
-            actionBar.setBackgroundDrawable(mActionBarBackgroundDrawable);
-            mActionBarBackgroundDrawable.setAlpha(200);
-        }
-//        ((NotifyingScrollView) view.findViewById(R.id.scroll_view)).setOnScrollChangedListener(
-//                new NotifyingScrollView.OnScrollChangedListener() {
-//                    @Override
-//                    public void onScrollChanged(ScrollView who, int l, int t, int oldl, int oldt) {
-//                        final int headerHeight = 500 - mActionBar.getHeight();
-//                        final float ratio = (float)
-//                                Math.min(Math.max(t, 0), headerHeight) / headerHeight;
-//                        final int newAlpha = (int) (ratio * 255);
-//                        mActionBarBackgroundDrawable.setAlpha(newAlpha);
-//                    }
-//                });
+            mPosition = getArguments().getInt(EXTRA_POSITION, 0);
 
+            final ActionBar actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
+            final int actionBarHeight = actionBar.getHeight();
+            mActionBarBackgroundDrawable =
+                    getResources().getDrawable(R.drawable.ab_solid_toolbarstyle);
+            actionBar.setBackgroundDrawable(mActionBarBackgroundDrawable);
+            ((NotifyingScrollView) view.findViewById(R.id.scroll_view)).setOnScrollChangedListener(
+                    new NotifyingScrollView.OnScrollChangedListener() {
+                        @Override
+                        public void onScrollChanged(ScrollView who, int l, int t, int oldl, int oldt) {
+                            final int headerHeight = 500 - actionBarHeight;
+                            final float ratio = (float)
+                                    Math.min(Math.max(t, 0), headerHeight) / headerHeight;
+                            final int newAlpha = (int) (ratio * 220);
+                            ((DetailsActivity) mActivity).setAlpha(newAlpha, mPosition);
+                            mActionBarBackgroundDrawable.setAlpha(newAlpha);
+                            actionBar.setBackgroundDrawable(mActionBarBackgroundDrawable);
+                        }
+                    });
+        } else {
+            view.findViewById(R.id.gradient).setVisibility(View.GONE);
+        }
         mImageViewFeed = (ImageView) view.findViewById(R.id.image_view_feed);
         mImageViewFeed.setVisibility(View.GONE);
         mImageProgressBar.setVisibility(View.VISIBLE);

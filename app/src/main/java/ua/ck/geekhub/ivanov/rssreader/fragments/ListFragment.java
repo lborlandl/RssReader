@@ -177,6 +177,7 @@ public class ListFragment extends Fragment {
                     intent.putExtra(Constants.EXTRA_FEEDS, mFeedList);
                     intent.putExtra(Constants.EXTRA_POSITION, position);
                     intent.putExtra(Constants.EXTRA_STATE, mSpinnerSelected);
+                    intent.putExtra(Constants.EXTRA_FEEDS_COUNT, mFeedList.size());
                     startActivityForResult(intent, Constants.REQUEST_FEED);
                 }
             }

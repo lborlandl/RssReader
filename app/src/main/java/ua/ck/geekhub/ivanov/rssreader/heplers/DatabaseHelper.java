@@ -132,8 +132,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public boolean isFeed(Feed feed) {
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM " + TABLE_NAME + " WHERE " + COLUMN_LINK +
-                " = \"" + feed.getLink() + "\"", null);
+        Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM " + TABLE_NAME + " WHERE " +
+                COLUMN_LINK + " = \"" + feed.getLink() + "\"", null);
         cursor.moveToFirst();
         return !(cursor.getInt(0) == 0);
     }

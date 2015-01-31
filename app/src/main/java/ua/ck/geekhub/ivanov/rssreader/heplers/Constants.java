@@ -6,6 +6,7 @@ public class Constants {
     public static final String URL_TEXT = "http://trashbox.ru/feed_topics/b_text/";
     public static final String FEED_SAVED = "feed_saved";
     public static final String EXTRA_STATE = "state";
+    public static final String EXTRA_FEEDS_COUNT = "EXTRA_FEEDS_COUNT";
     public static final String EXTRA_SPINNER = "spinner";
     public static final String EXTRA_ALLOW_NOTIFICATION = "allow_notification";
     public static final String EXTRA_FEED = "ua.ck.geekhub.ivanov.rssreader.feed";

@@ -2,6 +2,7 @@ package ua.ck.geekhub.ivanov.rssreader.activities;
 
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -23,10 +24,25 @@ public class DetailsActivity extends ActionBarActivity {
     private int mCurrentFeed;
 
     private static final String FEED_SELECTED = "feed_selected";
+    private Drawable mActionBarBackgroundDrawable;
+    private ActionBar mActionBar;
+    private int[] mAlpha;
+
+
+    public void setAlpha(int alpha) {
+        mActionBarBackgroundDrawable.setAlpha(alpha);
+        mActionBar.setBackgroundDrawable(mActionBarBackgroundDrawable);
+    }
+
+    public void setAlpha(int alpha, int position) {
+        mAlpha[position] = alpha;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        mAlpha = new int[getIntent().getIntExtra(Constants.EXTRA_FEEDS_COUNT, 10)];
 
 
         int intExtra = getIntent().getIntExtra(Constants.EXTRA_POSITION, 0);
@@ -37,23 +53,31 @@ public class DetailsActivity extends ActionBarActivity {
         }
         mFeeds = (ArrayList<Feed>) getIntent().getSerializableExtra(Constants.EXTRA_FEEDS);
         if (mFeeds == null) {
-            mFeeds = new ArrayList<Feed>();
+            mFeeds = new ArrayList<>();
         }
 
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
+        boolean isTableLand = getResources().getBoolean(R.bool.tablet_land);
+        mActionBarBackgroundDrawable =
+                getResources().getDrawable(R.drawable.ab_solid_toolbarstyle);
 
-        ViewPager viewPager = new ViewPager(this);
+        mActionBar = getSupportActionBar();
+        mActionBar.setDisplayHomeAsUpEnabled(true);
+        if (!isTableLand) {
+            mActionBar.setBackgroundDrawable(mActionBarBackgroundDrawable);
+            setAlpha(0);
+        }
+
+
+        final ViewPager viewPager = new ViewPager(this);
         viewPager.setId(R.id.viewPager);
-//        setContentView(R.layout.activity_details);
         setContentView(viewPager);
 
 
-        FragmentManager fm = getSupportFragmentManager();
+        final FragmentManager fm = getSupportFragmentManager();
         viewPager.setAdapter(new FragmentStatePagerAdapter(fm) {
             @Override
             public Fragment getItem(int i) {
-                return DetailsFragment.newInstance(mFeeds.get(i));
+                return DetailsFragment.newInstance(mFeeds.get(i), i);
             }
 
             @Override
@@ -66,11 +90,21 @@ public class DetailsActivity extends ActionBarActivity {
             @Override
             public void onPageScrolled(int position, float positionOffset,
                                        int positionOffsetPixels) {
+                int left = mAlpha[position];
+                int right = 0;
+                if (mAlpha.length - 1 != position) {
+                    right = mAlpha[position + 1];
+                }
 
+                if (positionOffset != 0.0f) {
+                    int alpha = (int) (right * positionOffset + left * (1 - positionOffset));
+                    setAlpha(alpha);
+                }
             }
 
             @Override
             public void onPageSelected(int position) {
+                setAlpha(mAlpha[position]);
                 mCurrentFeed = position;
             }
 
@@ -89,6 +123,7 @@ public class DetailsActivity extends ActionBarActivity {
             setResult(Constants.REQUEST_FEED, data);
             finish();
         }
+
     }
 
     @Override

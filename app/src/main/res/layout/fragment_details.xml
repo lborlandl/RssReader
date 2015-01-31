@@ -25,10 +25,11 @@
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop" />
 
-            <!--<View-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:background="@drawable/gradient" />-->
+            <View
+                android:id="@+id/gradient"
+                android:layout_width="match_parent"
+                android:layout_height="125dp"
+                android:background="@drawable/gradient" />
 
         </FrameLayout>
 
