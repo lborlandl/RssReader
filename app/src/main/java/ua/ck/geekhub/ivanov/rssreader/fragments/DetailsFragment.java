@@ -105,15 +105,16 @@ public class DetailsFragment extends Fragment {
             final int actionBarHeight = actionBar.getHeight();
             mActionBarBackgroundDrawable =
                     getResources().getDrawable(R.drawable.ab_solid_toolbarstyle);
+            final int imageHeight = 500;
             actionBar.setBackgroundDrawable(mActionBarBackgroundDrawable);
             ((NotifyingScrollView) view.findViewById(R.id.scroll_view)).setOnScrollChangedListener(
                     new NotifyingScrollView.OnScrollChangedListener() {
                         @Override
                         public void onScrollChanged(ScrollView who, int l, int t, int oldl, int oldt) {
-                            final int headerHeight = 500 - actionBarHeight;
+                            final int headerHeight = imageHeight - actionBarHeight;
                             final float ratio = (float)
                                     Math.min(Math.max(t, 0), headerHeight) / headerHeight;
-                            final int newAlpha = (int) (ratio * 220);
+                            final int newAlpha = (int) (ratio * 240);
                             ((DetailsActivity) mActivity).setAlpha(newAlpha, mPosition);
                             mActionBarBackgroundDrawable.setAlpha(newAlpha);
                             actionBar.setBackgroundDrawable(mActionBarBackgroundDrawable);
@@ -190,10 +191,10 @@ public class DetailsFragment extends Fragment {
     public void onPrepareOptionsMenu(Menu menu) {
         MenuItem itemFavourite = menu.findItem(R.id.menu_action_favourite);
         if (mIsFavourite) {
-            itemFavourite.setIcon(android.R.drawable.btn_star_big_on);
+            itemFavourite.setIcon(R.drawable.ic_star);
             itemFavourite.setTitle(R.string.remove_from_favourite);
         } else {
-            itemFavourite.setIcon(android.R.drawable.btn_star_big_off);
+            itemFavourite.setIcon(R.drawable.ic_star_outline);
             itemFavourite.setTitle(R.string.add_to_favourite);
         }
     }
@@ -203,11 +204,11 @@ public class DetailsFragment extends Fragment {
         switch (item.getItemId()) {
             case R.id.menu_action_favourite:
                 if (mIsFavourite) {
-                    item.setIcon(android.R.drawable.btn_star_big_off);
+                    item.setIcon(R.drawable.ic_star_outline);
                     item.setTitle(R.string.add_to_favourite);
                     mDb.deleteFeed(mFeed);
                 } else {
-                    item.setIcon(android.R.drawable.btn_star_big_on);
+                    item.setIcon(R.drawable.ic_star);
                     item.setTitle(R.string.remove_from_favourite);
                     mDb.addFeed(mFeed);
                 }
