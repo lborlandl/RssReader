@@ -4,10 +4,12 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.ScrollView;
 
+import com.nirhart.parallaxscroll.views.ParallaxScrollView;
+
 /**
  * @author Cyril Mottier
  */
-public class NotifyingScrollView extends ScrollView {
+public class NotifyingScrollView extends ParallaxScrollView {
 
     public interface OnScrollChangedListener {
         void onScrollChanged(ScrollView who, int l, int t, int oldl, int oldt);
