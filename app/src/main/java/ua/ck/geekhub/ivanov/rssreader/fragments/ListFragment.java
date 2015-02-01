@@ -14,6 +14,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -126,7 +127,7 @@ public class ListFragment extends Fragment {
                 editor.apply();
                 //TODO
                 switch (position) {
-                    case 2:
+                    case 1:
                         mSwipeLayout.setVisibility(View.VISIBLE);
                         mProgressBar.setVisibility(View.GONE);
                         DatabaseHelper db = DatabaseHelper.getInstance(getActivity());
@@ -136,7 +137,7 @@ public class ListFragment extends Fragment {
                     default:
                         mSwipeLayout.setVisibility(View.GONE);
                         mProgressBar.setVisibility(View.VISIBLE);
-                        startDownloadData(getSelectedLink(mSpinnerSelected));
+                        startDownloadData(Constants.URL_NEWS);
                 }
                 return true;
             }
@@ -149,13 +150,13 @@ public class ListFragment extends Fragment {
             @Override
             public void onRefresh() {
                 switch (mSpinnerSelected) {
-                    case 2:
+                    case 1:
                         DatabaseHelper db = DatabaseHelper.getInstance(getActivity());
                         mFeedList = db.getAllFeed();
                         updateList();
                         break;
                     default:
-                        startDownloadData(getSelectedLink(mSpinnerSelected));
+                        startDownloadData(Constants.URL_NEWS);
                 }
             }
         });
@@ -186,7 +187,7 @@ public class ListFragment extends Fragment {
         mListView.setAdapter(mFeedAdapter);
         mSwipeLayout.setVisibility(View.GONE);
         mProgressBar.setVisibility(View.VISIBLE);
-        startDownloadData(getSelectedLink(mSpinnerSelected));
+        startDownloadData(Constants.URL_NEWS);
     }
 
     @Override
@@ -281,16 +282,6 @@ public class ListFragment extends Fragment {
         outState.putInt(Constants.EXTRA_SPINNER, mSpinnerSelected);
     }
 
-    private String getSelectedLink(int pos) {
-        switch (pos) {
-            case 0:
-                return Constants.URL_NEWS;
-            case 1:
-                return Constants.URL_TEXT;
-            default:
-                return null;
-        }
-    }
 
     private void startDownloadData(String url) {
         if (Utils.isOnline(mActivity)) {
@@ -313,12 +304,14 @@ public class ListFragment extends Fragment {
             for (int i = 0; i < items.length(); i++) {
                 JSONObject item = items.getJSONObject(i);
                 JSONObject author = item.getJSONObject("atom:author");
-                Object enclosureObject = item.get("enclosure");
-                JSONObject enclosure;
-                if (enclosureObject instanceof JSONArray) {
-                    enclosure = ((JSONArray) enclosureObject).getJSONObject(0);
-                } else {
-                    enclosure = (JSONObject) enclosureObject;
+                Object enclosureObject = item.opt("enclosure");
+                JSONObject enclosure = null;
+                if (enclosureObject != null) {
+                    if (enclosureObject instanceof JSONArray) {
+                        enclosure = ((JSONArray) enclosureObject).getJSONObject(0);
+                    } else {
+                        enclosure = (JSONObject) enclosureObject;
+                    }
                 }
 
                 Feed rssItem = new Feed();
@@ -326,16 +319,20 @@ public class ListFragment extends Fragment {
                         .setTitle(item.optString("title"))
                         .setLink(item.optString("link"))
                         .setDescription(item.optString("description"))
-                        .setImage(enclosure.optString("url"))
                         .setAuthorName(author.optString("name"))
                         .setAuthorLink(author.optString("uri"))
                         .setPubDate(item.optString("pubDate"));
+
+                if (enclosureObject != null) {
+                    rssItem.setImage(enclosure.optString("url"));
+                }
 
                 list.add(rssItem);
             }
             return list;
         } catch (JSONException e) {
 //            Toast.makeText(mActivity, R.string.error_download, Toast.LENGTH_LONG).show();
+            Log.d("lalka", "ArrayList<>");
             e.printStackTrace();
             return new ArrayList<>();
         }
@@ -360,6 +357,7 @@ public class ListFragment extends Fragment {
         }
         mSwipeLayout.setVisibility(View.VISIBLE);
         mProgressBar.setVisibility(View.GONE);
+        Log.d("lalka", "updateList()");
     }
 
     private void setCurrentFeed() {
@@ -371,7 +369,6 @@ public class ListFragment extends Fragment {
                     .replace(R.id.table_content_container, detailsFragment)
                     .commit();
         }
-
     }
 
     class DownloadStringTask extends AsyncTask<String, String, String> {

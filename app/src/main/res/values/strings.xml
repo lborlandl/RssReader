@@ -37,7 +37,6 @@
 
     <string-array name="spinner_list">
         <item>Новости</item>
-        <item>Статьи</item>
         <item>Избранное</item>
     </string-array>
 

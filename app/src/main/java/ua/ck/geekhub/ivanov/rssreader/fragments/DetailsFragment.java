@@ -3,16 +3,13 @@ package ua.ck.geekhub.ivanov.rssreader.fragments;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.text.Html;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -31,8 +28,16 @@ import com.facebook.SessionState;
 import com.facebook.UiLifecycleHelper;
 import com.facebook.widget.FacebookDialog;
 import com.facebook.widget.WebDialog;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.assist.FailReason;
+import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
+import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 
-import java.io.InputStream;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 import ua.ck.geekhub.ivanov.rssreader.R;
 import ua.ck.geekhub.ivanov.rssreader.activities.DetailsActivity;
@@ -49,8 +54,6 @@ public class DetailsFragment extends Fragment {
     private UiLifecycleHelper mUiHelper;
     private Activity mActivity;
     private DatabaseHelper mDb;
-    private View mImageProgressBar;
-    private ImageView mImageViewFeed;
     private Drawable mActionBarBackgroundDrawable;
     private int mPosition;
     private static final String EXTRA_POSITION = "EXTRA_POSITION";
@@ -96,7 +99,6 @@ public class DetailsFragment extends Fragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mImageProgressBar = view.findViewById(R.id.image_progress_bar);
 
         if (!mIsTableLand) {
             mPosition = getArguments().getInt(EXTRA_POSITION, 0);
@@ -123,10 +125,20 @@ public class DetailsFragment extends Fragment {
         } else {
             view.findViewById(R.id.gradient).setVisibility(View.GONE);
         }
-        mImageViewFeed = (ImageView) view.findViewById(R.id.image_view_feed);
-        mImageViewFeed.setVisibility(View.GONE);
-        mImageProgressBar.setVisibility(View.VISIBLE);
-        new DownloadImageTask(mImageViewFeed).execute(mFeed.getImage());
+        DisplayImageOptions options = new DisplayImageOptions.Builder()
+                .showImageOnFail(R.drawable.no_image)
+                .showImageForEmptyUri(R.drawable.no_image)
+                .cacheOnDisk(true)
+                .cacheInMemory(true)
+                .considerExifParams(true)
+                .build();
+
+        ImageView mImageViewFeed = (ImageView) view.findViewById(R.id.image_view_feed);
+        
+        ImageLoader imageLoader = ImageLoader.getInstance();
+        imageLoader.init(ImageLoaderConfiguration.createDefault(mActivity.getBaseContext()));
+        imageLoader.displayImage(mFeed.getImage(), mImageViewFeed, options,
+                new AnimateFirstDisplayListener(view.findViewById(R.id.image_progress_bar)));
 
         TextView textViewTitle = (TextView) view.findViewById(R.id.text_view_title);
         textViewTitle.setText(Html.fromHtml(mFeed.getTitle()));
@@ -151,33 +163,6 @@ public class DetailsFragment extends Fragment {
 
         if (!mIsTableLand) {
             getActivity().setTitle(getResources().getString(R.string.news));
-        }
-    }
-
-    private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
-        ImageView bmImage;
-
-        public DownloadImageTask(ImageView bmImage) {
-            this.bmImage = bmImage;
-        }
-
-        protected Bitmap doInBackground(String... urls) {
-            String urldisplay = urls[0];
-            Bitmap mIcon11 = null;
-            try {
-                InputStream in = new java.net.URL(urldisplay).openStream();
-                mIcon11 = BitmapFactory.decodeStream(in);
-            } catch (Exception e) {
-                Log.e("Error", e.getMessage());
-                e.printStackTrace();
-            }
-            return mIcon11;
-        }
-
-        protected void onPostExecute(Bitmap result) {
-            mImageProgressBar.setVisibility(View.GONE);
-            mImageViewFeed.setVisibility(View.VISIBLE);
-            bmImage.setImageBitmap(result);
         }
     }
 
@@ -347,5 +332,44 @@ public class DetailsFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
         mUiHelper.onDestroy();
+    }
+
+    private static class AnimateFirstDisplayListener extends SimpleImageLoadingListener {
+
+        static final List<String> displayedImages =
+                Collections.synchronizedList(new LinkedList<String>());
+        View mImageProgressBar;
+
+        AnimateFirstDisplayListener(View v) {
+            mImageProgressBar = v;
+        }
+
+        @Override
+        public void onLoadingStarted(String s, View view) {
+            mImageProgressBar.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        public void onLoadingFailed(String s, View view, FailReason failReason) {
+            mImageProgressBar.setVisibility(View.GONE);
+        }
+
+        @Override
+        public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
+            mImageProgressBar.setVisibility(View.GONE);
+            if (loadedImage != null) {
+                ImageView imageView = (ImageView) view;
+                boolean firstDisplay = !displayedImages.contains(imageUri);
+                if (firstDisplay) {
+                    FadeInBitmapDisplayer.animate(imageView, 500);
+                    displayedImages.add(imageUri);
+                }
+            }
+        }
+
+        @Override
+        public void onLoadingCancelled(String s, View view) {
+            mImageProgressBar.setVisibility(View.GONE);
+        }
     }
 }
