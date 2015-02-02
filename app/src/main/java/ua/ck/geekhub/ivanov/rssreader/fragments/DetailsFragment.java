@@ -10,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.text.Html;
+import android.text.Spanned;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -45,6 +46,7 @@ import ua.ck.geekhub.ivanov.rssreader.dummy.Feed;
 import ua.ck.geekhub.ivanov.rssreader.heplers.Constants;
 import ua.ck.geekhub.ivanov.rssreader.heplers.DatabaseHelper;
 import ua.ck.geekhub.ivanov.rssreader.heplers.NotifyingScrollView;
+import ua.ck.geekhub.ivanov.rssreader.heplers.UILImageGetter;
 import ua.ck.geekhub.ivanov.rssreader.task.MyTagHandler;
 
 public class DetailsFragment extends Fragment {
@@ -97,7 +99,7 @@ public class DetailsFragment extends Fragment {
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
+    public void onViewCreated(final View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         if (!mIsTableLand) {
@@ -134,8 +136,8 @@ public class DetailsFragment extends Fragment {
                 .build();
 
         ImageView mImageViewFeed = (ImageView) view.findViewById(R.id.image_view_feed);
-        
-        ImageLoader imageLoader = ImageLoader.getInstance();
+
+        final ImageLoader imageLoader = ImageLoader.getInstance();
         imageLoader.init(ImageLoaderConfiguration.createDefault(mActivity.getBaseContext()));
         imageLoader.displayImage(mFeed.getImage(), mImageViewFeed, options,
                 new AnimateFirstDisplayListener(view.findViewById(R.id.image_progress_bar)));
@@ -144,14 +146,9 @@ public class DetailsFragment extends Fragment {
         textViewTitle.setText(Html.fromHtml(mFeed.getTitle()));
 
         TextView textViewDescription = (TextView) view.findViewById(R.id.text_view_description);
-        textViewDescription.setText(Html.fromHtml(mFeed.getDescription(), null, new MyTagHandler()));
-//        URLImageParser p = new URLImageParser(textViewDescription, getActivity());
-//        Spanned htmlSpan = Html.fromHtml(mFeed.getDescription(), p, new MyTagHandler());
-//        textViewDescription.setText(htmlSpan);
-        //Html.fromHtml(mFeed.getDescription(), parserDescription, new MyTagHandler()));
-
-//        TextView textViewDate = (TextView) view.findViewById(R.id.text_view_date);
-//        textViewDate.setText(Html.fromHtml(mFeed.getPubDate()));
+        Spanned spanned = Html.fromHtml(mFeed.getDescription(),
+                new UILImageGetter(textViewDescription, mActivity), new MyTagHandler());
+        textViewDescription.setText(spanned);
 
         view.findViewById(R.id.button_link).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -165,6 +162,7 @@ public class DetailsFragment extends Fragment {
             getActivity().setTitle(getResources().getString(R.string.news));
         }
     }
+
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -334,14 +332,43 @@ public class DetailsFragment extends Fragment {
         mUiHelper.onDestroy();
     }
 
+//    class LoadImage extends AsyncTask<Object, Void, Bitmap> {
+//
+//        private LevelListDrawable mDrawable;
+//
+//        @Override
+//        protected Bitmap doInBackground(Object... params) {
+//            String source = (String) params[0];
+//            mDrawable = (LevelListDrawable) params[1];
+//            try {
+//                InputStream is = new URL(source).openStream();
+//                return BitmapFactory.decodeStream(is);
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//            return null;
+//        }
+//
+//        @Override
+//        protected void onPostExecute(Bitmap bitmap) {
+//            if (bitmap != null) {
+//                BitmapDrawable d = new BitmapDrawable(bitmap);
+//                mDrawable.addLevel(1, 1, d);
+//                mDrawable.setBounds(0, 0, bitmap.getWidth(), bitmap.getHeight());
+//                mDrawable.setLevel(1);
+//            }
+//
+//        }
+//    }
+
     private static class AnimateFirstDisplayListener extends SimpleImageLoadingListener {
 
         static final List<String> displayedImages =
                 Collections.synchronizedList(new LinkedList<String>());
         View mImageProgressBar;
 
-        AnimateFirstDisplayListener(View v) {
-            mImageProgressBar = v;
+        AnimateFirstDisplayListener(View progressBar) {
+            mImageProgressBar = progressBar;
         }
 
         @Override

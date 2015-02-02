@@ -20,6 +20,7 @@ import ua.ck.geekhub.ivanov.rssreader.heplers.Constants;
 
 public class DetailsActivity extends ActionBarActivity {
 
+    public static final String INT_ARRAY = "INT_ARRAY";
     private ArrayList<Feed> mFeeds;
     private int mCurrentFeed;
 
@@ -41,6 +42,10 @@ public class DetailsActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (savedInstanceState != null) {
+            mAlpha = savedInstanceState.getIntArray(INT_ARRAY);
+        }
 
         mAlpha = new int[getIntent().getIntExtra(Constants.EXTRA_FEEDS_COUNT, 10)];
 
@@ -130,5 +135,6 @@ public class DetailsActivity extends ActionBarActivity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(FEED_SELECTED, mCurrentFeed);
+        outState.putIntArray(INT_ARRAY, mAlpha);
     }
 }

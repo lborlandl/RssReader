@@ -14,7 +14,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -332,7 +331,6 @@ public class ListFragment extends Fragment {
             return list;
         } catch (JSONException e) {
 //            Toast.makeText(mActivity, R.string.error_download, Toast.LENGTH_LONG).show();
-            Log.d("lalka", "ArrayList<>");
             e.printStackTrace();
             return new ArrayList<>();
         }
@@ -357,7 +355,6 @@ public class ListFragment extends Fragment {
         }
         mSwipeLayout.setVisibility(View.VISIBLE);
         mProgressBar.setVisibility(View.GONE);
-        Log.d("lalka", "updateList()");
     }
 
     private void setCurrentFeed() {
