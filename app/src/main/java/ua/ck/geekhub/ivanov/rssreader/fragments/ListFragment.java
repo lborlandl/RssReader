@@ -112,7 +112,7 @@ public class ListFragment extends Fragment {
 
         final String[] dropdownValues = getResources().getStringArray(R.array.spinner_list);
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(mActionBar.getThemedContext(),
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(mActionBar.getThemedContext(),
                 android.R.layout.simple_spinner_item, android.R.id.text1, dropdownValues);
 
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -201,7 +201,7 @@ public class ListFragment extends Fragment {
             mCurrentFeed = (Feed) data.getSerializableExtra(Constants.EXTRA_FEED);
             int selected = mFeedList.indexOf(mCurrentFeed);
             if (selected != -1) {
-                mListView.setSelection(selected);
+                //TODO: set selected news
             }
         } else {
             mIsResult = false;
@@ -217,7 +217,7 @@ public class ListFragment extends Fragment {
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         MenuItem itemDeleteAllFavourite = menu.findItem(R.id.menu_delete_all_favourite);
-        if (mSpinnerSelected == 2) {
+        if (mSpinnerSelected == 1) {
             itemDeleteAllFavourite.setVisible(true);
         } else {
             itemDeleteAllFavourite.setVisible(false);
@@ -301,7 +301,7 @@ public class ListFragment extends Fragment {
             JSONObject channel = rss.getJSONObject("channel");
             JSONArray items = channel.getJSONArray("item");
 
-            ArrayList<Feed> list = new ArrayList<Feed>();
+            ArrayList<Feed> list = new ArrayList<>();
             for (int i = 0; i < items.length(); i++) {
                 JSONObject item = items.getJSONObject(i);
                 JSONObject author = item.getJSONObject("atom:author");
@@ -351,9 +351,6 @@ public class ListFragment extends Fragment {
             } else {
                 if (!mFeedList.isEmpty()){
                     mCurrentFeed = mFeedList.get(0);
-                    if (mListView.getChildAt(0) != null) {
-                        mListView.getChildAt(0).setActivated(true);
-                    }
                 }
             }
             setCurrentFeed();
