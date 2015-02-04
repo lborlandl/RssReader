@@ -43,11 +43,12 @@ public class DetailsActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        mAlpha = new int[getIntent().getIntExtra(Constants.EXTRA_FEEDS_COUNT, 10)];
+        
         if (savedInstanceState != null) {
             mAlpha = savedInstanceState.getIntArray(INT_ARRAY);
         }
 
-        mAlpha = new int[getIntent().getIntExtra(Constants.EXTRA_FEEDS_COUNT, 10)];
 
 
         int intExtra = getIntent().getIntExtra(Constants.EXTRA_POSITION, 0);

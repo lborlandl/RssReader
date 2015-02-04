@@ -170,8 +170,10 @@ public class ListFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if (mIsTableLand) {
-                    mCurrentFeed = mFeedList.get(position);
-                    setCurrentFeed();
+                    if (mFeedList.indexOf(mCurrentFeed) != position) {
+                        mCurrentFeed = mFeedList.get(position);
+                        setCurrentFeed();
+                    }
                 } else {
                     Intent intent = new Intent(mActivity, DetailsActivity.class);
                     intent.putExtra(Constants.EXTRA_FEEDS, mFeedList);
@@ -349,6 +351,9 @@ public class ListFragment extends Fragment {
             } else {
                 if (!mFeedList.isEmpty()){
                     mCurrentFeed = mFeedList.get(0);
+                    if (mListView.getChildAt(0) != null) {
+                        mListView.getChildAt(0).setActivated(true);
+                    }
                 }
             }
             setCurrentFeed();
