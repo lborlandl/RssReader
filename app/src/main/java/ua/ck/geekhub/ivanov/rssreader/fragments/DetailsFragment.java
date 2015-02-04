@@ -10,13 +10,14 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.text.Html;
-import android.text.Spanned;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -46,8 +47,6 @@ import ua.ck.geekhub.ivanov.rssreader.dummy.Feed;
 import ua.ck.geekhub.ivanov.rssreader.heplers.Constants;
 import ua.ck.geekhub.ivanov.rssreader.heplers.DatabaseHelper;
 import ua.ck.geekhub.ivanov.rssreader.heplers.NotifyingScrollView;
-import ua.ck.geekhub.ivanov.rssreader.heplers.UILImageGetter;
-import ua.ck.geekhub.ivanov.rssreader.task.MyTagHandler;
 
 public class DetailsFragment extends Fragment {
 
@@ -145,10 +144,28 @@ public class DetailsFragment extends Fragment {
         TextView textViewTitle = (TextView) view.findViewById(R.id.text_view_title);
         textViewTitle.setText(Html.fromHtml(mFeed.getTitle()));
 
-        TextView textViewDescription = (TextView) view.findViewById(R.id.text_view_description);
-        Spanned spanned = Html.fromHtml(mFeed.getDescription(),
-                new UILImageGetter(textViewDescription, mActivity), new MyTagHandler());
-        textViewDescription.setText(spanned);
+//        TextView textViewDescription = (TextView) view.findViewById(R.id.text_view_description);
+//        Spanned spanned = Html.fromHtml(mFeed.getDescription(),
+//                new UILImageGetter(textViewDescription, mActivity), new MyTagHandler());
+//        textViewDescription.setText(spanned);
+
+        WebView webViewDescription = (WebView) view.findViewById(R.id.web_view_description);
+//        Spanned spanned = Html.fromHtml(mFeed.getDescription(),
+//                new UILImageGetter(webViewDescription, mActivity), new MyTagHandler());
+        webViewDescription.loadDataWithBaseURL("http://trashbox.ru", mFeed.getDescription(),
+                "text/html", "UTF-8", null);
+//        webViewDescription.setOnTouchListener(new View.OnTouchListener() {
+//            @Override
+//            public boolean onTouch(View v, MotionEvent event) {
+//                return (event.getAction() == MotionEvent.ACTION_MOVE);
+//            }
+//        });
+//        webViewDescription.setVerticalScrollBarEnabled(false);
+//        webViewDescription.setHorizontalScrollBarEnabled(false);
+        WebSettings webSettings = webViewDescription.getSettings();
+        webSettings.setUseWideViewPort(true);
+        webSettings.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);
+        webSettings.setDefaultZoom(WebSettings.ZoomDensity.FAR);
 
         view.findViewById(R.id.button_link).setOnClickListener(new View.OnClickListener() {
             @Override
