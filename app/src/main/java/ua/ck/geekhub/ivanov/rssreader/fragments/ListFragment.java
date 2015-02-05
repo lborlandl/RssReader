@@ -52,13 +52,14 @@ public class ListFragment extends Fragment {
     private View mProgressBar;
     private ActionBar mActionBar;
 
-    private ArrayList<Feed> mFeedList = new ArrayList<Feed>();
+    private ArrayList<Feed> mFeedList = new ArrayList<>();
     private Feed mCurrentFeed;
+    private int mCurrentFeedIndex;
 
     private SharedPreferences mSharedPreferences;
 
     private boolean mIsTableLand, mAllowNotification, mIsResult = false;
-    private int mSpinnerSelected = 0;
+    private int mSpinnerSelected;
     private FeedAdapter mFeedAdapter;
 
     private Context mContext;
@@ -122,7 +123,7 @@ public class ListFragment extends Fragment {
             public boolean onNavigationItemSelected(int position, long id) {
                 mSpinnerSelected = position;
                 SharedPreferences.Editor editor = mSharedPreferences.edit();
-                editor.putInt(Constants.EXTRA_SPINNER_POSITION, position);
+                editor.putInt(Constants.EXTRA_SPINNER, position);
                 editor.apply();
                 //TODO
                 switch (position) {
@@ -141,7 +142,6 @@ public class ListFragment extends Fragment {
                 return true;
             }
         });
-        //TODO not working:
         mActionBar.setSelectedNavigationItem(mSpinnerSelected);
 
         mSwipeLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_container);
@@ -156,6 +156,9 @@ public class ListFragment extends Fragment {
                         break;
                     default:
                         startDownloadData(Constants.URL_NEWS);
+                }
+                if (mIsTableLand) {
+                    mCurrentFeedIndex = 0;
                 }
             }
         });
@@ -173,6 +176,7 @@ public class ListFragment extends Fragment {
                     if (mFeedList.indexOf(mCurrentFeed) != position) {
                         mCurrentFeed = mFeedList.get(position);
                         setCurrentFeed();
+                        mCurrentFeedIndex = position;
                     }
                 } else {
                     Intent intent = new Intent(mActivity, DetailsActivity.class);
@@ -189,35 +193,34 @@ public class ListFragment extends Fragment {
         mListView.setEmptyView(view.findViewById(R.id.empty_view));
         view.findViewById(R.id.text_view_try_again)
                 .setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startDownloadData(Constants.URL_NEWS);
-            }
-        });
+                    @Override
+                    public void onClick(View v) {
+                        startDownloadData(Constants.URL_NEWS);
+                    }
+                });
         view.findViewById(R.id.text_view_go_to_favorite)
                 .setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //TODO: set favourite
-                Toast.makeText(mActivity, "go to favourite", Toast.LENGTH_SHORT).show();
-            }
-        });
+                    @Override
+                    public void onClick(View v) {
+                        //TODO: set favourite
+                        Toast.makeText(mActivity, "go to favourite", Toast.LENGTH_SHORT).show();
+                    }
+                });
         mSwipeLayout.setVisibility(View.GONE);
         mProgressBar.setVisibility(View.VISIBLE);
-        startDownloadData(Constants.URL_NEWS);
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        mSpinnerSelected = mSharedPreferences.getInt(Constants.EXTRA_SPINNER_POSITION, 0);
+        mSpinnerSelected = mSharedPreferences.getInt(Constants.EXTRA_SPINNER, 0);
         mActionBar.setSelectedNavigationItem(mSpinnerSelected);
         if (requestCode == Constants.REQUEST_FEED && data != null) {
             mIsResult = true;
             mCurrentFeed = (Feed) data.getSerializableExtra(Constants.EXTRA_FEED);
             int selected = mFeedList.indexOf(mCurrentFeed);
             if (selected != -1) {
-                //TODO: set selected news
+                mCurrentFeedIndex = selected;
             }
         } else {
             mIsResult = false;
@@ -365,7 +368,7 @@ public class ListFragment extends Fragment {
                     mTask = 0;
                 }
             } else {
-                if (!mFeedList.isEmpty()){
+                if (!mFeedList.isEmpty()) {
                     mCurrentFeed = mFeedList.get(0);
                 }
             }
@@ -390,7 +393,6 @@ public class ListFragment extends Fragment {
         @Override
         protected String doInBackground(String... params) {
             StringBuilder stringBuilder = new StringBuilder();
-
             try {
                 java.net.URL url = new java.net.URL(params[0]);
                 BufferedReader bufferedReader =

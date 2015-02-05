@@ -21,19 +21,18 @@ public class ListActivity extends ActionBarActivity {
         actionBar.setBackgroundDrawable(getResources()
                 .getDrawable(R.drawable.ab_solid_toolbarstyle_list));
         actionBar.setIcon(getResources().getDrawable(R.drawable.ic_launcher));
-        if (Build.VERSION.SDK_INT >=21) {
+        if (Build.VERSION.SDK_INT >= 21) {
             getWindow().setStatusBarColor(getResources().getColor(R.color.status_bar_blue));
         }
 
-
-
-
-        if (mFeedFragment == null) {
-            mFeedFragment = new ListFragment();
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.list_main_container, mFeedFragment)
-                    .commit();
+        if (savedInstanceState == null) {
+            if (mFeedFragment == null) {
+                mFeedFragment = new ListFragment();
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.list_main_container, mFeedFragment)
+                        .commit();
+            }
         }
     }
 }
