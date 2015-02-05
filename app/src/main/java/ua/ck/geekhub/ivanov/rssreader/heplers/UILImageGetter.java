@@ -7,7 +7,6 @@ import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.text.Html;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -35,9 +34,7 @@ public class UILImageGetter implements Html.ImageGetter {
     @Override
     public Drawable getDrawable(String source) {
         String newSource = "http://trashbox.ru";
-//        String newSource = "";
         newSource += source;
-        Log.d("lalka", "getDrawable source = " + newSource);
 
         UrlImageDownloader urlDrawable = new UrlImageDownloader(c.getResources(), newSource);
         urlDrawable.drawable = c.getResources().getDrawable(R.drawable.no_image);

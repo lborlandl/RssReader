@@ -51,7 +51,7 @@ public class DetailsActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (Build.VERSION.SDK_INT >=21) {
+        if (Build.VERSION.SDK_INT >= 21) {
             getWindow().setStatusBarColor(getResources().getColor(R.color.status_bar_grey));
         }
 
@@ -60,8 +60,6 @@ public class DetailsActivity extends ActionBarActivity {
         if (savedInstanceState != null) {
             mAlpha = savedInstanceState.getIntArray(INT_ARRAY);
         }
-
-
 
         int intExtra = getIntent().getIntExtra(Constants.EXTRA_POSITION, 0);
         if (savedInstanceState != null) {

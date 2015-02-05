@@ -332,34 +332,6 @@ public class DetailsFragment extends Fragment {
         mUiHelper.onDestroy();
     }
 
-//    class LoadImage extends AsyncTask<Object, Void, Bitmap> {
-//
-//        private LevelListDrawable mDrawable;
-//
-//        @Override
-//        protected Bitmap doInBackground(Object... params) {
-//            String source = (String) params[0];
-//            mDrawable = (LevelListDrawable) params[1];
-//            try {
-//                InputStream is = new URL(source).openStream();
-//                return BitmapFactory.decodeStream(is);
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//            return null;
-//        }
-//
-//        @Override
-//        protected void onPostExecute(Bitmap bitmap) {
-//            if (bitmap != null) {
-//                BitmapDrawable d = new BitmapDrawable(bitmap);
-//                mDrawable.addLevel(1, 1, d);
-//                mDrawable.setBounds(0, 0, bitmap.getWidth(), bitmap.getHeight());
-//                mDrawable.setLevel(1);
-//            }
-//
-//        }
-//    }
 
     private static class AnimateFirstDisplayListener extends SimpleImageLoadingListener {
 

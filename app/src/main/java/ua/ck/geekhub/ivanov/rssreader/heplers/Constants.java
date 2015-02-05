@@ -13,4 +13,6 @@ public class Constants {
     public static final String EXTRA_POSITION = "ua.ck.geekhub.ivanov.rssreader.position";
     public static final String LAST_LINK = "ua.ck.geekhub.ivanov.rssreader.last_link";
     public static final int REQUEST_FEED = 1;
+    public static final int NEWS = 0;
+    public static final int FAVOURITE = 1;
 }

@@ -14,6 +14,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -22,7 +24,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -33,12 +37,15 @@ import org.json.XML;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 
 import ua.ck.geekhub.ivanov.rssreader.R;
 import ua.ck.geekhub.ivanov.rssreader.activities.DetailsActivity;
 import ua.ck.geekhub.ivanov.rssreader.activities.LoginActivity;
-import ua.ck.geekhub.ivanov.rssreader.adapters.FeedAdapter;
 import ua.ck.geekhub.ivanov.rssreader.dummy.Feed;
 import ua.ck.geekhub.ivanov.rssreader.heplers.Constants;
 import ua.ck.geekhub.ivanov.rssreader.heplers.DatabaseHelper;
@@ -125,19 +132,18 @@ public class ListFragment extends Fragment {
                 SharedPreferences.Editor editor = mSharedPreferences.edit();
                 editor.putInt(Constants.EXTRA_SPINNER, position);
                 editor.apply();
-                //TODO
                 switch (position) {
-                    case 1:
+                    case Constants.NEWS:
+                        mSwipeLayout.setVisibility(View.GONE);
+                        mProgressBar.setVisibility(View.VISIBLE);
+                        startDownloadData(Constants.URL_NEWS);
+                    case Constants.FAVOURITE:
                         mSwipeLayout.setVisibility(View.VISIBLE);
                         mProgressBar.setVisibility(View.GONE);
                         DatabaseHelper db = DatabaseHelper.getInstance(getActivity());
                         mFeedList = db.getAllFeed();
                         updateList();
                         break;
-                    default:
-                        mSwipeLayout.setVisibility(View.GONE);
-                        mProgressBar.setVisibility(View.VISIBLE);
-                        startDownloadData(Constants.URL_NEWS);
                 }
                 return true;
             }
@@ -149,13 +155,13 @@ public class ListFragment extends Fragment {
             @Override
             public void onRefresh() {
                 switch (mSpinnerSelected) {
-                    case 1:
+                    case Constants.NEWS:
+                        startDownloadData(Constants.URL_NEWS);
+                    case Constants.FAVOURITE:
                         DatabaseHelper db = DatabaseHelper.getInstance(getActivity());
                         mFeedList = db.getAllFeed();
                         updateList();
                         break;
-                    default:
-                        startDownloadData(Constants.URL_NEWS);
                 }
                 if (mIsTableLand) {
                     mCurrentFeedIndex = 0;
@@ -213,15 +219,12 @@ public class ListFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        Log.d("mCurrentFeedIndex", mCurrentFeedIndex + " onActivityResult called");
         mSpinnerSelected = mSharedPreferences.getInt(Constants.EXTRA_SPINNER, 0);
         mActionBar.setSelectedNavigationItem(mSpinnerSelected);
         if (requestCode == Constants.REQUEST_FEED && data != null) {
             mIsResult = true;
             mCurrentFeed = (Feed) data.getSerializableExtra(Constants.EXTRA_FEED);
-            int selected = mFeedList.indexOf(mCurrentFeed);
-            if (selected != -1) {
-                mCurrentFeedIndex = selected;
-            }
         } else {
             mIsResult = false;
         }
@@ -236,7 +239,7 @@ public class ListFragment extends Fragment {
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         MenuItem itemDeleteAllFavourite = menu.findItem(R.id.menu_delete_all_favourite);
-        if (mSpinnerSelected == 1) {
+        if (mSpinnerSelected == Constants.FAVOURITE) {
             itemDeleteAllFavourite.setVisible(true);
         } else {
             itemDeleteAllFavourite.setVisible(false);
@@ -361,11 +364,18 @@ public class ListFragment extends Fragment {
         mFeedAdapter = new FeedAdapter(mContext, mFeedList);
         mListView.setAdapter(mFeedAdapter);
         mSwipeLayout.setRefreshing(false);
+        mSwipeLayout.setVisibility(View.VISIBLE);
+        mProgressBar.setVisibility(View.GONE);
         if (mIsTableLand) {
             if (mIsResult) {
                 if (mTask++ == 1) {
                     mIsResult = false;
                     mTask = 0;
+                }
+                int selected = mFeedList.indexOf(mCurrentFeed);
+                if (selected != -1) {
+                    mCurrentFeedIndex = selected;
+                    mListView.setSelectionFromTop(mCurrentFeedIndex, 0);
                 }
             } else {
                 if (!mFeedList.isEmpty()) {
@@ -374,8 +384,6 @@ public class ListFragment extends Fragment {
             }
             setCurrentFeed();
         }
-        mSwipeLayout.setVisibility(View.VISIBLE);
-        mProgressBar.setVisibility(View.GONE);
     }
 
     private void setCurrentFeed() {
@@ -414,5 +422,86 @@ public class ListFragment extends Fragment {
             mFeedList = parseJSON(s);
             updateList();
         }
+    }
+
+    class FeedAdapter extends BaseAdapter {
+
+        private ArrayList<Feed> mFeedList;
+        private LayoutInflater mLayoutInflater;
+
+        public FeedAdapter(Context context, ArrayList<Feed> feedList) {
+            mFeedList = feedList;
+            mLayoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        }
+
+        @Override
+        public int getCount() {
+            return mFeedList.size();
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return mFeedList.get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        public Feed getFeed(int position) {
+            return (Feed) getItem(position);
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            ViewHolder viewHolder;
+
+            if (convertView == null) {
+                convertView = mLayoutInflater.inflate(R.layout.feed_item, parent, false);
+
+                viewHolder = new ViewHolder();
+                viewHolder.mTextViewDate = (TextView) convertView.findViewById(R.id.feed_date);
+                viewHolder.mTextViewTitle = (TextView) convertView.findViewById(R.id.feed_title);
+                viewHolder.mTextViewAuthor = (TextView) convertView.findViewById(R.id.feed_author);
+
+                convertView.setTag(viewHolder);
+            } else {
+                viewHolder = (ViewHolder) convertView.getTag();
+            }
+
+            Feed feed = getFeed(position);
+
+            Date date = new Date();
+            try {
+                SimpleDateFormat incomingDate =
+                        new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss Z", Locale.ENGLISH);
+                date = incomingDate.parse(feed.getPubDate());
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM HH:mm");
+
+            viewHolder.mTextViewDate.setText(convertView.getResources()
+                    .getString(R.string.published) + " " + dateFormat.format(date));
+            viewHolder.mTextViewTitle.setText(Html.fromHtml(feed.getTitle()));
+            viewHolder.mTextViewAuthor.setText(", " + feed.getAuthorName());
+
+            if (mIsTableLand) {
+                if (position == mCurrentFeedIndex) {
+                    convertView.setBackgroundColor(convertView.getResources()
+                            .getColor(R.color.list_selected));
+                } else {
+                    convertView.setBackgroundColor(convertView.getResources()
+                            .getColor(R.color.background_floating_material_light));
+                }
+            }
+            return convertView;
+        }
+    }
+
+    static class ViewHolder {
+        TextView mTextViewTitle, mTextViewDate, mTextViewAuthor;
     }
 }
