@@ -10,7 +10,7 @@
         android:orderInCategory="200"
         app:showAsAction="never"
         android:title="@string/action_settings"
-        android:visible="false"/>
+        android:visible="true"/>
 
     <item
         android:id="@+id/menu_delete_all_favourite"

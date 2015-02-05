@@ -3,4 +3,7 @@
     <color name="sub_title_gray">#ff5a5a5a</color>
     <color name="action_bar_blue">#1FB6F2</color>
     <color name="list_selected">#ff89ebff</color>
+    <color name="status_bar_blue">#0288D1</color>
+   <!-- <color name="status_bar_blue">#0da4e0</color>-->
+    <color name="status_bar_grey">#bbbbbb</color>
 </resources>

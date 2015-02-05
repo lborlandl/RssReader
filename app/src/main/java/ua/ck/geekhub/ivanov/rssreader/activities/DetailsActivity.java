@@ -3,6 +3,7 @@ package ua.ck.geekhub.ivanov.rssreader.activities;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -33,6 +34,13 @@ public class DetailsActivity extends ActionBarActivity {
     public void setAlpha(int alpha) {
         mActionBarBackgroundDrawable.setAlpha(alpha);
         mActionBar.setBackgroundDrawable(mActionBarBackgroundDrawable);
+
+        /*if (Build.VERSION.SDK_INT >=21) {
+            int color = mActionBarBackgroundDrawable.getColorFilter();
+
+            getWindow().setStatusBarColor(getDrawable(color));
+        }*/
+
     }
 
     public void setAlpha(int alpha, int position) {
@@ -42,6 +50,10 @@ public class DetailsActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (Build.VERSION.SDK_INT >=21) {
+            getWindow().setStatusBarColor(getResources().getColor(R.color.status_bar_grey));
+        }
 
         mAlpha = new int[getIntent().getIntExtra(Constants.EXTRA_FEEDS_COUNT, 10)];
         
