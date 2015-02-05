@@ -34,6 +34,9 @@
     <string name="news">Новость</string>
     <string name="article">Статья</string>
     <string name="title_facebook_login">title_facebook_login</string>
+    <string name="error_for_empty_list">При загрузке данных произошла ошибка.\nПроверьте Ваше подключение к сети.</string>
+    <string name="try_again">Повторить попытку</string>
+    <string name="go_to_favourite">Перейти в избранное</string>
 
     <string-array name="spinner_list">
         <item>Новости</item>

@@ -186,6 +186,22 @@ public class ListFragment extends Fragment {
         });
         mFeedAdapter = new FeedAdapter(mActivity, mFeedList);
         mListView.setAdapter(mFeedAdapter);
+        mListView.setEmptyView(view.findViewById(R.id.empty_view));
+        view.findViewById(R.id.text_view_try_again)
+                .setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startDownloadData(Constants.URL_NEWS);
+            }
+        });
+        view.findViewById(R.id.text_view_go_to_favorite)
+                .setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //TODO: set favourite
+                Toast.makeText(mActivity, "go to favourite", Toast.LENGTH_SHORT).show();
+            }
+        });
         mSwipeLayout.setVisibility(View.GONE);
         mProgressBar.setVisibility(View.VISIBLE);
         startDownloadData(Constants.URL_NEWS);
