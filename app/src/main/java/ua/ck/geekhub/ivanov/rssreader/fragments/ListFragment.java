@@ -389,6 +389,7 @@ public class ListFragment extends android.support.v4.app.ListFragment {
             } else {
                 if (!mFeedList.isEmpty()) {
                     mCurrentFeed = mFeedList.get(0);
+                    mCurrentFeedIndex = 0;
                 }
             }
             mList.setItemChecked(mCurrentFeedIndex, true);
