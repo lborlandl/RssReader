@@ -12,6 +12,8 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 
+import com.readystatesoftware.systembartint.SystemBarTintManager;
+
 import java.util.ArrayList;
 
 import ua.ck.geekhub.ivanov.rssreader.R;
@@ -29,18 +31,15 @@ public class DetailsActivity extends ActionBarActivity {
     private Drawable mActionBarBackgroundDrawable;
     private ActionBar mActionBar;
     private int[] mAlpha;
+    private SystemBarTintManager mTintManager;
 
+    public void setAlpha() {
+        mTintManager.setStatusBarTintDrawable(mActionBarBackgroundDrawable);
+    }
 
     public void setAlpha(int alpha) {
         mActionBarBackgroundDrawable.setAlpha(alpha);
         mActionBar.setBackgroundDrawable(mActionBarBackgroundDrawable);
-
-        /*if (Build.VERSION.SDK_INT >=21) {
-            int color = mActionBarBackgroundDrawable.getColorFilter();
-
-            getWindow().setStatusBarColor(getDrawable(color));
-        }*/
-
     }
 
     public void setAlpha(int alpha, int position) {
@@ -51,17 +50,16 @@ public class DetailsActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (Build.VERSION.SDK_INT >=21) {
-            getWindow().setStatusBarColor(getResources().getColor(R.color.status_bar_grey));
-        }
+        mTintManager = new SystemBarTintManager(this);
+        mTintManager.setStatusBarTintEnabled(true);
+        mTintManager.setNavigationBarTintEnabled(true);
+        mTintManager.setStatusBarTintDrawable(mActionBarBackgroundDrawable);
 
         mAlpha = new int[getIntent().getIntExtra(Constants.EXTRA_FEEDS_COUNT, 10)];
         
         if (savedInstanceState != null) {
             mAlpha = savedInstanceState.getIntArray(INT_ARRAY);
         }
-
-
 
         int intExtra = getIntent().getIntExtra(Constants.EXTRA_POSITION, 0);
         if (savedInstanceState != null) {
@@ -141,6 +139,8 @@ public class DetailsActivity extends ActionBarActivity {
             setResult(Constants.REQUEST_FEED, data);
             finish();
         }
+
+
 
     }
 

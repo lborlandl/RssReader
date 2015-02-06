@@ -122,6 +122,7 @@ public class DetailsFragment extends Fragment {
                             ((DetailsActivity) mActivity).setAlpha(newAlpha, mPosition);
                             mActionBarBackgroundDrawable.setAlpha(newAlpha);
                             actionBar.setBackgroundDrawable(mActionBarBackgroundDrawable);
+                            ((DetailsActivity) mActivity).setAlpha();
                         }
                     });
         } else {

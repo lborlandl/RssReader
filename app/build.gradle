@@ -26,6 +26,7 @@ dependencies {
     compile 'com.facebook.android:facebook-android-sdk:3.21.1'
     compile 'com.github.nirhart:parallaxscroll:1.0'
     compile project(':universal-image-loader-1.9.3')
+    compile 'com.readystatesoftware.systembartint:systembartint:1.0.3' //прозорий статусбар
 }
 
 repositories {

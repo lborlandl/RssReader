@@ -22,10 +22,7 @@
 
 
     <style name="Widget.ActionBar" parent="@style/Widget.AppCompat.Light.ActionBar.Solid.Inverse">
-        <item name="android:windowTranslucentStatus">true</item>
-        <!--<item name="android:windowTranslucentNavigation">false</item>-->
         <item name="android:background">@drawable/ab_solid_toolbarstyle</item>
-
     </style>
 
     <!--<style name="Widget.ActionBar.Transparent">-->
