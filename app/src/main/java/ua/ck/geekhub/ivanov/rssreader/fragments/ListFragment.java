@@ -9,13 +9,11 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.text.Html;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -52,32 +50,35 @@ import ua.ck.geekhub.ivanov.rssreader.heplers.DatabaseHelper;
 import ua.ck.geekhub.ivanov.rssreader.heplers.Utils;
 import ua.ck.geekhub.ivanov.rssreader.services.UpdateFeedService;
 
-public class ListFragment extends Fragment {
+public class ListFragment extends android.support.v4.app.ListFragment {
 
-    private ListView mListView;
+    private ListView mList;
+    private View mListContainer;
     private SwipeRefreshLayout mSwipeLayout;
     private View mProgressBar;
-    private ActionBar mActionBar;
 
+    private ActionBar mActionBar;
     private ArrayList<Feed> mFeedList = new ArrayList<>();
     private Feed mCurrentFeed;
+
     private int mCurrentFeedIndex;
 
     private SharedPreferences mSharedPreferences;
-
     private boolean mIsTableLand, mAllowNotification, mIsResult = false;
     private int mSpinnerSelected;
-    private FeedAdapter mFeedAdapter;
+    private FeedAdapter mAdapter;
 
     private Context mContext;
     private Activity mActivity;
 
     private int mTask = 0;
+    static final String TAG = "test";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        mIsTableLand = getResources().getBoolean(R.bool.tablet_land);
     }
 
     @Override
@@ -91,7 +92,6 @@ public class ListFragment extends Fragment {
         super.onResume();
         mActivity = getActivity();
         mContext = mActivity.getApplicationContext();
-        mIsTableLand = getResources().getBoolean(R.bool.tablet_land);
     }
 
     @Override
@@ -134,12 +134,15 @@ public class ListFragment extends Fragment {
                 editor.apply();
                 switch (position) {
                     case Constants.NEWS:
-                        mSwipeLayout.setVisibility(View.GONE);
-                        mProgressBar.setVisibility(View.VISIBLE);
-                        startDownloadData(Constants.URL_NEWS);
+                        if (Utils.isOnline(mActivity)) {
+                            showProgressBar();
+                            startDownloadData(Constants.URL_NEWS);
+                        } else {
+                            mFeedList = new ArrayList<>();
+                            updateList();
+                        }
+                        break;
                     case Constants.FAVOURITE:
-                        mSwipeLayout.setVisibility(View.VISIBLE);
-                        mProgressBar.setVisibility(View.GONE);
                         DatabaseHelper db = DatabaseHelper.getInstance(getActivity());
                         mFeedList = db.getAllFeed();
                         updateList();
@@ -157,6 +160,7 @@ public class ListFragment extends Fragment {
                 switch (mSpinnerSelected) {
                     case Constants.NEWS:
                         startDownloadData(Constants.URL_NEWS);
+                        break;
                     case Constants.FAVOURITE:
                         DatabaseHelper db = DatabaseHelper.getInstance(getActivity());
                         mFeedList = db.getAllFeed();
@@ -174,8 +178,8 @@ public class ListFragment extends Fragment {
                 android.R.color.holo_blue_bright,
                 android.R.color.holo_red_light);
 
-        mListView = (ListView) view.findViewById(R.id.list_feeds);
-        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mList = (ListView) view.findViewById(android.R.id.list);
+        mList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if (mIsTableLand) {
@@ -194,9 +198,9 @@ public class ListFragment extends Fragment {
                 }
             }
         });
-        mFeedAdapter = new FeedAdapter(mActivity, mFeedList);
-        mListView.setAdapter(mFeedAdapter);
-        mListView.setEmptyView(view.findViewById(R.id.empty_view));
+        mAdapter = new FeedAdapter(mActivity, mFeedList);
+        mList.setAdapter(mAdapter);
+        mListContainer = view.findViewById(R.id.list_container);
         view.findViewById(R.id.text_view_try_again)
                 .setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -208,18 +212,14 @@ public class ListFragment extends Fragment {
                 .setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        //TODO: set favourite
-                        Toast.makeText(mActivity, "go to favourite", Toast.LENGTH_SHORT).show();
+                        mActionBar.setSelectedNavigationItem(Constants.FAVOURITE);
                     }
                 });
-        mSwipeLayout.setVisibility(View.GONE);
-        mProgressBar.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.d("mCurrentFeedIndex", mCurrentFeedIndex + " onActivityResult called");
         mSpinnerSelected = mSharedPreferences.getInt(Constants.EXTRA_SPINNER, 0);
         mActionBar.setSelectedNavigationItem(mSpinnerSelected);
         if (requestCode == Constants.REQUEST_FEED && data != null) {
@@ -311,9 +311,19 @@ public class ListFragment extends Fragment {
             mSwipeLayout.setRefreshing(true);
             new DownloadStringTask().execute(url);
         } else {
-            Toast.makeText(mActivity, R.string.not_network, Toast.LENGTH_SHORT).show();
+            Toast.makeText(mActivity, R.string.error_for_empty_list, Toast.LENGTH_SHORT).show();
             mSwipeLayout.setRefreshing(false);
         }
+    }
+
+    private void showProgressBar() {
+        mListContainer.setVisibility(View.GONE);
+        mProgressBar.setVisibility(View.VISIBLE);
+    }
+
+    private void hideProgressBar() {
+        mListContainer.setVisibility(View.VISIBLE);
+        mProgressBar.setVisibility(View.GONE);
     }
 
     private ArrayList<Feed> parseJSON(String data) {
@@ -361,11 +371,10 @@ public class ListFragment extends Fragment {
     }
 
     private void updateList() {
-        mFeedAdapter = new FeedAdapter(mContext, mFeedList);
-        mListView.setAdapter(mFeedAdapter);
+        mAdapter = new FeedAdapter(mContext, mFeedList);
+        mList.setAdapter(mAdapter);
         mSwipeLayout.setRefreshing(false);
-        mSwipeLayout.setVisibility(View.VISIBLE);
-        mProgressBar.setVisibility(View.GONE);
+        hideProgressBar();
         if (mIsTableLand) {
             if (mIsResult) {
                 if (mTask++ == 1) {
@@ -375,7 +384,7 @@ public class ListFragment extends Fragment {
                 int selected = mFeedList.indexOf(mCurrentFeed);
                 if (selected != -1) {
                     mCurrentFeedIndex = selected;
-                    mListView.setSelectionFromTop(mCurrentFeedIndex, 0);
+                    mList.setSelectionFromTop(mCurrentFeedIndex, 0);
                 }
             } else {
                 if (!mFeedList.isEmpty()) {
@@ -387,6 +396,9 @@ public class ListFragment extends Fragment {
     }
 
     private void setCurrentFeed() {
+        if (mCurrentFeed == null) {
+            return;
+        }
         FragmentManager fragmentManager = getFragmentManager();
         if (fragmentManager != null) {
             DetailsFragment detailsFragment = DetailsFragment.newInstance(mCurrentFeed);
@@ -451,6 +463,11 @@ public class ListFragment extends Fragment {
 
         public Feed getFeed(int position) {
             return (Feed) getItem(position);
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return mFeedList.isEmpty();
         }
 
         @Override
