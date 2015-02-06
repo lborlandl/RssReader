@@ -11,6 +11,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.text.Html;
 import android.text.Spanned;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -81,6 +82,7 @@ public class DetailsFragment extends Fragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        Log.d("test", "onCreate DetailsFragment called");
         super.onCreate(savedInstanceState);
         mActivity = getActivity();
         mIsTableLand = getResources().getBoolean(R.bool.tablet_land);
@@ -109,7 +111,13 @@ public class DetailsFragment extends Fragment {
             final int actionBarHeight = actionBar.getHeight();
             mActionBarBackgroundDrawable =
                     getResources().getDrawable(R.drawable.ab_solid_toolbarstyle);
-            final int imageHeight = 500;
+            boolean isTable = getResources().getBoolean(R.bool.tablet);
+            final int imageHeight;
+            if (isTable) {
+                imageHeight = 250;
+            } else {
+                imageHeight = 500;
+            }
             actionBar.setBackgroundDrawable(mActionBarBackgroundDrawable);
             ((NotifyingScrollView) view.findViewById(R.id.scroll_view)).setOnScrollChangedListener(
                     new NotifyingScrollView.OnScrollChangedListener() {
@@ -333,34 +341,6 @@ public class DetailsFragment extends Fragment {
         mUiHelper.onDestroy();
     }
 
-//    class LoadImage extends AsyncTask<Object, Void, Bitmap> {
-//
-//        private LevelListDrawable mDrawable;
-//
-//        @Override
-//        protected Bitmap doInBackground(Object... params) {
-//            String source = (String) params[0];
-//            mDrawable = (LevelListDrawable) params[1];
-//            try {
-//                InputStream is = new URL(source).openStream();
-//                return BitmapFactory.decodeStream(is);
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//            return null;
-//        }
-//
-//        @Override
-//        protected void onPostExecute(Bitmap bitmap) {
-//            if (bitmap != null) {
-//                BitmapDrawable d = new BitmapDrawable(bitmap);
-//                mDrawable.addLevel(1, 1, d);
-//                mDrawable.setBounds(0, 0, bitmap.getWidth(), bitmap.getHeight());
-//                mDrawable.setLevel(1);
-//            }
-//
-//        }
-//    }
 
     private static class AnimateFirstDisplayListener extends SimpleImageLoadingListener {
 

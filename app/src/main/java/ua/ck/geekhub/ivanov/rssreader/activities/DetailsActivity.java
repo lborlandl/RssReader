@@ -72,7 +72,16 @@ public class DetailsActivity extends ActionBarActivity {
             mFeeds = new ArrayList<>();
         }
 
+        boolean isTable = getResources().getBoolean(R.bool.tablet);
         boolean isTableLand = getResources().getBoolean(R.bool.tablet_land);
+
+        if (isTable && isTableLand) {
+            Intent data = new Intent();
+            data.putExtra(Constants.EXTRA_FEED, mFeeds.get(mCurrentFeed));
+            setResult(Constants.REQUEST_FEED, data);
+            finish();
+        }
+
         mActionBarBackgroundDrawable =
                 getResources().getDrawable(R.drawable.ab_solid_toolbarstyle);
 
@@ -131,17 +140,6 @@ public class DetailsActivity extends ActionBarActivity {
         });
 
         viewPager.setCurrentItem(mCurrentFeed);
-
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE
-                && getResources().getBoolean(R.bool.tablet)) {
-            Intent data = new Intent();
-            data.putExtra(Constants.EXTRA_FEED, mFeeds.get(mCurrentFeed));
-            setResult(Constants.REQUEST_FEED, data);
-            finish();
-        }
-
-
-
     }
 
     @Override

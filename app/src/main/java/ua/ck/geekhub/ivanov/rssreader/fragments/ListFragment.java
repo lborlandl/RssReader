@@ -9,11 +9,11 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -22,7 +22,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -33,43 +35,50 @@ import org.json.XML;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 
 import ua.ck.geekhub.ivanov.rssreader.R;
 import ua.ck.geekhub.ivanov.rssreader.activities.DetailsActivity;
 import ua.ck.geekhub.ivanov.rssreader.activities.LoginActivity;
-import ua.ck.geekhub.ivanov.rssreader.adapters.FeedAdapter;
 import ua.ck.geekhub.ivanov.rssreader.dummy.Feed;
 import ua.ck.geekhub.ivanov.rssreader.heplers.Constants;
 import ua.ck.geekhub.ivanov.rssreader.heplers.DatabaseHelper;
 import ua.ck.geekhub.ivanov.rssreader.heplers.Utils;
 import ua.ck.geekhub.ivanov.rssreader.services.UpdateFeedService;
 
-public class ListFragment extends Fragment {
+public class ListFragment extends android.support.v4.app.ListFragment {
 
-    private ListView mListView;
+    private ListView mList;
+    private View mListContainer;
     private SwipeRefreshLayout mSwipeLayout;
     private View mProgressBar;
-    private ActionBar mActionBar;
 
-    private ArrayList<Feed> mFeedList = new ArrayList<Feed>();
+    private ActionBar mActionBar;
+    private ArrayList<Feed> mFeedList = new ArrayList<>();
     private Feed mCurrentFeed;
 
-    private SharedPreferences mSharedPreferences;
+    private int mCurrentFeedIndex;
 
+    private SharedPreferences mSharedPreferences;
     private boolean mIsTableLand, mAllowNotification, mIsResult = false;
-    private int mSpinnerSelected = 0;
-    private FeedAdapter mFeedAdapter;
+    private int mSpinnerSelected;
+    private FeedAdapter mAdapter;
 
     private Context mContext;
     private Activity mActivity;
 
     private int mTask = 0;
+    static final String TAG = "test";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        mIsTableLand = getResources().getBoolean(R.bool.tablet_land);
     }
 
     @Override
@@ -83,7 +92,6 @@ public class ListFragment extends Fragment {
         super.onResume();
         mActivity = getActivity();
         mContext = mActivity.getApplicationContext();
-        mIsTableLand = getResources().getBoolean(R.bool.tablet_land);
     }
 
     @Override
@@ -122,26 +130,27 @@ public class ListFragment extends Fragment {
             public boolean onNavigationItemSelected(int position, long id) {
                 mSpinnerSelected = position;
                 SharedPreferences.Editor editor = mSharedPreferences.edit();
-                editor.putInt(Constants.EXTRA_SPINNER_POSITION, position);
+                editor.putInt(Constants.EXTRA_SPINNER, position);
                 editor.apply();
-                //TODO
                 switch (position) {
-                    case 1:
-                        mSwipeLayout.setVisibility(View.VISIBLE);
-                        mProgressBar.setVisibility(View.GONE);
+                    case Constants.NEWS:
+                        if (Utils.isOnline(mActivity)) {
+                            showProgressBar();
+                            startDownloadData(Constants.URL_NEWS);
+                        } else {
+                            mFeedList = new ArrayList<>();
+                            updateList();
+                        }
+                        break;
+                    case Constants.FAVOURITE:
                         DatabaseHelper db = DatabaseHelper.getInstance(getActivity());
                         mFeedList = db.getAllFeed();
                         updateList();
                         break;
-                    default:
-                        mSwipeLayout.setVisibility(View.GONE);
-                        mProgressBar.setVisibility(View.VISIBLE);
-                        startDownloadData(Constants.URL_NEWS);
                 }
                 return true;
             }
         });
-        //TODO not working:
         mActionBar.setSelectedNavigationItem(mSpinnerSelected);
 
         mSwipeLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_container);
@@ -149,13 +158,17 @@ public class ListFragment extends Fragment {
             @Override
             public void onRefresh() {
                 switch (mSpinnerSelected) {
-                    case 1:
+                    case Constants.NEWS:
+                        startDownloadData(Constants.URL_NEWS);
+                        break;
+                    case Constants.FAVOURITE:
                         DatabaseHelper db = DatabaseHelper.getInstance(getActivity());
                         mFeedList = db.getAllFeed();
                         updateList();
                         break;
-                    default:
-                        startDownloadData(Constants.URL_NEWS);
+                }
+                if (mIsTableLand) {
+                    mCurrentFeedIndex = 0;
                 }
             }
         });
@@ -165,14 +178,15 @@ public class ListFragment extends Fragment {
                 android.R.color.holo_blue_bright,
                 android.R.color.holo_red_light);
 
-        mListView = (ListView) view.findViewById(R.id.list_feeds);
-        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mList = (ListView) view.findViewById(android.R.id.list);
+        mList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if (mIsTableLand) {
                     if (mFeedList.indexOf(mCurrentFeed) != position) {
                         mCurrentFeed = mFeedList.get(position);
                         setCurrentFeed();
+                        mCurrentFeedIndex = position;
                     }
                 } else {
                     Intent intent = new Intent(mActivity, DetailsActivity.class);
@@ -184,41 +198,33 @@ public class ListFragment extends Fragment {
                 }
             }
         });
-        mFeedAdapter = new FeedAdapter(mActivity, mFeedList);
-        mListView.setAdapter(mFeedAdapter);
-        mListView.setEmptyView(view.findViewById(R.id.empty_view));
+        mAdapter = new FeedAdapter(mActivity, mFeedList);
+        mList.setAdapter(mAdapter);
+        mListContainer = view.findViewById(R.id.list_container);
         view.findViewById(R.id.text_view_try_again)
                 .setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startDownloadData(Constants.URL_NEWS);
-            }
-        });
+                    @Override
+                    public void onClick(View v) {
+                        startDownloadData(Constants.URL_NEWS);
+                    }
+                });
         view.findViewById(R.id.text_view_go_to_favorite)
                 .setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //TODO: set favourite
-                Toast.makeText(mActivity, "go to favourite", Toast.LENGTH_SHORT).show();
-            }
-        });
-        mSwipeLayout.setVisibility(View.GONE);
-        mProgressBar.setVisibility(View.VISIBLE);
-        startDownloadData(Constants.URL_NEWS);
+                    @Override
+                    public void onClick(View v) {
+                        mActionBar.setSelectedNavigationItem(Constants.FAVOURITE);
+                    }
+                });
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        mSpinnerSelected = mSharedPreferences.getInt(Constants.EXTRA_SPINNER_POSITION, 0);
+        mSpinnerSelected = mSharedPreferences.getInt(Constants.EXTRA_SPINNER, 0);
         mActionBar.setSelectedNavigationItem(mSpinnerSelected);
         if (requestCode == Constants.REQUEST_FEED && data != null) {
             mIsResult = true;
             mCurrentFeed = (Feed) data.getSerializableExtra(Constants.EXTRA_FEED);
-            int selected = mFeedList.indexOf(mCurrentFeed);
-            if (selected != -1) {
-                //TODO: set selected news
-            }
         } else {
             mIsResult = false;
         }
@@ -233,7 +239,7 @@ public class ListFragment extends Fragment {
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         MenuItem itemDeleteAllFavourite = menu.findItem(R.id.menu_delete_all_favourite);
-        if (mSpinnerSelected == 1) {
+        if (mSpinnerSelected == Constants.FAVOURITE) {
             itemDeleteAllFavourite.setVisible(true);
         } else {
             itemDeleteAllFavourite.setVisible(false);
@@ -305,9 +311,19 @@ public class ListFragment extends Fragment {
             mSwipeLayout.setRefreshing(true);
             new DownloadStringTask().execute(url);
         } else {
-            Toast.makeText(mActivity, R.string.not_network, Toast.LENGTH_SHORT).show();
+            Toast.makeText(mActivity, R.string.error_for_empty_list, Toast.LENGTH_SHORT).show();
             mSwipeLayout.setRefreshing(false);
         }
+    }
+
+    private void showProgressBar() {
+        mListContainer.setVisibility(View.GONE);
+        mProgressBar.setVisibility(View.VISIBLE);
+    }
+
+    private void hideProgressBar() {
+        mListContainer.setVisibility(View.VISIBLE);
+        mProgressBar.setVisibility(View.GONE);
     }
 
     private ArrayList<Feed> parseJSON(String data) {
@@ -355,27 +371,34 @@ public class ListFragment extends Fragment {
     }
 
     private void updateList() {
-        mFeedAdapter = new FeedAdapter(mContext, mFeedList);
-        mListView.setAdapter(mFeedAdapter);
+        mAdapter = new FeedAdapter(mContext, mFeedList);
+        mList.setAdapter(mAdapter);
         mSwipeLayout.setRefreshing(false);
+        hideProgressBar();
         if (mIsTableLand) {
             if (mIsResult) {
                 if (mTask++ == 1) {
                     mIsResult = false;
                     mTask = 0;
                 }
+                int selected = mFeedList.indexOf(mCurrentFeed);
+                if (selected != -1) {
+                    mCurrentFeedIndex = selected;
+                    mList.setSelectionFromTop(mCurrentFeedIndex, 0);
+                }
             } else {
-                if (!mFeedList.isEmpty()){
+                if (!mFeedList.isEmpty()) {
                     mCurrentFeed = mFeedList.get(0);
                 }
             }
             setCurrentFeed();
         }
-        mSwipeLayout.setVisibility(View.VISIBLE);
-        mProgressBar.setVisibility(View.GONE);
     }
 
     private void setCurrentFeed() {
+        if (mCurrentFeed == null) {
+            return;
+        }
         FragmentManager fragmentManager = getFragmentManager();
         if (fragmentManager != null) {
             DetailsFragment detailsFragment = DetailsFragment.newInstance(mCurrentFeed);
@@ -390,7 +413,6 @@ public class ListFragment extends Fragment {
         @Override
         protected String doInBackground(String... params) {
             StringBuilder stringBuilder = new StringBuilder();
-
             try {
                 java.net.URL url = new java.net.URL(params[0]);
                 BufferedReader bufferedReader =
@@ -412,5 +434,91 @@ public class ListFragment extends Fragment {
             mFeedList = parseJSON(s);
             updateList();
         }
+    }
+
+    class FeedAdapter extends BaseAdapter {
+
+        private ArrayList<Feed> mFeedList;
+        private LayoutInflater mLayoutInflater;
+
+        public FeedAdapter(Context context, ArrayList<Feed> feedList) {
+            mFeedList = feedList;
+            mLayoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        }
+
+        @Override
+        public int getCount() {
+            return mFeedList.size();
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return mFeedList.get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        public Feed getFeed(int position) {
+            return (Feed) getItem(position);
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return mFeedList.isEmpty();
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            ViewHolder viewHolder;
+
+            if (convertView == null) {
+                convertView = mLayoutInflater.inflate(R.layout.feed_item, parent, false);
+
+                viewHolder = new ViewHolder();
+                viewHolder.mTextViewDate = (TextView) convertView.findViewById(R.id.feed_date);
+                viewHolder.mTextViewTitle = (TextView) convertView.findViewById(R.id.feed_title);
+                viewHolder.mTextViewAuthor = (TextView) convertView.findViewById(R.id.feed_author);
+
+                convertView.setTag(viewHolder);
+            } else {
+                viewHolder = (ViewHolder) convertView.getTag();
+            }
+
+            Feed feed = getFeed(position);
+
+            Date date = new Date();
+            try {
+                SimpleDateFormat incomingDate =
+                        new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss Z", Locale.ENGLISH);
+                date = incomingDate.parse(feed.getPubDate());
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM HH:mm");
+
+            viewHolder.mTextViewDate.setText(convertView.getResources()
+                    .getString(R.string.published) + " " + dateFormat.format(date));
+            viewHolder.mTextViewTitle.setText(Html.fromHtml(feed.getTitle()));
+            viewHolder.mTextViewAuthor.setText(", " + feed.getAuthorName());
+
+            if (mIsTableLand) {
+                if (position == mCurrentFeedIndex) {
+                    convertView.setBackgroundColor(convertView.getResources()
+                            .getColor(R.color.list_selected));
+                } else {
+                    convertView.setBackgroundColor(convertView.getResources()
+                            .getColor(R.color.background_floating_material_light));
+                }
+            }
+            return convertView;
+        }
+    }
+
+    static class ViewHolder {
+        TextView mTextViewTitle, mTextViewDate, mTextViewAuthor;
     }
 }

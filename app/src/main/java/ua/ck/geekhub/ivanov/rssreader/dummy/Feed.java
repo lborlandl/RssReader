@@ -72,4 +72,15 @@ public class Feed implements Serializable {
     public String toString() {
         return title;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        Feed feed;
+        if (o instanceof Feed) {
+            feed = (Feed) o;
+        } else {
+            return false;
+        }
+        return feed.getLink().equals(getLink());
+    }
 }

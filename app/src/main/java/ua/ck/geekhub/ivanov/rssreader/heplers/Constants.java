@@ -11,7 +11,8 @@ public class Constants {
     public static final String EXTRA_FEED = "ua.ck.geekhub.ivanov.rssreader.feed";
     public static final String EXTRA_FEEDS = "ua.ck.geekhub.ivanov.rssreader.feeds";
     public static final String EXTRA_POSITION = "ua.ck.geekhub.ivanov.rssreader.position";
-    public static final String EXTRA_SPINNER_POSITION = "spinner.position";
     public static final String LAST_LINK = "ua.ck.geekhub.ivanov.rssreader.last_link";
     public static final int REQUEST_FEED = 1;
+    public static final int NEWS = 0;
+    public static final int FAVOURITE = 1;
 }
