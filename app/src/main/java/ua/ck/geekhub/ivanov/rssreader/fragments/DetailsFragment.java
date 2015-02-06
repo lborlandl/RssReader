@@ -3,7 +3,6 @@ package ua.ck.geekhub.ivanov.rssreader.fragments;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -11,7 +10,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.text.Html;
 import android.text.Spanned;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -57,7 +55,6 @@ public class DetailsFragment extends Fragment {
     private UiLifecycleHelper mUiHelper;
     private Activity mActivity;
     private DatabaseHelper mDb;
-    private Drawable mActionBarBackgroundDrawable;
     private int mPosition;
     private static final String EXTRA_POSITION = "EXTRA_POSITION";
 
@@ -82,7 +79,6 @@ public class DetailsFragment extends Fragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        Log.d("test", "onCreate DetailsFragment called");
         super.onCreate(savedInstanceState);
         mActivity = getActivity();
         mIsTableLand = getResources().getBoolean(R.bool.tablet_land);
@@ -107,30 +103,20 @@ public class DetailsFragment extends Fragment {
         if (!mIsTableLand) {
             mPosition = getArguments().getInt(EXTRA_POSITION, 0);
 
-            final ActionBar actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
+            ActionBar actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
             final int actionBarHeight = actionBar.getHeight();
-            mActionBarBackgroundDrawable =
-                    getResources().getDrawable(R.drawable.ab_solid_toolbarstyle);
             boolean isTable = getResources().getBoolean(R.bool.tablet);
-            final int imageHeight;
-            if (isTable) {
-                imageHeight = 250;
-            } else {
-                imageHeight = 500;
-            }
-            actionBar.setBackgroundDrawable(mActionBarBackgroundDrawable);
+            final int imageHeight = isTable ? 250 : 500;
+            final int maxAlpha = 255;
             ((NotifyingScrollView) view.findViewById(R.id.scroll_view)).setOnScrollChangedListener(
                     new NotifyingScrollView.OnScrollChangedListener() {
                         @Override
                         public void onScrollChanged(ScrollView who, int l, int t, int oldl, int oldt) {
-                            final int headerHeight = imageHeight - actionBarHeight;
-                            final float ratio = (float)
+                            int headerHeight = imageHeight - actionBarHeight;
+                            float ratio = (float)
                                     Math.min(Math.max(t, 0), headerHeight) / headerHeight;
-                            final int newAlpha = (int) (ratio * 240);
+                            int newAlpha = (int) (ratio * maxAlpha);
                             ((DetailsActivity) mActivity).setAlpha(newAlpha, mPosition);
-                            mActionBarBackgroundDrawable.setAlpha(newAlpha);
-                            actionBar.setBackgroundDrawable(mActionBarBackgroundDrawable);
-                            ((DetailsActivity) mActivity).setAlpha();
                         }
                     });
         } else {

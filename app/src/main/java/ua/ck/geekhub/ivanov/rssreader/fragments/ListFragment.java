@@ -507,13 +507,6 @@ public class ListFragment extends android.support.v4.app.ListFragment {
             viewHolder.mTextViewTitle.setText(Html.fromHtml(feed.getTitle()));
             viewHolder.mTextViewAuthor.setText(", " + feed.getAuthorName());
 
-//            if (mIsTableLand) {
-//                if (position == mCurrentFeedIndex) {
-//                    convertView.setActivated(true);
-//                } else {
-//                    convertView.setActivated(false);
-//                }
-//            }
             return convertView;
         }
     }

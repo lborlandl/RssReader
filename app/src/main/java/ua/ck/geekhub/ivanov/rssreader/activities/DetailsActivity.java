@@ -1,9 +1,7 @@
 package ua.ck.geekhub.ivanov.rssreader.activities;
 
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -33,17 +31,17 @@ public class DetailsActivity extends ActionBarActivity {
     private int[] mAlpha;
     private SystemBarTintManager mTintManager;
 
-    public void setAlpha() {
-        mTintManager.setStatusBarTintDrawable(mActionBarBackgroundDrawable);
-    }
-
     public void setAlpha(int alpha) {
-        mActionBarBackgroundDrawable.setAlpha(alpha);
-        mActionBar.setBackgroundDrawable(mActionBarBackgroundDrawable);
+        setAlpha(alpha, -1);
     }
 
     public void setAlpha(int alpha, int position) {
-        mAlpha[position] = alpha;
+        if (position != -1) {
+            mAlpha[position] = alpha;
+        }
+        mActionBarBackgroundDrawable.setAlpha(alpha);
+        float alphaForStatusBar = ((float) alpha) / 255f;
+        mTintManager.setStatusBarAlpha(alphaForStatusBar);
     }
 
     @Override
@@ -52,17 +50,13 @@ public class DetailsActivity extends ActionBarActivity {
 
         mTintManager = new SystemBarTintManager(this);
         mTintManager.setStatusBarTintEnabled(true);
-        mTintManager.setNavigationBarTintEnabled(true);
-        mTintManager.setStatusBarTintDrawable(mActionBarBackgroundDrawable);
+        mTintManager.setStatusBarTintColor(getResources().getColor(R.color.action_bar_blue));
 
         mAlpha = new int[getIntent().getIntExtra(Constants.EXTRA_FEEDS_COUNT, 10)];
         
-        if (savedInstanceState != null) {
-            mAlpha = savedInstanceState.getIntArray(INT_ARRAY);
-        }
-
         int intExtra = getIntent().getIntExtra(Constants.EXTRA_POSITION, 0);
         if (savedInstanceState != null) {
+            mAlpha = savedInstanceState.getIntArray(INT_ARRAY);
             mCurrentFeed = savedInstanceState.getInt(FEED_SELECTED, intExtra);
         } else {
             mCurrentFeed = intExtra;
@@ -91,7 +85,6 @@ public class DetailsActivity extends ActionBarActivity {
             mActionBar.setBackgroundDrawable(mActionBarBackgroundDrawable);
             setAlpha(0);
         }
-
 
         final ViewPager viewPager = new ViewPager(this);
         viewPager.setId(R.id.viewPager);
