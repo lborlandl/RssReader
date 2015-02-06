@@ -13,11 +13,8 @@
     <style name="AppTheme.ActionBar" />
 
     <style name="AppTheme.ActionBar.Overlay" parent="@style/Theme.AppCompat.Light">
-        <item name="android:windowTranslucentStatus">true</item>
-        <item name="android:windowTranslucentNavigation">true</item>
-        <!--<item name="android:actionBarStyle">@style/Widget.ActionBar.Transparent</item>-->
-        <!--<item name="android:windowActionBarOverlay">true</item>
+        <item name="android:windowActionBarOverlay">true</item>
         <item name="windowActionBarOverlay">true</item>
-        <item name="android:windowContentOverlay">@null</item>-->
+        <item name="android:windowContentOverlay">@null</item>
     </style>
 </resources>

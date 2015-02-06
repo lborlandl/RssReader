@@ -391,6 +391,7 @@ public class ListFragment extends android.support.v4.app.ListFragment {
                     mCurrentFeed = mFeedList.get(0);
                 }
             }
+            mList.setItemChecked(mCurrentFeedIndex, true);
             setCurrentFeed();
         }
     }
@@ -505,15 +506,13 @@ public class ListFragment extends android.support.v4.app.ListFragment {
             viewHolder.mTextViewTitle.setText(Html.fromHtml(feed.getTitle()));
             viewHolder.mTextViewAuthor.setText(", " + feed.getAuthorName());
 
-            if (mIsTableLand) {
-                if (position == mCurrentFeedIndex) {
-                    convertView.setBackgroundColor(convertView.getResources()
-                            .getColor(R.color.list_selected));
-                } else {
-                    convertView.setBackgroundColor(convertView.getResources()
-                            .getColor(R.color.background_floating_material_light));
-                }
-            }
+//            if (mIsTableLand) {
+//                if (position == mCurrentFeedIndex) {
+//                    convertView.setActivated(true);
+//                } else {
+//                    convertView.setActivated(false);
+//                }
+//            }
             return convertView;
         }
     }
