@@ -115,7 +115,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM " + TABLE_NAME + " WHERE " +
                 COLUMN_LINK + " = \"" + feed.getLink() + "\"", null);
         cursor.moveToFirst();
+        boolean result = !(cursor.getInt(0) == 0);
         cursor.close();
-        return !(cursor.getInt(0) == 0);
+        return result;
     }
 }
