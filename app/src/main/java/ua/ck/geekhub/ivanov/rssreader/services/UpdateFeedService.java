@@ -33,8 +33,8 @@ public class UpdateFeedService extends Service {
     private final static int ID = 1;
 
     private String mLastLink;
+    private int mUpdateTimeSeconds = 30 * 60;
     private int count = 0;
-    private int updateTimeSeconds = 30*60; //раз в 30 хвилин
 
     @Override
     public void onCreate() {
@@ -51,7 +51,7 @@ public class UpdateFeedService extends Service {
                 while (true) {
                     new CheckUpdateTask().execute(Constants.URL_NEWS);
                     try {
-                        TimeUnit.SECONDS.sleep(10);
+                        TimeUnit.SECONDS.sleep(mUpdateTimeSeconds);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -95,7 +95,7 @@ public class UpdateFeedService extends Service {
         notification.defaults = Notification.DEFAULT_ALL;
 
         nm.notify(ID, notification);
-      //  startForeground(ID, builder.build());
+//        startForeground(ID, builder.build());
     }
 
     private class CheckUpdateTask extends AsyncTask<String, Void, String> {

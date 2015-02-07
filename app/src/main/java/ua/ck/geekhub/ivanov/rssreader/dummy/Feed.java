@@ -4,7 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class Feed implements Parcelable {
-    private String title, link, image, description, authorName, authorLink, pubDate;
+    private String mTitle, mLink, mImage, mDescription, mAuthorName, mAuthorLink, mPubDate;
 
     public Feed() {
 
@@ -13,81 +13,81 @@ public class Feed implements Parcelable {
     public Feed(Parcel in) {
         String[] data = new String[7];
         in.readStringArray(data);
-        title = data[0];
-        link = data[1];
-        image = data[2];
-        description = data[3];
-        authorName = data[4];
-        authorLink = data[5];
-        pubDate = data[6];
+        mTitle = data[0];
+        mLink = data[1];
+        mImage = data[2];
+        mDescription = data[3];
+        mAuthorName = data[4];
+        mAuthorLink = data[5];
+        mPubDate = data[6];
     }
 
     public String getTitle() {
-        return title;
+        return mTitle;
     }
 
     public Feed setTitle(String title) {
-        this.title = title;
+        mTitle = title;
         return this;
     }
 
     public String getLink() {
-        return link;
+        return mLink;
     }
 
     public Feed setLink(String link) {
-        this.link = link;
+        mLink = link;
         return this;
     }
 
     public String getImage() {
-        return image;
+        return mImage;
     }
 
     public Feed setImage(String image) {
-        this.image = image;
+        mImage = image;
         return this;
     }
 
     public String getDescription() {
-        return description;
+        return mDescription;
     }
 
     public Feed setDescription(String description) {
-        this.description = description;
+        mDescription = description;
         return this;
     }
 
     public String getAuthorName() {
-        return authorName;
+        return mAuthorName;
     }
 
     public Feed setAuthorName(String authorName) {
-        this.authorName = authorName;
+        mAuthorName = authorName;
         return this;
     }
 
     public String getAuthorLink() {
-        return authorLink;
+        return mAuthorLink;
     }
 
     public Feed setAuthorLink(String authorLink) {
-        this.authorLink = authorLink;
+        mAuthorLink = authorLink;
         return this;
     }
 
     public String getPubDate() {
-        return pubDate;
+        return mPubDate;
     }
 
     public Feed setPubDate(String pubDate) {
-        this.pubDate = pubDate;
+        mPubDate = pubDate;
         return this;
     }
 
     @Override
     public String toString() {
-        return title;
+        return mTitle;
     }
 
     @Override
@@ -109,7 +109,7 @@ public class Feed implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeStringArray(new String[]{
-                title, link, image, description, authorName, authorLink, pubDate
+                mTitle, mLink, mImage, mDescription, mAuthorName, mAuthorLink, mPubDate
         });
     }
 

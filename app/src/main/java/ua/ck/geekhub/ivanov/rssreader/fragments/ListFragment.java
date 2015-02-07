@@ -72,7 +72,6 @@ public class ListFragment extends android.support.v4.app.ListFragment {
     private Activity mActivity;
 
     private int mTask = 0;
-    static final String TAG = "test";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

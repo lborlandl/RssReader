@@ -27,7 +27,6 @@ public class DetailsActivity extends ActionBarActivity {
 
     private static final String FEED_SELECTED = "feed_selected";
     private Drawable mActionBarBackgroundDrawable;
-    private ActionBar mActionBar;
     private int[] mAlpha;
     private SystemBarTintManager mTintManager;
 
@@ -79,10 +78,10 @@ public class DetailsActivity extends ActionBarActivity {
         mActionBarBackgroundDrawable =
                 getResources().getDrawable(R.drawable.ab_solid_toolbarstyle);
 
-        mActionBar = getSupportActionBar();
-        mActionBar.setDisplayHomeAsUpEnabled(true);
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
         if (!isTableLand) {
-            mActionBar.setBackgroundDrawable(mActionBarBackgroundDrawable);
+            actionBar.setBackgroundDrawable(mActionBarBackgroundDrawable);
             setAlpha(0);
         }
 

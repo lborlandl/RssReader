@@ -73,29 +73,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return result != 0;
     }
 
-    public Feed getFeed(int id) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.query(TABLE_NAME, new String[]{
-                        COLUMN_ID, COLUMN_TITLE, COLUMN_LINK, COLUMN_IMAGE, COLUMN_DESCRIPTION,
-                        COLUMN_AUTHOR_NAME, COLUMN_AUTHOR_LINK, COLUMN_DATE},
-                COLUMN_ID + "=?", new String[]{String.valueOf(id)}, null, null, null);
-        Feed feed = new Feed();
-        if (cursor != null) {
-            cursor.moveToFirst();
-            feed
-                    .setTitle(cursor.getString(1))
-                    .setLink(cursor.getString(2))
-                    .setImage(cursor.getString(4))
-                    .setDescription(cursor.getString(3))
-                    .setAuthorName(cursor.getString(5))
-                    .setAuthorLink(cursor.getString(6))
-                    .setPubDate(cursor.getString(7));
-        }
-        return feed;
-    }
-
     public ArrayList<Feed> getAllFeed() {
-        ArrayList<Feed> feedList = new ArrayList<Feed>();
+        ArrayList<Feed> feedList = new ArrayList<>();
         String query = "SELECT * FROM " + TABLE_NAME;
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(query, null);
@@ -113,7 +92,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 feedList.add(feed);
             } while (cursor.moveToNext());
         }
-        ArrayList<Feed> feeds = new ArrayList<Feed>();
+        cursor.close();
+        ArrayList<Feed> feeds = new ArrayList<>();
         for (int i = feedList.size() - 1; i >= 0; i--) {
             feeds.add(feedList.get(i));
         }
@@ -135,6 +115,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM " + TABLE_NAME + " WHERE " +
                 COLUMN_LINK + " = \"" + feed.getLink() + "\"", null);
         cursor.moveToFirst();
+        cursor.close();
         return !(cursor.getInt(0) == 0);
     }
 }

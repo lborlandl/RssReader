@@ -1,4 +1,4 @@
-package ua.ck.geekhub.ivanov.rssreader.task;
+package ua.ck.geekhub.ivanov.rssreader.heplers;
 
 import android.text.Editable;
 import android.text.Html;
@@ -26,7 +26,7 @@ public class MyTagHandler implements Html.TagHandler {
                 }
             } else {
                 if (first) {
-                    output.append("\n\t" + index + ". ");
+                    output.append("\n\t").append(Integer.toString(index)).append(". ");
                     first = false;
                     index++;
                 } else {

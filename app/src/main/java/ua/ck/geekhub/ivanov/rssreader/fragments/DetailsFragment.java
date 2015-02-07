@@ -46,7 +46,7 @@ import ua.ck.geekhub.ivanov.rssreader.heplers.Constants;
 import ua.ck.geekhub.ivanov.rssreader.heplers.DatabaseHelper;
 import ua.ck.geekhub.ivanov.rssreader.heplers.NotifyingScrollView;
 import ua.ck.geekhub.ivanov.rssreader.heplers.UILImageGetter;
-import ua.ck.geekhub.ivanov.rssreader.task.MyTagHandler;
+import ua.ck.geekhub.ivanov.rssreader.heplers.MyTagHandler;
 
 public class DetailsFragment extends Fragment {
 
