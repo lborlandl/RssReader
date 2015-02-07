@@ -224,7 +224,7 @@ public class ListFragment extends android.support.v4.app.ListFragment {
         mActionBar.setSelectedNavigationItem(mSpinnerSelected);
         if (requestCode == Constants.REQUEST_FEED && data != null) {
             mIsResult = true;
-            mCurrentFeed = (Feed) data.getSerializableExtra(Constants.EXTRA_FEED);
+            mCurrentFeed = data.getParcelableExtra(Constants.EXTRA_FEED);
         } else {
             mIsResult = false;
         }

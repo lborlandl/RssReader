@@ -62,7 +62,7 @@ public class DetailsFragment extends Fragment {
 
     public static DetailsFragment newInstance(Feed feed) {
         Bundle args = new Bundle();
-        args.putSerializable(Constants.EXTRA_FEED, feed);
+        args.putParcelable(Constants.EXTRA_FEED, feed);
         DetailsFragment fragment = new DetailsFragment();
         fragment.setArguments(args);
         return fragment;
@@ -70,8 +70,8 @@ public class DetailsFragment extends Fragment {
 
     public static DetailsFragment newInstance(Feed feed, int position) {
         Bundle args = new Bundle();
-        args.putSerializable(Constants.EXTRA_FEED, feed);
-        args.putSerializable(EXTRA_POSITION, position);
+        args.putParcelable(Constants.EXTRA_FEED, feed);
+        args.putInt(EXTRA_POSITION, position);
         DetailsFragment fragment = new DetailsFragment();
         fragment.setArguments(args);
         return fragment;
@@ -82,7 +82,7 @@ public class DetailsFragment extends Fragment {
         super.onCreate(savedInstanceState);
         mActivity = getActivity();
         mIsTableLand = getResources().getBoolean(R.bool.tablet_land);
-        mFeed = (Feed) getArguments().getSerializable(Constants.EXTRA_FEED);
+        mFeed = getArguments().getParcelable(Constants.EXTRA_FEED);
         mUiHelper = new UiLifecycleHelper(mActivity, null);
         mUiHelper.onCreate(savedInstanceState);
         mDb = DatabaseHelper.getInstance(mActivity);

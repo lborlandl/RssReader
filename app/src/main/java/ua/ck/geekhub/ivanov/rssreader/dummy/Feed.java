@@ -1,9 +1,26 @@
 package ua.ck.geekhub.ivanov.rssreader.dummy;
 
-import java.io.Serializable;
+import android.os.Parcel;
+import android.os.Parcelable;
 
-public class Feed implements Serializable {
+public class Feed implements Parcelable {
     private String title, link, image, description, authorName, authorLink, pubDate;
+
+    public Feed() {
+
+    }
+
+    public Feed(Parcel in) {
+        String[] data = new String[7];
+        in.readStringArray(data);
+        title = data[0];
+        link = data[1];
+        image = data[2];
+        description = data[3];
+        authorName = data[4];
+        authorLink = data[5];
+        pubDate = data[6];
+    }
 
     public String getTitle() {
         return title;
@@ -83,4 +100,29 @@ public class Feed implements Serializable {
         }
         return feed.getLink().equals(getLink());
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeStringArray(new String[]{
+                title, link, image, description, authorName, authorLink, pubDate
+        });
+    }
+
+    public static final Parcelable.Creator<Feed> CREATOR = new Parcelable.Creator<Feed>() {
+
+        @Override
+        public Feed createFromParcel(Parcel source) {
+            return new Feed(source);
+        }
+
+        @Override
+        public Feed[] newArray(int size) {
+            return new Feed[size];
+        }
+    };
 }

@@ -61,7 +61,7 @@ public class DetailsActivity extends ActionBarActivity {
         } else {
             mCurrentFeed = intExtra;
         }
-        mFeeds = (ArrayList<Feed>) getIntent().getSerializableExtra(Constants.EXTRA_FEEDS);
+        mFeeds = getIntent().getParcelableArrayListExtra(Constants.EXTRA_FEEDS);
         if (mFeeds == null) {
             mFeeds = new ArrayList<>();
         }
