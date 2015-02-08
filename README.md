@@ -1,5 +1,5 @@
 # RssReader
-Reader for trashbox.ru<br>
+Reader for <a href="http://trashbox.ru/">trashbox.ru</a>
 <h2>Downloads</h2>
 <a href="https://drive.google.com/file/d/0B0cFiA2IrxXKN0VTOHg5ZEdsRTA/">
 <img src="http://www.bfw-datentechnik.de/layout/extensions/apk.png" height="180px" style="max-width:100%;"></a>
