@@ -36,8 +36,8 @@
             <View
                 android:id="@+id/gradient"
                 android:layout_width="match_parent"
-                android:layout_height="70dp"
-                android:background="@drawable/gradient" />
+                android:layout_height="60dp"
+                android:background="@drawable/gradient"/>
 
         </FrameLayout>
 
