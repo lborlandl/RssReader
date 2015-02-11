@@ -7,7 +7,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:parallax_factor="1.9"
-    tools:context=".ListActivity" >
+    tools:context=".ListActivity"
+    android:background="@android:color/white">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -44,7 +45,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:background="@color/common_signin_btn_light_text_pressed">
+            android:background="@android:color/white">
 
             <TextView
                 android:id="@+id/text_view_title"
@@ -60,12 +61,6 @@
                 android:paddingRight="15dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
-
-            <!--<TextView-->
-            <!--android:id="@+id/text_view_date"-->
-            <!--style="@style/TextStyle"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content" />-->
 
             <Button
                 android:id="@+id/button_link"

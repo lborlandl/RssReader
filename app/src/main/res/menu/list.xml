@@ -3,23 +3,23 @@
     <item
         android:id="@+id/action_login"
         android:orderInCategory="100"
-        app:showAsAction="never"
-        android:title="@string/action_login" />
+        android:title="@string/action_login"
+        app:showAsAction="never" />
     <item
         android:id="@+id/action_settings"
         android:orderInCategory="200"
-        app:showAsAction="never"
         android:title="@string/action_settings"
-        android:visible="true"/>
+        android:visible="false"
+        app:showAsAction="never" />
 
     <item
         android:id="@+id/menu_delete_all_favourite"
         android:title="@string/delete_all_favourite"
-        app:showAsAction="never"
-        android:visible="false"/>
+        android:visible="false"
+        app:showAsAction="never" />
 
     <item
         android:id="@+id/menu_change_notification"
         android:title="@string/on_notification"
-        app:showAsAction="never"/>
+        app:showAsAction="never" />
 </menu>
