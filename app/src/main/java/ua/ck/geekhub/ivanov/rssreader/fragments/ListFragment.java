@@ -45,6 +45,7 @@ import java.util.Locale;
 import ua.ck.geekhub.ivanov.rssreader.R;
 import ua.ck.geekhub.ivanov.rssreader.activities.DetailsActivity;
 import ua.ck.geekhub.ivanov.rssreader.activities.LoginActivity;
+import ua.ck.geekhub.ivanov.rssreader.activities.SettingsActivity;
 import ua.ck.geekhub.ivanov.rssreader.dummy.Feed;
 import ua.ck.geekhub.ivanov.rssreader.heplers.Constants;
 import ua.ck.geekhub.ivanov.rssreader.heplers.DatabaseHelper;
@@ -292,6 +293,7 @@ public class ListFragment extends android.support.v4.app.ListFragment {
         int id = item.getItemId();
         switch (id) {
             case R.id.action_settings:
+                startActivity(new Intent(getActivity(), SettingsActivity.class));
                 return true;
             case R.id.action_login:
                 startActivity(new Intent(getActivity(), LoginActivity.class));
