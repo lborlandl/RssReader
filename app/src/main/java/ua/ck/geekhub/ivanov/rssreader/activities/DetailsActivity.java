@@ -10,8 +10,6 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 
-import com.readystatesoftware.systembartint.SystemBarTintManager;
-
 import java.util.ArrayList;
 
 import ua.ck.geekhub.ivanov.rssreader.R;
@@ -28,7 +26,6 @@ public class DetailsActivity extends ActionBarActivity {
     private static final String FEED_SELECTED = "feed_selected";
     private Drawable mActionBarBackgroundDrawable;
     private int[] mAlpha;
-    private SystemBarTintManager mTintManager;
 
     public void setAlpha(int alpha) {
         setAlpha(alpha, -1);
@@ -39,17 +36,11 @@ public class DetailsActivity extends ActionBarActivity {
             mAlpha[position] = alpha;
         }
         mActionBarBackgroundDrawable.setAlpha(alpha);
-        float alphaForStatusBar = ((float) alpha) / 255f;
-        mTintManager.setStatusBarAlpha(alphaForStatusBar);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        mTintManager = new SystemBarTintManager(this);
-        mTintManager.setStatusBarTintEnabled(true);
-        mTintManager.setStatusBarTintColor(getResources().getColor(R.color.action_bar_blue));
 
         mAlpha = new int[getIntent().getIntExtra(Constants.EXTRA_FEEDS_COUNT, 10)];
         

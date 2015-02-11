@@ -8,8 +8,9 @@
     <style name="AppTheme.ActionBar"  parent="@style/Theme.AppCompat.Light"/>
 
     <style name="AppTheme.ActionBar.Overlay" parent="AppTheme.ActionBar">
-        <item name="android:windowActionBarOverlay">true</item>
         <item name="windowActionBarOverlay">true</item>
         <item name="android:windowContentOverlay">@null</item>
     </style>
+
+    <style name="AppTheme.ActionBar.SystemOverlay" parent="AppTheme.ActionBar" />
 </resources>

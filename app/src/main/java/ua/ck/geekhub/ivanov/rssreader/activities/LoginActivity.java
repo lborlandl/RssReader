@@ -17,6 +17,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
+import com.readystatesoftware.systembartint.SystemBarTintManager;
 
 import java.io.InputStream;
 
@@ -41,6 +42,10 @@ public class LoginActivity extends ActionBarActivity  implements
         actionBar.setBackgroundDrawable(getResources()
                 .getDrawable(R.drawable.ab_solid_toolbarstyle_list));
         setContentView(R.layout.activity_login);
+
+        SystemBarTintManager tintManager = new SystemBarTintManager(this);
+        tintManager.setStatusBarTintEnabled(true);
+        tintManager.setStatusBarTintColor(getResources().getColor(R.color.system_bar_blue));
 
         findViewById(R.id.sign_in_button).setOnClickListener(this);
         mGoogleApiClient = new GoogleApiClient.Builder(this)

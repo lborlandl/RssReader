@@ -25,7 +25,7 @@ public class ListActivity extends ActionBarActivity {
 
         SystemBarTintManager tintManager = new SystemBarTintManager(this);
         tintManager.setStatusBarTintEnabled(true);
-        tintManager.setStatusBarTintColor(getResources().getColor(R.color.action_bar_blue));
+        tintManager.setStatusBarTintColor(getResources().getColor(R.color.system_bar_blue));
 
         if (savedInstanceState == null && mFeedFragment == null) {
             mFeedFragment = new ListFragment();
