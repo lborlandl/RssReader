@@ -33,4 +33,11 @@
     <string name="button_yes">Очистити</string>
     <string name="button_no">Відміна</string>
     <string name="message_dialog">Ви дійсно бажаєте очистити обране? Цю операцію неможливо відмінити!</string>
+    <string name="button_try_again">Повторити спробу</string>
+    <string name="warning_favourite">Ви не додали статтів в обране.\nПерейдіть до розділу з новинами і додайте декілька статей.</string>
+    <string name="warning_news">При завантаженні даних трапилась помилка.\nПеревірте Ваше підключення до мережі.</string>
+    <string name="go_to_favourite">Перейти в обране</string>
+    <string name="go_to_news">Перейти до новин</string>
+    <string name="no_favourite">Відсутні обрані статті</string>
+    <string name="author">Автор</string>
 </resources>

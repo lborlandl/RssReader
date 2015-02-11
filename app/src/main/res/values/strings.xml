@@ -18,7 +18,7 @@
     <string name="remove_from_favourite">Удалить из избранного</string>
     <string name="share">Поделиться</string>
     <string name="share_facebook">Поделиться</string>
-    <string name="no_favourite">Нет избранных новостей</string>
+    <string name="no_favourite">Нет избранных статей</string>
     <string name="on_notification">Включить уведомления</string>
     <string name="off_notification">Выключить уведомления</string>
 
@@ -34,9 +34,12 @@
     <string name="news">Новость</string>
     <string name="article">Статья</string>
     <string name="title_facebook_login">title_facebook_login</string>
-    <string name="error_for_empty_list">При загрузке данных произошла ошибка.\nПроверьте Ваше подключение к сети.</string>
-    <string name="try_again">Повторить попытку</string>
+
+    <string name="warning_news">При загрузке данных произошла ошибка.\nПроверьте Ваше подключение к сети.</string>
+    <string name="warning_favourite">Вы не добавили статей в избранное.\nПерейдите в раздел с новостями и добавьте несколько статей.</string>
+    <string name="button_try_again">Повторить попытку</string>
     <string name="go_to_favourite">Перейти в избранное</string>
+    <string name="go_to_news">Перейти в новости</string>
 
     <string-array name="spinner_list">
         <item>Новости</item>

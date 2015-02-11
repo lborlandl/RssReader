@@ -23,6 +23,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -73,6 +74,10 @@ public class ListFragment extends android.support.v4.app.ListFragment {
 
     private int mTask = 0;
 
+    private TextView mTextViewEmpty;
+    private View mButtonTryAgain;
+    private Button mButtonGoToOther;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -111,46 +116,9 @@ public class ListFragment extends android.support.v4.app.ListFragment {
         }
 
         mContext = mActivity.getApplicationContext();
-
-        mActionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
-        mActionBar.setDisplayShowTitleEnabled(false);
-        mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
         mProgressBar = view.findViewById(R.id.loading_indicator);
 
-        final String[] dropdownValues = getResources().getStringArray(R.array.spinner_list);
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(mActionBar.getThemedContext(),
-                android.R.layout.simple_spinner_item, android.R.id.text1, dropdownValues);
-
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-        mActionBar.setListNavigationCallbacks(adapter, new ActionBar.OnNavigationListener() {
-            @Override
-            public boolean onNavigationItemSelected(int position, long id) {
-                mSpinnerSelected = position;
-                SharedPreferences.Editor editor = mSharedPreferences.edit();
-                editor.putInt(Constants.EXTRA_SPINNER, position);
-                editor.apply();
-                switch (position) {
-                    case Constants.NEWS:
-                        if (Utils.isOnline(mActivity)) {
-                            showProgressBar();
-                            startDownloadData(Constants.URL_NEWS);
-                        } else {
-                            mFeedList = new ArrayList<>();
-                            updateList();
-                        }
-                        break;
-                    case Constants.FAVOURITE:
-                        DatabaseHelper db = DatabaseHelper.getInstance(getActivity());
-                        mFeedList = db.getAllFeed();
-                        updateList();
-                        break;
-                }
-                return true;
-            }
-        });
-        mActionBar.setSelectedNavigationItem(mSpinnerSelected);
+        setActionBarSetting();
 
         mSwipeLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_container);
         mSwipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -177,6 +145,52 @@ public class ListFragment extends android.support.v4.app.ListFragment {
                 android.R.color.holo_blue_bright,
                 android.R.color.holo_red_light);
 
+        setListViewSetting(view);
+    }
+
+    private void setActionBarSetting() {
+        mActionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
+        mActionBar.setDisplayShowTitleEnabled(false);
+        mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+
+        final String[] dropdownValues = getResources().getStringArray(R.array.spinner_list);
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(mActionBar.getThemedContext(),
+                android.R.layout.simple_spinner_item, android.R.id.text1, dropdownValues);
+
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        mActionBar.setListNavigationCallbacks(adapter, new ActionBar.OnNavigationListener() {
+            @Override
+            public boolean onNavigationItemSelected(int position, long id) {
+                mSpinnerSelected = position;
+                SharedPreferences.Editor editor = mSharedPreferences.edit();
+                editor.putInt(Constants.EXTRA_SPINNER, position);
+                editor.apply();
+                setEmptyViewChanges();
+                switch (position) {
+                    case Constants.NEWS:
+                        if (Utils.isOnline(mActivity)) {
+                            showProgressBar();
+                            startDownloadData(Constants.URL_NEWS);
+                        } else {
+                            mFeedList = new ArrayList<>();
+                            updateList();
+                        }
+                        break;
+                    case Constants.FAVOURITE:
+                        DatabaseHelper db = DatabaseHelper.getInstance(getActivity());
+                        mFeedList = db.getAllFeed();
+                        updateList();
+                        break;
+                }
+                return true;
+            }
+        });
+        mActionBar.setSelectedNavigationItem(mSpinnerSelected);
+    }
+
+    private void setListViewSetting(View view) {
         mList = (ListView) view.findViewById(android.R.id.list);
         mList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -199,21 +213,43 @@ public class ListFragment extends android.support.v4.app.ListFragment {
         });
         mAdapter = new FeedAdapter(mActivity, mFeedList);
         mList.setAdapter(mAdapter);
+
         mListContainer = view.findViewById(R.id.list_container);
-        view.findViewById(R.id.text_view_try_again)
-                .setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        startDownloadData(Constants.URL_NEWS);
-                    }
-                });
-        view.findViewById(R.id.text_view_go_to_favorite)
-                .setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        mActionBar.setSelectedNavigationItem(Constants.FAVOURITE);
-                    }
-                });
+
+        mTextViewEmpty = (TextView) view.findViewById(R.id.text_view_empty);
+        mButtonTryAgain = view.findViewById(R.id.button_empty_try_again);
+        mButtonTryAgain.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showProgressBar();
+                startDownloadData(Constants.URL_NEWS);
+            }
+        });
+
+        mButtonGoToOther = (Button) view.findViewById(R.id.button_empty_go_to_other);
+        mButtonGoToOther.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mSpinnerSelected == Constants.FAVOURITE) {
+                    mActionBar.setSelectedNavigationItem(Constants.NEWS);
+                } else {
+                    mActionBar.setSelectedNavigationItem(Constants.FAVOURITE);
+                }
+            }
+        });
+    }
+
+    private void setEmptyViewChanges() {
+        boolean isFavourite = mSpinnerSelected == Constants.FAVOURITE;
+
+        int text = isFavourite ? R.string.warning_favourite : R.string.warning_news;
+        mTextViewEmpty.setText(text);
+
+        int visibility = isFavourite ? View.GONE : View.VISIBLE;
+        mButtonTryAgain.setVisibility(visibility);
+
+        int textButton = isFavourite ? R.string.go_to_news : R.string.go_to_favourite;
+        mButtonGoToOther.setText(textButton);
     }
 
     @Override
@@ -310,8 +346,9 @@ public class ListFragment extends android.support.v4.app.ListFragment {
             mSwipeLayout.setRefreshing(true);
             new DownloadStringTask().execute(url);
         } else {
-            Toast.makeText(mActivity, R.string.error_for_empty_list, Toast.LENGTH_SHORT).show();
+            Toast.makeText(mActivity, R.string.warning_news, Toast.LENGTH_SHORT).show();
             mSwipeLayout.setRefreshing(false);
+            hideProgressBar();
         }
     }
 
