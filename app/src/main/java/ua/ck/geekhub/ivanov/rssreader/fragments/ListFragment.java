@@ -1,9 +1,7 @@
 package ua.ck.geekhub.ivanov.rssreader.fragments;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -27,6 +25,8 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.afollestad.materialdialogs.MaterialDialog;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -297,24 +297,21 @@ public class ListFragment extends android.support.v4.app.ListFragment {
                 startActivity(new Intent(getActivity(), LoginActivity.class));
                 return true;
             case R.id.menu_delete_all_favourite:
-                AlertDialog.Builder alertDialog = new AlertDialog.Builder(mActivity);
-                alertDialog.setTitle(getString(R.string.title_dialog));
-                alertDialog.setMessage(getString(R.string.message_dialog));
-                alertDialog.setPositiveButton(getString(R.string.button_yes), new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int arg1) {
-                        DatabaseHelper db = DatabaseHelper.getInstance(getActivity());
-                        db.deleteAll();
-                        mFeedList = new ArrayList<>();
-                        updateList();
-                    }
-                });
-                alertDialog.setNegativeButton(getString(R.string.button_no), new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int arg1) {
-
-                    }
-                });
-                alertDialog.setCancelable(true);
-                alertDialog.show();
+                new MaterialDialog.Builder(mActivity)
+                        .title(R.string.title_dialog)
+                        .content(R.string.message_dialog)
+                        .positiveText(R.string.button_yes)
+                        .negativeText(R.string.button_no)
+                        .callback(new MaterialDialog.ButtonCallback() {
+                            @Override
+                            public void onPositive(MaterialDialog dialog) {
+                                DatabaseHelper db = DatabaseHelper.getInstance(getActivity());
+                                db.deleteAll();
+                                mFeedList = new ArrayList<>();
+                                updateList();
+                            }
+                        })
+                        .show();
                 return true;
             case R.id.menu_change_notification:
                 Intent updateServiceIntent = new Intent(getActivity(), UpdateFeedService.class);
