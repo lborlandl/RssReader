@@ -37,6 +37,11 @@
             android:label="@string/title_activity_login"
             android:parentActivityName=".activities.ListActivity"
             android:windowSoftInputMode="adjustResize|stateHidden" />
+        <activity
+            android:name=".activities.SettingsActivity"
+            android:label="@string/action_settings"
+            android:parentActivityName=".activities.ListActivity"
+            android:theme="@style/AppTheme.ActionBar.Overlay" />
 
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
