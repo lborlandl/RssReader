@@ -69,7 +69,6 @@ public class ListFragment extends android.support.v4.app.ListFragment {
     private int mSpinnerSelected;
     private FeedAdapter mAdapter;
 
-    private Context mContext;
     private ActionBarActivity mActivity;
 
     private int mTask = 0;
@@ -95,7 +94,6 @@ public class ListFragment extends android.support.v4.app.ListFragment {
     public void onResume() {
         super.onResume();
         mActivity =(ActionBarActivity) getActivity();
-        mContext = mActivity.getApplicationContext();
     }
 
     @Override
@@ -115,7 +113,6 @@ public class ListFragment extends android.support.v4.app.ListFragment {
             mActivity.startService(updateServiceIntent);
         }
 
-        mContext = mActivity.getApplicationContext();
         mProgressBar = view.findViewById(R.id.loading_indicator);
 
         setActionBarSetting();
@@ -212,7 +209,7 @@ public class ListFragment extends android.support.v4.app.ListFragment {
                 }
             }
         });
-        mAdapter = new FeedAdapter(mActivity, mFeedList);
+        mAdapter = new FeedAdapter(mActivity);
         mList.setAdapter(mAdapter);
 
         mListContainer = view.findViewById(R.id.list_container);
@@ -399,8 +396,7 @@ public class ListFragment extends android.support.v4.app.ListFragment {
     }
 
     private void updateList() {
-        mAdapter = new FeedAdapter(mContext, mFeedList);
-        mList.setAdapter(mAdapter);
+        mAdapter.notifyDataSetChanged();
         mSwipeLayout.setRefreshing(false);
         hideProgressBar();
         if (mIsTableLand) {
@@ -468,11 +464,9 @@ public class ListFragment extends android.support.v4.app.ListFragment {
 
     class FeedAdapter extends BaseAdapter {
 
-        private ArrayList<Feed> mFeedList;
         private LayoutInflater mLayoutInflater;
 
-        public FeedAdapter(Context context, ArrayList<Feed> feedList) {
-            mFeedList = feedList;
+        public FeedAdapter(Context context) {
             mLayoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         }
 
