@@ -6,10 +6,13 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -17,11 +20,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -51,9 +51,10 @@ import ua.ck.geekhub.ivanov.rssreader.heplers.DatabaseHelper;
 import ua.ck.geekhub.ivanov.rssreader.heplers.Utils;
 import ua.ck.geekhub.ivanov.rssreader.services.UpdateFeedService;
 
-public class ListFragment extends android.support.v4.app.ListFragment {
+public class ListFragment extends Fragment {
 
-    private ListView mList;
+//    private ListView mList;
+    private RecyclerView mRecyclerView;
     private View mListContainer;
     private SwipeRefreshLayout mSwipeLayout;
     private View mProgressBar;
@@ -77,6 +78,7 @@ public class ListFragment extends android.support.v4.app.ListFragment {
     private TextView mTextViewEmpty;
     private View mButtonTryAgain;
     private Button mButtonGoToOther;
+    private LinearLayoutManager mLayoutManager;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -145,7 +147,7 @@ public class ListFragment extends android.support.v4.app.ListFragment {
                 android.R.color.holo_blue_bright,
                 android.R.color.holo_red_light);
 
-        setListViewSetting(view);
+        setRecycleViewSetting(view);
     }
 
     private void setActionBarSetting() {
@@ -167,7 +169,7 @@ public class ListFragment extends android.support.v4.app.ListFragment {
                 SharedPreferences.Editor editor = mSharedPreferences.edit();
                 editor.putInt(Constants.EXTRA_SPINNER, position);
                 editor.apply();
-                setEmptyViewChanges();
+//                setEmptyViewChanges();
                 switch (position) {
                     case Constants.NEWS:
                         if (Utils.isOnline(mActivity)) {
@@ -191,32 +193,18 @@ public class ListFragment extends android.support.v4.app.ListFragment {
         mActionBar.setSelectedNavigationItem(mSpinnerSelected);
     }
 
-    private void setListViewSetting(View view) {
-        mList = (ListView) view.findViewById(android.R.id.list);
-        mList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (mIsTableLand) {
-                    if (mFeedList.indexOf(mCurrentFeed) != position) {
-                        mCurrentFeed = mFeedList.get(position);
-                        setCurrentFeed();
-                        mCurrentFeedIndex = position;
-                    }
-                } else {
-                    Intent intent = new Intent(mActivity, DetailsActivity.class);
-                    intent.putExtra(Constants.EXTRA_FEEDS, mFeedList);
-                    intent.putExtra(Constants.EXTRA_POSITION, position);
-                    intent.putExtra(Constants.EXTRA_STATE, mSpinnerSelected);
-                    intent.putExtra(Constants.EXTRA_FEEDS_COUNT, mFeedList.size());
-                    startActivityForResult(intent, Constants.REQUEST_FEED);
-                }
-            }
-        });
-        mAdapter = new FeedAdapter(mActivity, mFeedList);
-        mList.setAdapter(mAdapter);
+    private void setRecycleViewSetting(View view) {
+        mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
+        mRecyclerView.setHasFixedSize(true);
+        mLayoutManager = new LinearLayoutManager(mActivity);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        mAdapter = new FeedAdapter();
+        mRecyclerView.setAdapter(mAdapter);
 
         mListContainer = view.findViewById(R.id.list_container);
+    }
 
+    private void initEmptyView(View view) {
         mTextViewEmpty = (TextView) view.findViewById(R.id.text_view_empty);
         mButtonTryAgain = view.findViewById(R.id.button_empty_try_again);
         mButtonTryAgain.setOnClickListener(new View.OnClickListener() {
@@ -399,8 +387,9 @@ public class ListFragment extends android.support.v4.app.ListFragment {
     }
 
     private void updateList() {
-        mAdapter = new FeedAdapter(mContext, mFeedList);
-        mList.setAdapter(mAdapter);
+//        mAdapter = new FeedAdapter(mContext, mFeedList);
+//        mList.setAdapter(mAdapter);
+        mAdapter.notifyDataSetChanged();
         mSwipeLayout.setRefreshing(false);
         hideProgressBar();
         if (mIsTableLand) {
@@ -412,7 +401,7 @@ public class ListFragment extends android.support.v4.app.ListFragment {
                 int selected = mFeedList.indexOf(mCurrentFeed);
                 if (selected != -1) {
                     mCurrentFeedIndex = selected;
-                    mList.setSelectionFromTop(mCurrentFeedIndex, 0);
+                    mLayoutManager.scrollToPosition(mCurrentFeedIndex);
                 }
             } else {
                 if (!mFeedList.isEmpty()) {
@@ -420,7 +409,7 @@ public class ListFragment extends android.support.v4.app.ListFragment {
                     mCurrentFeedIndex = 0;
                 }
             }
-            mList.setItemChecked(mCurrentFeedIndex, true);
+//            mList.setItemChecked(mCurrentFeedIndex, true);
             setCurrentFeed();
         }
     }
@@ -466,57 +455,54 @@ public class ListFragment extends android.support.v4.app.ListFragment {
         }
     }
 
-    class FeedAdapter extends BaseAdapter {
+    public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder> {
 
-        private ArrayList<Feed> mFeedList;
-        private LayoutInflater mLayoutInflater;
+        public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+            private Feed mFeed;
+            private int mPosition;
+            private TextView mTextViewTitle, mTextViewDate, mTextViewAuthor;
 
-        public FeedAdapter(Context context, ArrayList<Feed> feedList) {
-            mFeedList = feedList;
-            mLayoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        }
-
-        @Override
-        public int getCount() {
-            return mFeedList.size();
-        }
-
-        @Override
-        public Object getItem(int position) {
-            return mFeedList.get(position);
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
-
-        public Feed getFeed(int position) {
-            return (Feed) getItem(position);
-        }
-
-        @Override
-        public boolean isEmpty() {
-            return mFeedList.isEmpty();
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            ViewHolder viewHolder;
-
-            if (convertView == null) {
-                convertView = mLayoutInflater.inflate(R.layout.feed_item, parent, false);
-
-                viewHolder = new ViewHolder();
-                viewHolder.mTextViewDate = (TextView) convertView.findViewById(R.id.feed_date);
-                viewHolder.mTextViewTitle = (TextView) convertView.findViewById(R.id.feed_title);
-                viewHolder.mTextViewAuthor = (TextView) convertView.findViewById(R.id.feed_author);
-
-                convertView.setTag(viewHolder);
-            } else {
-                viewHolder = (ViewHolder) convertView.getTag();
+            public ViewHolder(View itemView) {
+                super(itemView);
+                mTextViewDate = (TextView) itemView.findViewById(R.id.feed_date);
+                mTextViewTitle = (TextView) itemView.findViewById(R.id.feed_title);
+                mTextViewAuthor = (TextView) itemView.findViewById(R.id.feed_author);
+                itemView.setOnClickListener(this);
             }
 
+            public void bindFeed(Feed feed, int position) {
+                mFeed = feed;
+                mPosition = position;
+            }
+
+            @Override
+            public void onClick(View v) {
+                if (mIsTableLand) {
+                    if (mFeedList.indexOf(mCurrentFeed) != mPosition) {
+                        mCurrentFeed = mFeed;
+                        setCurrentFeed();
+                        mCurrentFeedIndex = mPosition;
+                    }
+                } else {
+                    Intent intent = new Intent(mActivity, DetailsActivity.class);
+                    intent.putExtra(Constants.EXTRA_FEEDS, mFeedList);
+                    intent.putExtra(Constants.EXTRA_POSITION, mPosition);
+                    intent.putExtra(Constants.EXTRA_STATE, mSpinnerSelected);
+                    intent.putExtra(Constants.EXTRA_FEEDS_COUNT, mFeedList.size());
+                    startActivityForResult(intent, Constants.REQUEST_FEED);
+                }
+            }
+        }
+
+        @Override
+        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.feed_item, parent, false);
+            return new ViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(ViewHolder holder, int position) {
             Feed feed = getFeed(position);
 
             Date date = new Date();
@@ -527,19 +513,22 @@ public class ListFragment extends android.support.v4.app.ListFragment {
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM HH:mm");
 
-            viewHolder.mTextViewDate.setText(convertView.getResources()
+            holder.mTextViewTitle.setText(Html.fromHtml(feed.getTitle()));
+            holder.mTextViewDate.setText(holder.mTextViewTitle.getResources()
                     .getString(R.string.published) + " " + dateFormat.format(date));
-            viewHolder.mTextViewTitle.setText(Html.fromHtml(feed.getTitle()));
-            viewHolder.mTextViewAuthor.setText(", " + feed.getAuthorName());
-
-            return convertView;
+            holder.mTextViewAuthor.setText(", " + feed.getAuthorName());
+            holder.bindFeed(feed, position);
         }
-    }
 
-    static class ViewHolder {
-        TextView mTextViewTitle, mTextViewDate, mTextViewAuthor;
+        @Override
+        public int getItemCount() {
+            return mFeedList.size();
+        }
+
+        public Feed getFeed(int position) {
+            return mFeedList.get(position);
+        }
     }
 }
