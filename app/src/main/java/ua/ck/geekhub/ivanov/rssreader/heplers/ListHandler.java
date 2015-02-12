@@ -5,7 +5,7 @@ import android.text.Html;
 
 import org.xml.sax.XMLReader;
 
-public class MyTagHandler implements Html.TagHandler {
+public class ListHandler implements Html.TagHandler {
     boolean first = true;
     String parent = null;
     int index = 1;

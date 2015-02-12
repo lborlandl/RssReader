@@ -46,7 +46,7 @@ import ua.ck.geekhub.ivanov.rssreader.heplers.Constants;
 import ua.ck.geekhub.ivanov.rssreader.heplers.DatabaseHelper;
 import ua.ck.geekhub.ivanov.rssreader.heplers.NotifyingScrollView;
 import ua.ck.geekhub.ivanov.rssreader.heplers.UILImageGetter;
-import ua.ck.geekhub.ivanov.rssreader.heplers.MyTagHandler;
+import ua.ck.geekhub.ivanov.rssreader.heplers.ListHandler;
 
 public class DetailsFragment extends Fragment {
 
@@ -142,7 +142,7 @@ public class DetailsFragment extends Fragment {
 
         TextView textViewDescription = (TextView) view.findViewById(R.id.text_view_description);
         Spanned spanned = Html.fromHtml(mFeed.getDescription(),
-                new UILImageGetter(textViewDescription, mActivity), new MyTagHandler());
+                new UILImageGetter(textViewDescription, mActivity), new ListHandler());
         textViewDescription.setText(spanned);
 
         view.findViewById(R.id.button_link).setOnClickListener(new View.OnClickListener() {

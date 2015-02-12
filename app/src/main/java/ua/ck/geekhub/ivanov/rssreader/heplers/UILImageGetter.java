@@ -68,10 +68,8 @@ public class UILImageGetter implements Html.ImageGetter {
             urlImageDownloader.setBounds(0, 0, newWidth, newHeight);
             urlImageDownloader.drawable = result;
 
-
-            container.invalidate();
-
             container.setHeight((container.getHeight() + result.getIntrinsicHeight()));
+            container.invalidate();
         }
     }
 
