@@ -1,6 +1,5 @@
 package ua.ck.geekhub.ivanov.rssreader.fragments;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -71,7 +70,7 @@ public class ListFragment extends android.support.v4.app.ListFragment {
     private FeedAdapter mAdapter;
 
     private Context mContext;
-    private Activity mActivity;
+    private ActionBarActivity mActivity;
 
     private int mTask = 0;
 
@@ -95,7 +94,7 @@ public class ListFragment extends android.support.v4.app.ListFragment {
     @Override
     public void onResume() {
         super.onResume();
-        mActivity = getActivity();
+        mActivity =(ActionBarActivity) getActivity();
         mContext = mActivity.getApplicationContext();
     }
 
@@ -105,7 +104,7 @@ public class ListFragment extends android.support.v4.app.ListFragment {
         if (savedInstanceState != null) {
             mSpinnerSelected = savedInstanceState.getInt(Constants.EXTRA_SPINNER);
         }
-        mActivity = getActivity();
+        mActivity = (ActionBarActivity) getActivity();
         mSharedPreferences = PreferenceManager
                 .getDefaultSharedPreferences(mActivity);
 
@@ -141,7 +140,7 @@ public class ListFragment extends android.support.v4.app.ListFragment {
             }
         });
         mSwipeLayout.setColorSchemeResources(
-                R.color.action_bar_blue,
+                R.color.color_primary,
                 android.R.color.holo_orange_light,
                 android.R.color.holo_blue_bright,
                 android.R.color.holo_red_light);
@@ -150,7 +149,7 @@ public class ListFragment extends android.support.v4.app.ListFragment {
     }
 
     private void setActionBarSetting() {
-        mActionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
+        mActionBar = mActivity.getSupportActionBar();
         mActionBar.setDisplayShowTitleEnabled(false);
         mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 
@@ -183,6 +182,7 @@ public class ListFragment extends android.support.v4.app.ListFragment {
                         DatabaseHelper db = DatabaseHelper.getInstance(getActivity());
                         mFeedList = db.getAllFeed();
                         updateList();
+                        mActivity.supportInvalidateOptionsMenu();
                         break;
                 }
                 return true;
@@ -274,18 +274,11 @@ public class ListFragment extends android.support.v4.app.ListFragment {
 
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
-        MenuItem itemDeleteAllFavourite = menu.findItem(R.id.menu_delete_all_favourite);
-        if (mSpinnerSelected == Constants.FAVOURITE) {
-            itemDeleteAllFavourite.setVisible(true);
-        } else {
-            itemDeleteAllFavourite.setVisible(false);
-        }
-        MenuItem itemChangeNotification = menu.findItem(R.id.menu_change_notification);
-        if (mAllowNotification) {
-            itemChangeNotification.setTitle(R.string.off_notification);
-        } else {
-            itemChangeNotification.setTitle(R.string.on_notification);
-        }
+        boolean visibility = (mSpinnerSelected == Constants.FAVOURITE) && !mFeedList.isEmpty();
+        menu.findItem(R.id.menu_delete_all_favourite).setVisible(visibility);
+
+        int title = mAllowNotification ? R.string.off_notification : R.string.on_notification;
+        menu.findItem(R.id.menu_change_notification).setTitle(title);
     }
 
     @Override

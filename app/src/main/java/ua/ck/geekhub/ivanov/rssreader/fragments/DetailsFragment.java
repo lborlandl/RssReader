@@ -1,12 +1,10 @@
 package ua.ck.geekhub.ivanov.rssreader.fragments;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.text.Html;
 import android.text.Spanned;
@@ -44,16 +42,16 @@ import ua.ck.geekhub.ivanov.rssreader.activities.DetailsActivity;
 import ua.ck.geekhub.ivanov.rssreader.dummy.Feed;
 import ua.ck.geekhub.ivanov.rssreader.heplers.Constants;
 import ua.ck.geekhub.ivanov.rssreader.heplers.DatabaseHelper;
+import ua.ck.geekhub.ivanov.rssreader.heplers.ListHandler;
 import ua.ck.geekhub.ivanov.rssreader.heplers.NotifyingScrollView;
 import ua.ck.geekhub.ivanov.rssreader.heplers.UILImageGetter;
-import ua.ck.geekhub.ivanov.rssreader.heplers.ListHandler;
 
 public class DetailsFragment extends Fragment {
 
     private Feed mFeed;
     private boolean mIsTableLand, mIsFavourite;
     private UiLifecycleHelper mUiHelper;
-    private Activity mActivity;
+    private ActionBarActivity mActivity;
     private DatabaseHelper mDb;
     private int mPosition;
     private static final String EXTRA_POSITION = "EXTRA_POSITION";
@@ -80,7 +78,7 @@ public class DetailsFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mActivity = getActivity();
+        mActivity = (ActionBarActivity) getActivity();
         mIsTableLand = getResources().getBoolean(R.bool.tablet_land);
         mFeed = getArguments().getParcelable(Constants.EXTRA_FEED);
         mUiHelper = new UiLifecycleHelper(mActivity, null);
@@ -103,11 +101,10 @@ public class DetailsFragment extends Fragment {
         if (!mIsTableLand) {
             mPosition = getArguments().getInt(EXTRA_POSITION, 0);
 
-            ActionBar actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
-            final int actionBarHeight = actionBar.getHeight();
+            final int actionBarHeight = mActivity.getSupportActionBar().getHeight();
             boolean isTable = getResources().getBoolean(R.bool.tablet);
             final int imageHeight = isTable ? 250 : 500;
-            final int maxAlpha = 255;
+            final int maxAlpha = 250;
             ((NotifyingScrollView) view.findViewById(R.id.scroll_view)).setOnScrollChangedListener(
                     new NotifyingScrollView.OnScrollChangedListener() {
                         @Override

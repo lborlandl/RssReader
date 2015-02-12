@@ -6,7 +6,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.View;
@@ -17,7 +16,6 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
-import com.readystatesoftware.systembartint.SystemBarTintManager;
 
 import java.io.InputStream;
 
@@ -37,15 +35,8 @@ public class LoginActivity extends ActionBarActivity  implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setBackgroundDrawable(getResources()
-                .getDrawable(R.drawable.ab_solid_toolbarstyle_list));
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         setContentView(R.layout.activity_login);
-
-        SystemBarTintManager tintManager = new SystemBarTintManager(this);
-        tintManager.setStatusBarTintEnabled(true);
-        tintManager.setStatusBarTintColor(getResources().getColor(R.color.system_bar_blue));
 
         findViewById(R.id.sign_in_button).setOnClickListener(this);
         mGoogleApiClient = new GoogleApiClient.Builder(this)

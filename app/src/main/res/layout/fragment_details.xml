@@ -6,9 +6,9 @@
     android:id="@+id/scroll_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@android:color/white"
     app:parallax_factor="1.9"
-    tools:context=".ListActivity"
-    android:background="@android:color/white">
+    tools:context=".ListActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -25,7 +25,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:visibility="gone"/>
+                android:visibility="gone" />
 
             <ImageView
                 android:id="@+id/image_view_feed"
@@ -37,28 +37,26 @@
                 android:id="@+id/gradient"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@drawable/gradient"/>
-
+                android:background="@drawable/gradient" />
         </FrameLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@android:color/white"
             android:orientation="vertical"
-            android:background="@android:color/white">
+            android:padding="15dp">
 
             <TextView
                 android:id="@+id/text_view_title"
                 style="@style/TextTitleStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="15dp" />
+                android:paddingBottom="10dp" />
 
             <TextView
                 android:id="@+id/text_view_description"
                 style="@style/TextStyle"
-                android:layout_marginLeft="15dp"
-                android:layout_marginRight="15dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
@@ -66,9 +64,7 @@
                 android:id="@+id/button_link"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="15dp"
-                android:layout_marginLeft="15dp"
-                android:layout_marginRight="15dp"
+                android:layout_marginTop="15dp"
                 android:text="@string/read_on_site" />
         </LinearLayout>
     </LinearLayout>

@@ -1,6 +1,7 @@
 package ua.ck.geekhub.ivanov.rssreader.activities;
 
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -9,6 +10,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.view.View;
 
 import java.util.ArrayList;
 
@@ -24,26 +26,15 @@ public class DetailsActivity extends ActionBarActivity {
     private int mCurrentFeed;
 
     private static final String FEED_SELECTED = "feed_selected";
-    private Drawable mActionBarBackgroundDrawable;
+    private Drawable mActionBarBackground;
     private int[] mAlpha;
-
-    public void setAlpha(int alpha) {
-        setAlpha(alpha, -1);
-    }
-
-    public void setAlpha(int alpha, int position) {
-        if (position != -1) {
-            mAlpha[position] = alpha;
-        }
-        mActionBarBackgroundDrawable.setAlpha(alpha);
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         mAlpha = new int[getIntent().getIntExtra(Constants.EXTRA_FEEDS_COUNT, 10)];
-        
+
         int intExtra = getIntent().getIntExtra(Constants.EXTRA_POSITION, 0);
         if (savedInstanceState != null) {
             mAlpha = savedInstanceState.getIntArray(INT_ARRAY);
@@ -66,15 +57,18 @@ public class DetailsActivity extends ActionBarActivity {
             finish();
         }
 
-        mActionBarBackgroundDrawable =
-                getResources().getDrawable(R.drawable.ab_solid_toolbarstyle);
+        mActionBarBackground = new ColorDrawable(getResources().getColor(R.color.color_primary));
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
+
         if (!isTableLand) {
-            actionBar.setBackgroundDrawable(mActionBarBackgroundDrawable);
+            actionBar.setBackgroundDrawable(mActionBarBackground);
             setAlpha(0);
         }
+
+        int titleId = getResources().getIdentifier("action_bar_title", "id", "android");
+        View abTitle = findViewById(R.id.action_bar_title);
 
         final ViewPager viewPager = new ViewPager(this);
         viewPager.setId(R.id.viewPager);
@@ -123,6 +117,18 @@ public class DetailsActivity extends ActionBarActivity {
         });
 
         viewPager.setCurrentItem(mCurrentFeed);
+    }
+
+
+    public void setAlpha(int alpha) {
+        setAlpha(alpha, -1);
+    }
+
+    public void setAlpha(int alpha, int position) {
+        if (position != -1) {
+            mAlpha[position] = alpha;
+        }
+        mActionBarBackground.setAlpha(alpha);
     }
 
     @Override
