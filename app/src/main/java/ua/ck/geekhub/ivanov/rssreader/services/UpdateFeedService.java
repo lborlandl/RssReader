@@ -26,6 +26,7 @@ import ua.ck.geekhub.ivanov.rssreader.R;
 import ua.ck.geekhub.ivanov.rssreader.activities.ListActivity;
 import ua.ck.geekhub.ivanov.rssreader.heplers.Constants;
 import ua.ck.geekhub.ivanov.rssreader.heplers.SharedPreferenceHelper;
+import ua.ck.geekhub.ivanov.rssreader.heplers.Utils;
 
 public class UpdateFeedService extends Service {
 
@@ -105,8 +106,10 @@ public class UpdateFeedService extends Service {
 
         @Override
         protected String doInBackground(String... params) {
+            if (!Utils.isOnline(getApplicationContext())) {
+                return null;
+            }
             StringBuilder stringBuilder = new StringBuilder();
-
             try {
                 java.net.URL url = new java.net.URL(params[0]);
                 BufferedReader bufferedReader =
@@ -133,11 +136,11 @@ public class UpdateFeedService extends Service {
                         .getJSONObject("channel")
                         .getJSONArray("item");
                 s = items.getJSONObject(0).optString("link");
-            } catch (JSONException e) {
+            } catch (JSONException | NullPointerException e) {
                 e.printStackTrace();
             }
             String link = mSPHelper.getLastNewsLink();
-            if (link == null || !link.equals(s)) {
+            if (link == null || (s != null && !link.equals(s))) {
                 if (!mSPHelper.getListRunning()) {
                     buildNotification();
                     mCounter++;
