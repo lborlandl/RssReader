@@ -5,7 +5,9 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.ShareActionProvider;
 import android.text.Html;
 import android.text.Spanned;
 import android.view.LayoutInflater;
@@ -54,6 +56,7 @@ public class DetailsFragment extends Fragment {
     private ActionBarActivity mActivity;
     private DatabaseHelper mDb;
     private int mPosition;
+    private ShareActionProvider mShareActionProvider;
     private static final String EXTRA_POSITION = "EXTRA_POSITION";
 
     private SessionStatusCallback statusCallback = new SessionStatusCallback();
@@ -160,6 +163,9 @@ public class DetailsFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.details, menu);
+        MenuItem menuItem = menu.findItem(R.id.action_share);
+        mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(menuItem);
+        mShareActionProvider.setShareIntent(buildShareIntent());
     }
 
     @Override
@@ -226,6 +232,15 @@ public class DetailsFragment extends Fragment {
 
             }
         });
+    }
+
+    private Intent buildShareIntent() {
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.setAction(Intent.ACTION_SEND);
+        shareIntent.setType("text/plain");
+        shareIntent.putExtra(Intent.EXTRA_SUBJECT, Html.fromHtml(mFeed.getTitle()).toString());
+        shareIntent.putExtra(Intent.EXTRA_TEXT, mFeed.getLink());
+        return shareIntent;
     }
 
     private void publishFeedDialog() {

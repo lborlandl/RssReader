@@ -17,7 +17,7 @@
     <string name="delete_all_favourite">Очистить избранное</string>
     <string name="remove_from_favourite">Удалить из избранного</string>
     <string name="share">Поделиться</string>
-    <string name="share_facebook">Поделиться</string>
+    <string name="share_facebook">Поделиться через Facebook</string>
     <string name="no_favourite">Нет избранных статей</string>
     <string name="allow_notification">Уведомления</string>
 
