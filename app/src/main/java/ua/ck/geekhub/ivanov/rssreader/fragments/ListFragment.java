@@ -395,6 +395,7 @@ public class ListFragment extends android.support.v4.app.ListFragment {
 
     private void updateList() {
         mAdapter.notifyDataSetChanged();
+        mList.setSelectionFromTop(0, 0);
         mSwipeLayout.setRefreshing(false);
         hideProgressBar();
         if (mIsTableLand) {
