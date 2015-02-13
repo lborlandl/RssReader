@@ -138,6 +138,7 @@ public class UpdateFeedService extends Service {
                 s = items.getJSONObject(0).optString("link");
             } catch (JSONException | NullPointerException e) {
                 e.printStackTrace();
+                s = null;
             }
             String link = mSPHelper.getLastNewsLink();
             if (link == null || (s != null && !link.equals(s))) {
