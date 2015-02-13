@@ -63,7 +63,7 @@ public class DetailsActivity extends ActionBarActivity {
 
         if (!isTableLand) {
             actionBar.setBackgroundDrawable(mActionBarBackground);
-            setAlpha(0);
+            setAlpha(mAlpha[mCurrentFeed]);
         }
 
         final ViewPager viewPager = new ViewPager(this);
