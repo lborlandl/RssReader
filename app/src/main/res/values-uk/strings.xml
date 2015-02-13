@@ -13,8 +13,7 @@
     <string name="remove_from_favourite">Видалити з обраного</string>
     <string name="share">Поділитись</string>
     <string name="share_facebook">Поділитись через Facebook</string>
-    <string name="on_notification">Увімкнути нагадування</string>
-    <string name="off_notification">Вимкнути нагадування</string>
+    <string name="allow_notification">Нагадування</string>
 
     <string name="notification_ticker">Є оновлення новин!</string>
     <string name="notification_title">Є оновлення!</string>

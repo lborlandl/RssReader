@@ -10,7 +10,6 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
-import android.view.View;
 
 import java.util.ArrayList;
 
@@ -66,9 +65,6 @@ public class DetailsActivity extends ActionBarActivity {
             actionBar.setBackgroundDrawable(mActionBarBackground);
             setAlpha(0);
         }
-
-        int titleId = getResources().getIdentifier("action_bar_title", "id", "android");
-        View abTitle = findViewById(R.id.action_bar_title);
 
         final ViewPager viewPager = new ViewPager(this);
         viewPager.setId(R.id.viewPager);

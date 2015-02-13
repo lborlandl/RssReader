@@ -19,8 +19,7 @@
     <string name="share">Поделиться</string>
     <string name="share_facebook">Поделиться</string>
     <string name="no_favourite">Нет избранных статей</string>
-    <string name="on_notification">Включить уведомления</string>
-    <string name="off_notification">Выключить уведомления</string>
+    <string name="allow_notification">Уведомления</string>
 
     <string name="button_yes">Очистить</string>
     <string name="button_no">Отмена</string>

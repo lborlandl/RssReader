@@ -6,13 +6,11 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.IBinder;
-import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 
 import org.json.JSONArray;
@@ -27,23 +25,21 @@ import java.util.concurrent.TimeUnit;
 import ua.ck.geekhub.ivanov.rssreader.R;
 import ua.ck.geekhub.ivanov.rssreader.activities.ListActivity;
 import ua.ck.geekhub.ivanov.rssreader.heplers.Constants;
+import ua.ck.geekhub.ivanov.rssreader.heplers.SharedPreferenceHelper;
 
 public class UpdateFeedService extends Service {
 
     private final static int ID = 1;
+    private final static int DAY = 24 * 60 * 60;
 
-    private String mLastLink;
-    private int mUpdateTimeSeconds = 30 * 60;
-    private int count = 0;
+    private SharedPreferenceHelper mSPHelper;
+    private int mCounter = 0;
 
     @Override
     public void onCreate() {
         super.onCreate();
 
-        SharedPreferences sharedPreferences = PreferenceManager
-                .getDefaultSharedPreferences(getApplicationContext());
-
-        mLastLink = sharedPreferences.getString(Constants.LAST_LINK, null);
+        mSPHelper = SharedPreferenceHelper.getInstance(getApplicationContext());
 
         new Thread(new Runnable() {
             @Override
@@ -51,7 +47,14 @@ public class UpdateFeedService extends Service {
                 while (true) {
                     new CheckUpdateTask().execute(Constants.URL_NEWS);
                     try {
-                        TimeUnit.SECONDS.sleep(mUpdateTimeSeconds);
+                        int updateTime;
+                        if (mCounter > mSPHelper.getCountAttempt()) {
+                            mCounter = 0;
+                            updateTime = DAY;
+                        } else {
+                            updateTime = mSPHelper.getUpdateTime();
+                        }
+                        TimeUnit.SECONDS.sleep(updateTime);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -124,17 +127,22 @@ public class UpdateFeedService extends Service {
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
             try {
-                JSONArray items = XML.toJSONObject(s).getJSONObject("rss").getJSONObject("channel")
+                JSONArray items = XML
+                        .toJSONObject(s)
+                        .getJSONObject("rss")
+                        .getJSONObject("channel")
                         .getJSONArray("item");
                 s = items.getJSONObject(0).optString("link");
             } catch (JSONException e) {
-                //TODO: write code here
+                e.printStackTrace();
             }
-            if (mLastLink == null || !mLastLink.equals(s)) {
-                if (count++ > 0) {
+            String link = mSPHelper.getLastNewsLink();
+            if (link == null || !link.equals(s)) {
+                if (!mSPHelper.getListRunning()) {
                     buildNotification();
+                    mCounter++;
                 }
-                mLastLink = s;
+                mSPHelper.putLastNewsLink(s);
             }
         }
     }

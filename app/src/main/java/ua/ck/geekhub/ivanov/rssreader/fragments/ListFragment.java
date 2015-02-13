@@ -2,10 +2,8 @@ package ua.ck.geekhub.ivanov.rssreader.fragments;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
@@ -48,6 +46,7 @@ import ua.ck.geekhub.ivanov.rssreader.activities.SettingsActivity;
 import ua.ck.geekhub.ivanov.rssreader.dummy.Feed;
 import ua.ck.geekhub.ivanov.rssreader.heplers.Constants;
 import ua.ck.geekhub.ivanov.rssreader.heplers.DatabaseHelper;
+import ua.ck.geekhub.ivanov.rssreader.heplers.SharedPreferenceHelper;
 import ua.ck.geekhub.ivanov.rssreader.heplers.Utils;
 import ua.ck.geekhub.ivanov.rssreader.services.UpdateFeedService;
 
@@ -64,7 +63,7 @@ public class ListFragment extends android.support.v4.app.ListFragment {
 
     private int mCurrentFeedIndex;
 
-    private SharedPreferences mSharedPreferences;
+    private SharedPreferenceHelper mSPHelper;
     private boolean mIsTableLand, mAllowNotification, mIsResult = false;
     private int mSpinnerSelected;
     private FeedAdapter mAdapter;
@@ -94,6 +93,13 @@ public class ListFragment extends android.support.v4.app.ListFragment {
     public void onResume() {
         super.onResume();
         mActivity =(ActionBarActivity) getActivity();
+        mSPHelper.putListRunning(true);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mSPHelper.putListRunning(false);
     }
 
     @Override
@@ -103,11 +109,9 @@ public class ListFragment extends android.support.v4.app.ListFragment {
             mSpinnerSelected = savedInstanceState.getInt(Constants.EXTRA_SPINNER);
         }
         mActivity = (ActionBarActivity) getActivity();
-        mSharedPreferences = PreferenceManager
-                .getDefaultSharedPreferences(mActivity);
+        mSPHelper = SharedPreferenceHelper.getInstance(mActivity);
 
-        mAllowNotification = mSharedPreferences
-                .getBoolean(Constants.EXTRA_ALLOW_NOTIFICATION, false);
+        mAllowNotification = mSPHelper.getAllowNotification();
         if (mAllowNotification) {
             Intent updateServiceIntent = new Intent(mActivity, UpdateFeedService.class);
             mActivity.startService(updateServiceIntent);
@@ -161,9 +165,7 @@ public class ListFragment extends android.support.v4.app.ListFragment {
             @Override
             public boolean onNavigationItemSelected(int position, long id) {
                 mSpinnerSelected = position;
-                SharedPreferences.Editor editor = mSharedPreferences.edit();
-                editor.putInt(Constants.EXTRA_SPINNER, position);
-                editor.apply();
+                mSPHelper.putSpinnerPosition(position);
                 setEmptyViewChanges();
                 switch (position) {
                     case Constants.NEWS:
@@ -253,7 +255,7 @@ public class ListFragment extends android.support.v4.app.ListFragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        mSpinnerSelected = mSharedPreferences.getInt(Constants.EXTRA_SPINNER, 0);
+        mSpinnerSelected = mSPHelper.getSpinnerPosition();
         mActionBar.setSelectedNavigationItem(mSpinnerSelected);
         if (requestCode == Constants.REQUEST_FEED && data != null) {
             mIsResult = true;
@@ -274,8 +276,7 @@ public class ListFragment extends android.support.v4.app.ListFragment {
         boolean visibility = (mSpinnerSelected == Constants.FAVOURITE) && !mFeedList.isEmpty();
         menu.findItem(R.id.menu_delete_all_favourite).setVisible(visibility);
 
-        int title = mAllowNotification ? R.string.off_notification : R.string.on_notification;
-        menu.findItem(R.id.menu_change_notification).setTitle(title);
+        menu.findItem(R.id.menu_change_notification).setChecked(mAllowNotification);
     }
 
     @Override
@@ -308,16 +309,13 @@ public class ListFragment extends android.support.v4.app.ListFragment {
             case R.id.menu_change_notification:
                 Intent updateServiceIntent = new Intent(getActivity(), UpdateFeedService.class);
                 if (mAllowNotification) {
-                    item.setTitle(R.string.off_notification);
                     getActivity().stopService(updateServiceIntent);
                 } else {
-                    item.setTitle(R.string.on_notification);
                     getActivity().startService(updateServiceIntent);
                 }
                 mAllowNotification = !mAllowNotification;
-                SharedPreferences.Editor editor = mSharedPreferences.edit();
-                editor.putBoolean(Constants.EXTRA_ALLOW_NOTIFICATION, mAllowNotification);
-                editor.apply();
+                item.setChecked(mAllowNotification);
+                mSPHelper.putAllowNotification(mAllowNotification);
                 return true;
         }
         return super.onOptionsItemSelected(item);
