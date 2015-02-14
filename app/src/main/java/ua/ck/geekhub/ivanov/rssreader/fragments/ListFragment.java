@@ -15,6 +15,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
@@ -43,12 +45,12 @@ import ua.ck.geekhub.ivanov.rssreader.R;
 import ua.ck.geekhub.ivanov.rssreader.activities.DetailsActivity;
 import ua.ck.geekhub.ivanov.rssreader.activities.LoginActivity;
 import ua.ck.geekhub.ivanov.rssreader.activities.SettingsActivity;
-import ua.ck.geekhub.ivanov.rssreader.models.Feed;
-import ua.ck.geekhub.ivanov.rssreader.tools.Constants;
 import ua.ck.geekhub.ivanov.rssreader.heplers.DatabaseHelper;
 import ua.ck.geekhub.ivanov.rssreader.heplers.SharedPreferenceHelper;
-import ua.ck.geekhub.ivanov.rssreader.tools.Utils;
+import ua.ck.geekhub.ivanov.rssreader.models.Feed;
 import ua.ck.geekhub.ivanov.rssreader.services.UpdateFeedService;
+import ua.ck.geekhub.ivanov.rssreader.tools.Constants;
+import ua.ck.geekhub.ivanov.rssreader.tools.Utils;
 
 public class ListFragment extends android.support.v4.app.ListFragment {
 
@@ -92,7 +94,7 @@ public class ListFragment extends android.support.v4.app.ListFragment {
     @Override
     public void onResume() {
         super.onResume();
-        mActivity =(ActionBarActivity) getActivity();
+        mActivity = (ActionBarActivity) getActivity();
         mSPHelper.putListRunning(true);
     }
 
@@ -449,6 +451,7 @@ public class ListFragment extends android.support.v4.app.ListFragment {
     }
 
     class FeedAdapter extends BaseAdapter {
+        private int lastPosition = -1;
 
         private LayoutInflater mLayoutInflater;
 
@@ -478,6 +481,12 @@ public class ListFragment extends android.support.v4.app.ListFragment {
         @Override
         public boolean isEmpty() {
             return mFeedList.isEmpty();
+        }
+
+        @Override
+        public void notifyDataSetChanged() {
+            super.notifyDataSetChanged();
+            lastPosition = -1;
         }
 
         @Override
@@ -514,6 +523,11 @@ public class ListFragment extends android.support.v4.app.ListFragment {
                     .getString(R.string.published) + " " + dateFormat.format(date));
             viewHolder.mTextViewTitle.setText(Html.fromHtml(feed.getTitle()));
             viewHolder.mTextViewAuthor.setText(", " + feed.getAuthorName());
+
+            int id = position > lastPosition ? R.anim.abc_slide_in_bottom : R.anim.abc_slide_in_top;
+            Animation animation = AnimationUtils.loadAnimation(getActivity(), id);
+            convertView.startAnimation(animation);
+            lastPosition = position;
 
             return convertView;
         }
