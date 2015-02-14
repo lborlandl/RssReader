@@ -64,7 +64,7 @@ public class ListFragment extends android.support.v4.app.ListFragment {
     private int mCurrentFeedIndex;
 
     private SharedPreferenceHelper mSPHelper;
-    private boolean mIsTableLand, mAllowNotification, mIsResult = false;
+    private boolean mIsTableLand, mIsResult = false;
     private int mSpinnerSelected;
     private FeedAdapter mAdapter;
 
@@ -111,8 +111,7 @@ public class ListFragment extends android.support.v4.app.ListFragment {
         mActivity = (ActionBarActivity) getActivity();
         mSPHelper = SharedPreferenceHelper.getInstance(mActivity);
 
-        mAllowNotification = mSPHelper.getAllowNotification();
-        if (mAllowNotification) {
+        if (mSPHelper.isNotification()) {
             Intent updateServiceIntent = new Intent(mActivity, UpdateFeedService.class);
             mActivity.startService(updateServiceIntent);
         }
@@ -275,8 +274,6 @@ public class ListFragment extends android.support.v4.app.ListFragment {
     public void onPrepareOptionsMenu(Menu menu) {
         boolean visibility = (mSpinnerSelected == Constants.FAVOURITE) && !mFeedList.isEmpty();
         menu.findItem(R.id.menu_delete_all_favourite).setVisible(visibility);
-
-        menu.findItem(R.id.menu_change_notification).setChecked(mAllowNotification);
     }
 
     @Override
@@ -305,17 +302,6 @@ public class ListFragment extends android.support.v4.app.ListFragment {
                             }
                         })
                         .show();
-                return true;
-            case R.id.menu_change_notification:
-                Intent updateServiceIntent = new Intent(getActivity(), UpdateFeedService.class);
-                if (mAllowNotification) {
-                    getActivity().stopService(updateServiceIntent);
-                } else {
-                    getActivity().startService(updateServiceIntent);
-                }
-                mAllowNotification = !mAllowNotification;
-                item.setChecked(mAllowNotification);
-                mSPHelper.putAllowNotification(mAllowNotification);
                 return true;
         }
         return super.onOptionsItemSelected(item);

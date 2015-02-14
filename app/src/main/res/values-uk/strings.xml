@@ -13,7 +13,6 @@
     <string name="remove_from_favourite">Видалити з обраного</string>
     <string name="share">Поділитись</string>
     <string name="share_facebook">Поділитись через Facebook</string>
-    <string name="allow_notification">Нагадування</string>
 
     <string name="notification_ticker">Є оновлення новин!</string>
     <string name="notification_title">Є оновлення!</string>
@@ -39,4 +38,12 @@
     <string name="go_to_news">Перейти до новин</string>
     <string name="no_favourite">Відсутні обрані статті</string>
     <string name="author">Автор</string>
+    <string name="pref_notification">Сповіщення</string>
+    <string name="pref_notification_delay">Період сповіщень</string>
+    <string name="pref_notification_led">Світловий індикатор</string>
+    <string name="pref_notification_sound">Звуковий сигнал</string>
+    <string name="pref_notification_vibration">Вібрація</string>
+    <string name="pref_summary_one">Перевірка оновлень кожних</string>
+    <string name="pref_summary_two">хв.</string>
+    <string name="pref_notification_delay_text">Встановіть період спроб оновлень в хвилинах</string>
 </resources>

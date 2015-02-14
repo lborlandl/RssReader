@@ -10,13 +10,16 @@ public class SharedPreferenceHelper {
 
     private SharedPreferences mSharedPreferences;
 
-    public static final String ALLOW_NOTIFICATION = "allow_notification";
+    public static final String NOTIFICATION_ON = "pref_key_notification_on";
+    public static final String NOTIFICATION_VIBRATION = "pref_key_notification_vibration";
+    public static final String NOTIFICATION_LED = "pref_key_notification_led";
+    public static final String NOTIFICATION_SOUND = "pref_key_notification_sound";
+    public static final String NOTIFICATION_DELAY = "pref_key_notification_delay";
+
     public static final String SPINNER_POSITION = "spinner_position";
     public static final String LAST_NEWS_LINK = "last_news_link";
-    public static final String UPDATE_TIME = "time_for_update";
     public static final String RUNNING_LIST_FRAGMENT = "running_list_fragment";
     public static final String ATTEMPT_TO_UPDATE = "attempt_to_update";
-
 
     private SharedPreferenceHelper(Context context) {
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -29,14 +32,24 @@ public class SharedPreferenceHelper {
         return mInstance;
     }
 
-    public boolean getAllowNotification() {
-        return mSharedPreferences.getBoolean(ALLOW_NOTIFICATION, false);
+    public boolean isNotification() {
+        return mSharedPreferences.getBoolean(NOTIFICATION_ON, false);
     }
 
-    public void putAllowNotification(boolean isAllow) {
-        mSharedPreferences.edit()
-                .putBoolean(ALLOW_NOTIFICATION, isAllow)
-                .apply();
+    public boolean isVibration() {
+        return mSharedPreferences.getBoolean(NOTIFICATION_VIBRATION, true);
+    }
+
+    public boolean isLed() {
+        return mSharedPreferences.getBoolean(NOTIFICATION_LED, false);
+    }
+
+    public boolean isSound() {
+        return mSharedPreferences.getBoolean(NOTIFICATION_SOUND, true);
+    }
+
+    public int getDelay() {
+        return mSharedPreferences.getInt(NOTIFICATION_DELAY, 3);
     }
 
     public int getSpinnerPosition() {
@@ -59,23 +72,7 @@ public class SharedPreferenceHelper {
                 .apply();
     }
 
-    public int getUpdateTime() {
-        return mSharedPreferences.getInt(UPDATE_TIME, (30 * 60));
-    }
-
-    public void putTimeSecond(int second) {
-        mSharedPreferences.edit()
-                .putInt(UPDATE_TIME, second)
-                .apply();
-    }
-
-    public void putTimeMinute(int minute) {
-        mSharedPreferences.edit()
-                .putInt(UPDATE_TIME, (minute / 60))
-                .apply();
-    }
-
-    public boolean getListRunning() {
+    public boolean isListRunning() {
         return mSharedPreferences.getBoolean(RUNNING_LIST_FRAGMENT, false);
     }
 
@@ -87,11 +84,5 @@ public class SharedPreferenceHelper {
 
     public int getCountAttempt() {
         return mSharedPreferences.getInt(ATTEMPT_TO_UPDATE, (3));
-    }
-
-    public void putCountAttempt(int count) {
-        mSharedPreferences.edit()
-                .putInt(ATTEMPT_TO_UPDATE, count)
-                .apply();
     }
 }

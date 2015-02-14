@@ -2,26 +2,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/action_login"
-        android:orderInCategory="100"
         android:title="@string/action_login"
         app:showAsAction="never" />
+
     <item
         android:id="@+id/action_settings"
-        android:orderInCategory="200"
         android:title="@string/action_settings"
-        android:visible="false"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/menu_delete_all_favourite"
         android:title="@string/delete_all_favourite"
         android:visible="false"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/menu_change_notification"
-        android:checkable="true"
-        android:checked="false"
-        android:title="@string/allow_notification"
         app:showAsAction="never" />
 </menu>

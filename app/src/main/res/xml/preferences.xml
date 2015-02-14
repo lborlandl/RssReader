@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="@string/pref_notification">
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="pref_key_notification_on"
+            android:title="@string/pref_notification" />
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:dependency="pref_key_notification_on"
+            android:key="pref_key_notification_vibration"
+            android:title="@string/pref_notification_vibration" />
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:dependency="pref_key_notification_on"
+            android:key="pref_key_notification_led"
+            android:title="@string/pref_notification_led" />
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:dependency="pref_key_notification_on"
+            android:key="pref_key_notification_sound"
+            android:title="@string/pref_notification_sound" />
+
+        <ua.ck.geekhub.ivanov.rssreader.heplers.NumberPickerPreference
+            android:dependency="pref_key_notification_on"
+            android:key="pref_key_notification_delay"
+            android:title="@string/pref_notification_delay" />
+    </PreferenceCategory>
+</PreferenceScreen>

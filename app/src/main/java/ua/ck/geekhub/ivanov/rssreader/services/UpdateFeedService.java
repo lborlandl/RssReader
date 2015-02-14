@@ -48,14 +48,14 @@ public class UpdateFeedService extends Service {
                 while (true) {
                     new CheckUpdateTask().execute(Constants.URL_NEWS);
                     try {
-                        int updateTime;
+                        int delay;
                         if (mCounter > mSPHelper.getCountAttempt()) {
                             mCounter = 0;
-                            updateTime = DAY;
+                            delay = DAY;
                         } else {
-                            updateTime = mSPHelper.getUpdateTime();
+                            delay = mSPHelper.getDelay() * 60;
                         }
-                        TimeUnit.SECONDS.sleep(updateTime);
+                        TimeUnit.SECONDS.sleep(delay);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -96,7 +96,15 @@ public class UpdateFeedService extends Service {
                 .setContentIntent(resultPendingIntent);
 
         Notification notification = builder.build();
-        notification.defaults = Notification.DEFAULT_ALL;
+        if (mSPHelper.isVibration()) {
+            notification.defaults |= Notification.DEFAULT_VIBRATE;
+        }
+        if (mSPHelper.isLed()) {
+            notification.defaults |= Notification.DEFAULT_LIGHTS;
+        }
+        if (mSPHelper.isSound()) {
+            notification.defaults |= Notification.DEFAULT_SOUND;
+        }
 
         nm.notify(ID, notification);
 //        startForeground(ID, builder.build());
@@ -142,7 +150,7 @@ public class UpdateFeedService extends Service {
             }
             String link = mSPHelper.getLastNewsLink();
             if (link == null || (s != null && !link.equals(s))) {
-                if (!mSPHelper.getListRunning()) {
+                if (!mSPHelper.isListRunning()) {
                     buildNotification();
                     mCounter++;
                 }
