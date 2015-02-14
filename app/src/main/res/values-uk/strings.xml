@@ -4,8 +4,6 @@
     <string name="action_settings">Налаштування</string>
     <string name="published">Опубліковано</string>
     <string name="read_on_site">Читати на сайті</string>
-    <string name="not_network">Немає підключення</string>
-    <string name="no_data">Відсутні дані</string>
     <string name="error_download">Помилка завантаження</string>
     <string name="action_login">Вхід</string>
     <string name="add_to_favourite">Додати в обране</string>
@@ -19,7 +17,6 @@
     <string name="notification_text">Натисніть для перегляду оновлень</string>
 
     <string name="news">Новина</string>
-    <string name="article">Стаття</string>
 
     <string-array name="spinner_list">
         <item>Новини</item>
@@ -37,7 +34,6 @@
     <string name="go_to_favourite">Перейти в обране</string>
     <string name="go_to_news">Перейти до новин</string>
     <string name="no_favourite">Відсутні обрані статті</string>
-    <string name="author">Автор</string>
     <string name="pref_notification">Сповіщення</string>
     <string name="pref_notification_delay">Період сповіщень</string>
     <string name="pref_notification_led">Світловий індикатор</string>
