@@ -24,7 +24,7 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:text=""
-        style="@style/TextTitleStyle" />
+        style="@style/text_title" />
 
     <com.google.android.gms.common.SignInButton
         android:id="@+id/sign_in_button"

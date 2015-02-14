@@ -6,4 +6,6 @@
     <color name="color_primary">#1FB6F2</color>
     <color name="color_primary_dark">#ff1b8bb7</color>
 
+    <color name="btn_pressed">#551fb6f2</color>
+    <color name="btn_transparent">#00ffffff</color>
 </resources>

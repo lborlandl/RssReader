@@ -4,6 +4,7 @@
     <style name="Theme.AppTheme" parent="Theme.AppCompat.Light">
         <item name="colorPrimary">@color/color_primary</item>
         <item name="colorPrimaryDark">@color/color_primary_dark</item>
+        <item name="android:buttonStyle">@style/button</item>
     </style>
 
     <style name="AppTheme.ActionBar.Overlay" parent="Theme.AppTheme">

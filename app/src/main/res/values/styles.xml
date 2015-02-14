@@ -1,20 +1,26 @@
 <resources>
 
-    <style name="TextStyle">
+    <style name="text">
         <item name="android:textColor">@android:color/background_dark</item>
-        <item name="android:textSize">20sp</item>
+        <item name="android:textSize">18sp</item>
     </style>
 
-    <style name="TextTitleStyle">
+    <style name="text_title">
         <item name="android:textColor">@android:color/background_dark</item>
-        <item name="android:textSize">22sp</item>
+        <item name="android:textSize">20sp</item>
         <item name="android:textStyle">bold</item>
     </style>
 
-    <style name="TextSubTitleStyle">
+    <style name="text_subtitle">
         <item name="android:textColor">@color/sub_title_gray</item>
         <item name="android:textSize">14sp</item>
         <item name="android:singleLine">true</item>
+    </style>
 
+    <style name="button" parent="android:Widget.Button">
+        <item name="android:background">@drawable/button</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/material_blue_grey_800</item>
+        <item name="android:textAllCaps">true</item>
     </style>
 </resources>
