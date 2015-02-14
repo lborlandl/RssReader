@@ -1,4 +1,4 @@
-package ua.ck.geekhub.ivanov.rssreader.heplers;
+package ua.ck.geekhub.ivanov.rssreader.tools;
 
 public class Constants {
     public static final String URL_NEWS = "http://trashbox.ru/feed_topics/b_news/";

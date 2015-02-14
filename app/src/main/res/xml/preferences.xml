@@ -25,7 +25,7 @@
             android:key="pref_key_notification_sound"
             android:title="@string/pref_notification_sound" />
 
-        <ua.ck.geekhub.ivanov.rssreader.heplers.NumberPickerPreference
+        <ua.ck.geekhub.ivanov.rssreader.views.NumberPickerPreference
             android:dependency="pref_key_notification_on"
             android:key="pref_key_notification_delay"
             android:title="@string/pref_notification_delay" />

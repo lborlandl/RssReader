@@ -1,4 +1,4 @@
-package ua.ck.geekhub.ivanov.rssreader.heplers;
+package ua.ck.geekhub.ivanov.rssreader.views;
 
 import android.content.Context;
 import android.util.AttributeSet;

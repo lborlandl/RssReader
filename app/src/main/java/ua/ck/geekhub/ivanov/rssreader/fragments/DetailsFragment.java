@@ -41,12 +41,12 @@ import java.util.List;
 
 import ua.ck.geekhub.ivanov.rssreader.R;
 import ua.ck.geekhub.ivanov.rssreader.activities.DetailsActivity;
-import ua.ck.geekhub.ivanov.rssreader.dummy.Feed;
-import ua.ck.geekhub.ivanov.rssreader.heplers.Constants;
+import ua.ck.geekhub.ivanov.rssreader.models.Feed;
+import ua.ck.geekhub.ivanov.rssreader.tools.Constants;
 import ua.ck.geekhub.ivanov.rssreader.heplers.DatabaseHelper;
-import ua.ck.geekhub.ivanov.rssreader.heplers.ListHandler;
-import ua.ck.geekhub.ivanov.rssreader.heplers.NotifyingScrollView;
-import ua.ck.geekhub.ivanov.rssreader.heplers.UILImageGetter;
+import ua.ck.geekhub.ivanov.rssreader.tools.ListHandler;
+import ua.ck.geekhub.ivanov.rssreader.views.NotifyingScrollView;
+import ua.ck.geekhub.ivanov.rssreader.tools.UILImageGetter;
 
 public class DetailsFragment extends Fragment {
 
@@ -56,7 +56,6 @@ public class DetailsFragment extends Fragment {
     private ActionBarActivity mActivity;
     private DatabaseHelper mDb;
     private int mPosition;
-    private ShareActionProvider mShareActionProvider;
     private static final String EXTRA_POSITION = "EXTRA_POSITION";
 
     private SessionStatusCallback statusCallback = new SessionStatusCallback();
@@ -158,14 +157,14 @@ public class DetailsFragment extends Fragment {
         }
     }
 
-
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.details, menu);
         MenuItem menuItem = menu.findItem(R.id.action_share);
-        mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(menuItem);
-        mShareActionProvider.setShareIntent(buildShareIntent());
+        ShareActionProvider shareActionProvider =
+                (ShareActionProvider) MenuItemCompat.getActionProvider(menuItem);
+        shareActionProvider.setShareIntent(buildShareIntent());
     }
 
     @Override

@@ -1,4 +1,4 @@
-package ua.ck.geekhub.ivanov.rssreader.heplers;
+package ua.ck.geekhub.ivanov.rssreader.tools;
 
 import android.text.Editable;
 import android.text.Html;

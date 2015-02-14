@@ -24,9 +24,9 @@ import java.util.concurrent.TimeUnit;
 
 import ua.ck.geekhub.ivanov.rssreader.R;
 import ua.ck.geekhub.ivanov.rssreader.activities.ListActivity;
-import ua.ck.geekhub.ivanov.rssreader.heplers.Constants;
+import ua.ck.geekhub.ivanov.rssreader.tools.Constants;
 import ua.ck.geekhub.ivanov.rssreader.heplers.SharedPreferenceHelper;
-import ua.ck.geekhub.ivanov.rssreader.heplers.Utils;
+import ua.ck.geekhub.ivanov.rssreader.tools.Utils;
 
 public class UpdateFeedService extends Service {
 

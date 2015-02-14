@@ -1,4 +1,4 @@
-package ua.ck.geekhub.ivanov.rssreader.dummy;
+package ua.ck.geekhub.ivanov.rssreader.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;

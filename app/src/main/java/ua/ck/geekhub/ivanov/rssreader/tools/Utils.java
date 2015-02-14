@@ -1,4 +1,4 @@
-package ua.ck.geekhub.ivanov.rssreader.heplers;
+package ua.ck.geekhub.ivanov.rssreader.tools;
 
 import android.content.Context;
 import android.net.ConnectivityManager;

@@ -43,11 +43,11 @@ import ua.ck.geekhub.ivanov.rssreader.R;
 import ua.ck.geekhub.ivanov.rssreader.activities.DetailsActivity;
 import ua.ck.geekhub.ivanov.rssreader.activities.LoginActivity;
 import ua.ck.geekhub.ivanov.rssreader.activities.SettingsActivity;
-import ua.ck.geekhub.ivanov.rssreader.dummy.Feed;
-import ua.ck.geekhub.ivanov.rssreader.heplers.Constants;
+import ua.ck.geekhub.ivanov.rssreader.models.Feed;
+import ua.ck.geekhub.ivanov.rssreader.tools.Constants;
 import ua.ck.geekhub.ivanov.rssreader.heplers.DatabaseHelper;
 import ua.ck.geekhub.ivanov.rssreader.heplers.SharedPreferenceHelper;
-import ua.ck.geekhub.ivanov.rssreader.heplers.Utils;
+import ua.ck.geekhub.ivanov.rssreader.tools.Utils;
 import ua.ck.geekhub.ivanov.rssreader.services.UpdateFeedService;
 
 public class ListFragment extends android.support.v4.app.ListFragment {

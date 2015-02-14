@@ -8,15 +8,14 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 
 import java.util.ArrayList;
 
 import ua.ck.geekhub.ivanov.rssreader.R;
-import ua.ck.geekhub.ivanov.rssreader.dummy.Feed;
+import ua.ck.geekhub.ivanov.rssreader.models.Feed;
 import ua.ck.geekhub.ivanov.rssreader.fragments.DetailsFragment;
-import ua.ck.geekhub.ivanov.rssreader.heplers.Constants;
+import ua.ck.geekhub.ivanov.rssreader.tools.Constants;
 
 public class DetailsActivity extends ActionBarActivity {
 
@@ -58,11 +57,8 @@ public class DetailsActivity extends ActionBarActivity {
 
         mActionBarBackground = new ColorDrawable(getResources().getColor(R.color.color_primary));
 
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
-
         if (!isTableLand) {
-            actionBar.setBackgroundDrawable(mActionBarBackground);
+            getSupportActionBar().setBackgroundDrawable(mActionBarBackground);
             setAlpha(mAlpha[mCurrentFeed]);
         }
 

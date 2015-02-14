@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import java.util.ArrayList;
 
-import ua.ck.geekhub.ivanov.rssreader.dummy.Feed;
+import ua.ck.geekhub.ivanov.rssreader.models.Feed;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 

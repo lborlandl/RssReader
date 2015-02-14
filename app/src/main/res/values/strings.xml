@@ -8,10 +8,7 @@
     <string name="published">Опубликовано</string>
     <string name="error_published">Ошибка публикации</string>
     <string name="cancel_published">Публикация отменена</string>
-    <string name="author">Автор</string>
     <string name="read_on_site">Прочитать статью в интернете</string>
-    <string name="not_network">Нет подключения</string>
-    <string name="no_data">Нет данных</string>
     <string name="error_download">Ошибка загрузки</string>
     <string name="add_to_favourite">Добавить в избранное</string>
     <string name="delete_all_favourite">Очистить избранное</string>
@@ -40,8 +37,7 @@
     <string name="pref_summary_two">мин.</string>
 
     <string name="news">Новость</string>
-    <string name="article">Статья</string>
-    <string name="title_facebook_login">title_facebook_login</string>
+    <string name="title_facebook_login">Facebook login</string>
 
     <string name="warning_news">При загрузке данных произошла ошибка.\nПроверьте Ваше подключение к сети.</string>
     <string name="warning_favourite">Вы не добавили статей в избранное.\nПерейдите в раздел с новостями и добавьте несколько статей.</string>
