@@ -395,7 +395,6 @@ public class ListFragment extends android.support.v4.app.ListFragment {
 
     private void updateList() {
         mAdapter.notifyDataSetChanged();
-        mList.setSelectionFromTop(0, 0);
         mSwipeLayout.setRefreshing(false);
         hideProgressBar();
         if (mIsTableLand) {
@@ -407,7 +406,6 @@ public class ListFragment extends android.support.v4.app.ListFragment {
                 int selected = mFeedList.indexOf(mCurrentFeed);
                 if (selected != -1) {
                     mCurrentFeedIndex = selected;
-                    mList.setSelectionFromTop(mCurrentFeedIndex, 0);
                 }
             } else {
                 if (!mFeedList.isEmpty()) {
@@ -417,7 +415,10 @@ public class ListFragment extends android.support.v4.app.ListFragment {
             }
             mList.setItemChecked(mCurrentFeedIndex, true);
             setCurrentFeed();
+        } else {
+            mCurrentFeedIndex = 0;
         }
+        mList.setSelectionFromTop(mCurrentFeedIndex, 0);
     }
 
     private void setCurrentFeed() {
