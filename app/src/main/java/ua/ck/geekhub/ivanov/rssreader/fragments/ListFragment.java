@@ -530,8 +530,8 @@ public class ListFragment extends android.support.v4.app.ListFragment {
                         R.anim.abc_slide_in_bottom : R.anim.abc_slide_in_top;
                 Animation animation = AnimationUtils.loadAnimation(getActivity(), id);
                 convertView.startAnimation(animation);
-                lastPosition = position;
             }
+            lastPosition = position;
 
             return convertView;
         }

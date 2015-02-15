@@ -21,14 +21,28 @@ public class SettingsFragment extends PreferenceFragment
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        getPreferenceScreen().getSharedPreferences()
+                .registerOnSharedPreferenceChangeListener(this);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        getPreferenceScreen().getSharedPreferences()
+                .unregisterOnSharedPreferenceChangeListener(this);
+    }
+
+    @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (key.equals(KEY_PREF_NOTIFICATION_ON)) {
             CheckBoxPreference notificationOn = (CheckBoxPreference) findPreference(key);
             Intent updateServiceIntent = new Intent(getActivity(), UpdateFeedService.class);
             if (notificationOn.isChecked()) {
-                getActivity().stopService(updateServiceIntent);
-            } else {
                 getActivity().startService(updateServiceIntent);
+            } else {
+                getActivity().stopService(updateServiceIntent);
             }
         }
     }
