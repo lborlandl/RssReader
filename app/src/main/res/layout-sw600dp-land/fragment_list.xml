@@ -29,9 +29,11 @@
                     android:id="@android:id/list"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@android:color/background_light"
-                    android:choiceMode="singleChoice" />
-
+                    android:background="@color/background_material_light"
+                    android:choiceMode="singleChoice"
+                    android:divider="@null"
+                    android:dividerHeight="0dp"
+                    android:listSelector="@color/background_material_light" />
             </android.support.v4.widget.SwipeRefreshLayout>
 
             <ViewStub

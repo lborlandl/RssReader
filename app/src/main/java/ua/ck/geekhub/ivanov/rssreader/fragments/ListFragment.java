@@ -66,7 +66,7 @@ public class ListFragment extends android.support.v4.app.ListFragment {
     private int mCurrentFeedIndex;
 
     private SharedPreferenceHelper mSPHelper;
-    private boolean mIsTableLand, mIsResult = false;
+    private boolean mIsTableLand, mIsAnimations, mIsResult = false;
     private int mSpinnerSelected;
     private FeedAdapter mAdapter;
 
@@ -96,6 +96,7 @@ public class ListFragment extends android.support.v4.app.ListFragment {
         super.onResume();
         mActivity = (ActionBarActivity) getActivity();
         mSPHelper.putListRunning(true);
+        mIsAnimations = mSPHelper.isAnimation();
     }
 
     @Override
@@ -524,10 +525,13 @@ public class ListFragment extends android.support.v4.app.ListFragment {
             viewHolder.mTextViewTitle.setText(Html.fromHtml(feed.getTitle()));
             viewHolder.mTextViewAuthor.setText(", " + feed.getAuthorName());
 
-            int id = position > lastPosition ? R.anim.abc_slide_in_bottom : R.anim.abc_slide_in_top;
-            Animation animation = AnimationUtils.loadAnimation(getActivity(), id);
-            convertView.startAnimation(animation);
-            lastPosition = position;
+            if (mIsAnimations) {
+                int id = (position > lastPosition) ?
+                        R.anim.abc_slide_in_bottom : R.anim.abc_slide_in_top;
+                Animation animation = AnimationUtils.loadAnimation(getActivity(), id);
+                convertView.startAnimation(animation);
+                lastPosition = position;
+            }
 
             return convertView;
         }

@@ -16,6 +16,8 @@ public class SharedPreferenceHelper {
     public static final String NOTIFICATION_SOUND = "pref_key_notification_sound";
     public static final String NOTIFICATION_DELAY = "pref_key_notification_delay";
 
+    public static final String ANIMATIONS = "pref_animation";
+
     public static final String SPINNER_POSITION = "spinner_position";
     public static final String LAST_NEWS_LINK = "last_news_link";
     public static final String RUNNING_LIST_FRAGMENT = "running_list_fragment";
@@ -50,6 +52,10 @@ public class SharedPreferenceHelper {
 
     public int getDelay() {
         return mSharedPreferences.getInt(NOTIFICATION_DELAY, 3);
+    }
+
+    public boolean isAnimation() {
+        return mSharedPreferences.getBoolean(ANIMATIONS, true);
     }
 
     public int getSpinnerPosition() {

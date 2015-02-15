@@ -32,6 +32,7 @@
     <string name="pref_notification_sound">Звуковой сигнал</string>
     <string name="pref_notification_delay">Период обновлений</string>
     <string name="pref_notification_delay_text">Установите период попыток обновлений в минутах</string>
+    <string name="pref_animation">Анимации</string>
 
     <string name="pref_summary_one">Проверка обновлений каждых</string>
     <string name="pref_summary_two">мин.</string>
