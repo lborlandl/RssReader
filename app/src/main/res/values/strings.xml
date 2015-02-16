@@ -37,6 +37,10 @@
     <string name="pref_summary_one">Проверка обновлений каждых</string>
     <string name="pref_summary_two">мин.</string>
 
+    <string name="pref_cache_image">Кэш изображений</string>
+    <string name="pref_cache_on_disk">Кэш на диск</string>
+    <string name="pref_cache_in_memory">Кэш в памяти</string>
+
     <string name="news">Новость</string>
     <string name="title_facebook_login">Facebook login</string>
 

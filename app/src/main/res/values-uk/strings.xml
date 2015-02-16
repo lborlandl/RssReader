@@ -43,4 +43,7 @@
     <string name="pref_summary_two">хв.</string>
     <string name="pref_notification_delay_text">Встановіть період спроб оновлень в хвилинах</string>
     <string name="pref_animation">Анімації</string>
+    <string name="pref_cache_image">Кеш зображень</string>
+    <string name="pref_cache_on_disk">Кеш на диск</string>
+    <string name="pref_cache_in_memory">Кеш в пам'яті</string>
 </resources>

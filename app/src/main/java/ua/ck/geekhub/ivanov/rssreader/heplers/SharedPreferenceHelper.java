@@ -16,7 +16,10 @@ public class SharedPreferenceHelper {
     public static final String NOTIFICATION_SOUND = "pref_key_notification_sound";
     public static final String NOTIFICATION_DELAY = "pref_key_notification_delay";
 
-    public static final String ANIMATIONS = "pref_animation";
+    public static final String ANIMATIONS = "pref_key_animation";
+
+    public static final String CACHE_ON_DISK = "pref_key_cache_on_disk";
+    public static final String CACHE_IN_MEMORY = "pref_key_cache_in_memory";
 
     public static final String SPINNER_POSITION = "spinner_position";
     public static final String LAST_NEWS_LINK = "last_news_link";
@@ -56,6 +59,14 @@ public class SharedPreferenceHelper {
 
     public boolean isAnimation() {
         return mSharedPreferences.getBoolean(ANIMATIONS, true);
+    }
+
+    public boolean isCacheOnDisk() {
+        return mSharedPreferences.getBoolean(CACHE_ON_DISK, true);
+    }
+
+    public boolean isCacheInMemory() {
+        return mSharedPreferences.getBoolean(CACHE_IN_MEMORY, true);
     }
 
     public int getSpinnerPosition() {
