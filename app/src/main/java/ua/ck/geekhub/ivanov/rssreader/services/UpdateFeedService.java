@@ -1,17 +1,10 @@
 package ua.ck.geekhub.ivanov.rssreader.services;
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
-import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.IBinder;
-import android.support.v4.app.NotificationCompat;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -22,43 +15,39 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.concurrent.TimeUnit;
 
-import ua.ck.geekhub.ivanov.rssreader.R;
-import ua.ck.geekhub.ivanov.rssreader.activities.ListActivity;
-import ua.ck.geekhub.ivanov.rssreader.tools.Constants;
+import ua.ck.geekhub.ivanov.rssreader.heplers.NotificationHelper;
 import ua.ck.geekhub.ivanov.rssreader.heplers.PreferenceHelper;
+import ua.ck.geekhub.ivanov.rssreader.tools.Constants;
 import ua.ck.geekhub.ivanov.rssreader.tools.Utils;
 
 public class UpdateFeedService extends Service {
 
-    private final static int ID = 1;
-    private final static int DAY = 24 * 60 * 60;
-
     private PreferenceHelper mPreferenceHelper;
-    private int mCounter = 0;
+    private NotificationHelper mNotificationHelper;
+
+    private static volatile boolean flag;
 
     @Override
     public void onCreate() {
         super.onCreate();
-
+        flag = true;
         mPreferenceHelper = PreferenceHelper.getInstance(getApplicationContext());
-
+        mNotificationHelper = NotificationHelper.getInstance(getApplicationContext());
+        if (mPreferenceHelper.isForeground()) {
+            startForeground(NotificationHelper.NOTIFY_ID,
+                    mNotificationHelper.build(NotificationHelper.FOREGROUND_FIRST));
+        }
         new Thread(new Runnable() {
             @Override
             public void run() {
-                while (true) {
-                    new CheckUpdateTask().execute(Constants.URL_NEWS);
+                while (flag) {
                     try {
-                        int delay;
-                        if (mCounter > mPreferenceHelper.getCountAttempt()) {
-                            mCounter = 0;
-                            delay = DAY;
-                        } else {
-                            delay = mPreferenceHelper.getDelay() * 60;
-                        }
-                        TimeUnit.SECONDS.sleep(delay);
+                        TimeUnit.MINUTES.sleep(mPreferenceHelper.getDelay());
                     } catch (InterruptedException e) {
+                        flag = false;
                         e.printStackTrace();
                     }
+                    new CheckUpdateTask().execute(Constants.URL_NEWS);
                 }
             }
         }).start();
@@ -74,40 +63,10 @@ public class UpdateFeedService extends Service {
         return new Binder();
     }
 
-    private void buildNotification() {
-        Context context = getApplicationContext();
-
-        NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-
-        Intent resultIntent = new Intent(context, ListActivity.class);
-        PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent,
-                PendingIntent.FLAG_CANCEL_CURRENT);
-
-        Resources res = getResources();
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
-        builder
-                .setSmallIcon(R.drawable.logo_trash)
-                .setLargeIcon(BitmapFactory.decodeResource(res, R.drawable.logo_trash_large))
-                .setTicker(res.getString(R.string.notification_ticker))
-                .setContentTitle(res.getString(R.string.notification_title))
-                .setContentText(res.getString(R.string.notification_text))
-                .setWhen(System.currentTimeMillis())
-                .setAutoCancel(true)
-                .setContentIntent(resultPendingIntent);
-
-        Notification notification = builder.build();
-        if (mPreferenceHelper.isVibration()) {
-            notification.defaults |= Notification.DEFAULT_VIBRATE;
-        }
-        if (mPreferenceHelper.isLed()) {
-            notification.defaults |= Notification.DEFAULT_LIGHTS;
-        }
-        if (mPreferenceHelper.isSound()) {
-            notification.defaults |= Notification.DEFAULT_SOUND;
-        }
-
-        nm.notify(ID, notification);
-//        startForeground(ID, builder.build());
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        flag = false;
     }
 
     private class CheckUpdateTask extends AsyncTask<String, Void, String> {
@@ -133,7 +92,6 @@ public class UpdateFeedService extends Service {
             return stringBuilder.toString();
         }
 
-
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
@@ -148,11 +106,10 @@ public class UpdateFeedService extends Service {
                 e.printStackTrace();
                 s = null;
             }
-            String link = mPreferenceHelper.getLastNewsLink();
-            if (link == null || (s != null && !link.equals(s))) {
-                if (!mPreferenceHelper.isListRunning()) {
-                    buildNotification();
-                    mCounter++;
+            String last = mPreferenceHelper.getLastNewsLink();
+            if (last == null || (s != null && !last.equals(s))) {
+                if (!mPreferenceHelper.isListRunning() && flag) {
+                    mNotificationHelper.showNotification(NotificationHelper.UPDATE);
                 }
                 mPreferenceHelper.putLastNewsLink(s);
             }

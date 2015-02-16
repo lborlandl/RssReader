@@ -24,9 +24,14 @@
 
     <string name="notification_ticker">Есть обновления новостей!</string>
     <string name="notification_title">Есть обновления!</string>
-    <string name="notification_text">Нажмите для просмотра обновлений</string>
+    <string name="notification_text">Нажмите для просмотра</string>
+
+    <string name="notification_running_ticker">Запущен сервис проверки обновлений</string>
+    <string name="notification_running_title">Сервис проверки обновлений</string>
+    <string name="notification_running_text">Нажмите для изменения настроек</string>
 
     <string name="pref_notification">Оповещения</string>
+    <string name="pref_notification_type">Отображение сервиса</string>
     <string name="pref_notification_vibration">Вибрация</string>
     <string name="pref_notification_led">Световой индикатор</string>
     <string name="pref_notification_sound">Звуковой сигнал</string>
@@ -50,10 +55,4 @@
     <string name="go_to_favourite">Перейти в избранное</string>
     <string name="go_to_news">Перейти в новости</string>
     <string name="setting_notification">Оповещения</string>
-
-    <string-array name="spinner_list">
-        <item>Новости</item>
-        <item>Избранное</item>
-    </string-array>
-
 </resources>

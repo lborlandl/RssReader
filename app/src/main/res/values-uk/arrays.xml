@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="spinner_list">
+        <item>Новини</item>
+        <item>Обране</item>
+    </string-array>
+
+    <string-array name="pref_notification_type_entries">
+        <item>Завжди відображати</item>
+        <item>Відображати тільки сповіщення</item>
+    </string-array>
+</resources>

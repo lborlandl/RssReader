@@ -11,6 +11,8 @@ public class PreferenceHelper {
     private SharedPreferences mSharedPreferences;
 
     public static final String NOTIFICATION_ON = "pref_key_notification_on";
+    public static final String NOTIFICATION_TYPE = "pref_key_notification_type";
+    public static final String FOREGROUND = "foreground";
     public static final String NOTIFICATION_VIBRATION = "pref_key_notification_vibration";
     public static final String NOTIFICATION_LED = "pref_key_notification_led";
     public static final String NOTIFICATION_SOUND = "pref_key_notification_sound";
@@ -24,7 +26,6 @@ public class PreferenceHelper {
     public static final String SPINNER_POSITION = "spinner_position";
     public static final String LAST_NEWS_LINK = "last_news_link";
     public static final String RUNNING_LIST_FRAGMENT = "running_list_fragment";
-    public static final String ATTEMPT_TO_UPDATE = "attempt_to_update";
 
     private PreferenceHelper(Context context) {
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -39,6 +40,11 @@ public class PreferenceHelper {
 
     public boolean isNotification() {
         return mSharedPreferences.getBoolean(NOTIFICATION_ON, false);
+    }
+
+    public boolean isForeground() {
+        String temp = mSharedPreferences.getString(NOTIFICATION_TYPE, FOREGROUND);
+        return temp.equals(FOREGROUND);
     }
 
     public boolean isVibration() {
@@ -97,9 +103,5 @@ public class PreferenceHelper {
         mSharedPreferences.edit()
                 .putBoolean(RUNNING_LIST_FRAGMENT, isRunning)
                 .apply();
-    }
-
-    public int getCountAttempt() {
-        return mSharedPreferences.getInt(ATTEMPT_TO_UPDATE, (3));
     }
 }

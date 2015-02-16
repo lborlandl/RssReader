@@ -1,5 +1,6 @@
 package ua.ck.geekhub.ivanov.rssreader.fragments;
 
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -46,6 +47,7 @@ import ua.ck.geekhub.ivanov.rssreader.activities.DetailsActivity;
 import ua.ck.geekhub.ivanov.rssreader.activities.LoginActivity;
 import ua.ck.geekhub.ivanov.rssreader.activities.SettingsActivity;
 import ua.ck.geekhub.ivanov.rssreader.heplers.DatabaseHelper;
+import ua.ck.geekhub.ivanov.rssreader.heplers.NotificationHelper;
 import ua.ck.geekhub.ivanov.rssreader.heplers.PreferenceHelper;
 import ua.ck.geekhub.ivanov.rssreader.models.Feed;
 import ua.ck.geekhub.ivanov.rssreader.services.UpdateFeedService;
@@ -97,6 +99,7 @@ public class ListFragment extends android.support.v4.app.ListFragment {
         mActivity = (ActionBarActivity) getActivity();
         mPreferenceHelper.putListRunning(true);
         mIsAnimations = mPreferenceHelper.isAnimation();
+        updateNotification();
     }
 
     @Override
@@ -252,6 +255,20 @@ public class ListFragment extends android.support.v4.app.ListFragment {
 
         int textButton = isFavourite ? R.string.go_to_news : R.string.go_to_favourite;
         mButtonGoToOther.setText(textButton);
+    }
+
+    private void updateNotification() {
+        boolean result = mActivity.getIntent().getBooleanExtra(Constants.EXTRA_NOTIFICATION, false);
+        if (mPreferenceHelper.isNotification() && result && mPreferenceHelper.isForeground()) {
+            NotificationHelper helper = NotificationHelper.getInstance(getActivity());
+            helper.showNotification(NotificationHelper.FOREGROUND);
+        } else {
+            if (result) {
+                NotificationManager manager = (NotificationManager)
+                        mActivity.getSystemService(Context.NOTIFICATION_SERVICE);
+                manager.cancel(NotificationHelper.NOTIFY_ID);
+            }
+        }
     }
 
     @Override

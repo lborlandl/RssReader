@@ -14,14 +14,10 @@
 
     <string name="notification_ticker">Є оновлення новин!</string>
     <string name="notification_title">Є оновлення!</string>
-    <string name="notification_text">Натисніть для перегляду оновлень</string>
+    <string name="notification_text">Натисніть для перегляду</string>
 
     <string name="news">Новина</string>
 
-    <string-array name="spinner_list">
-        <item>Новини</item>
-        <item>Обране</item>
-    </string-array>
     <string name="cancel_published">Публікація відмінена</string>
     <string name="error_published">Помилка публікації</string>
     <string name="title_dialog">Підтвердження</string>
@@ -46,4 +42,9 @@
     <string name="pref_cache_image">Кеш зображень</string>
     <string name="pref_cache_on_disk">Кеш на диск</string>
     <string name="pref_cache_in_memory">Кеш в пам\'яті</string>
+    <string name="pref_notification_type">Відображення сервісу</string>
+    <string name="setting_notification">Сповіщення</string>
+    <string name="notification_running_text">Натисніть для налаштуваня</string>
+    <string name="notification_running_ticker">Запущено сервіс перевірки оновлень</string>
+    <string name="notification_running_title">Сервіс перевірки оновлень</string>
 </resources>

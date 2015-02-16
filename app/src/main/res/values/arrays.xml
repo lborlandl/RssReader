@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="spinner_list">
+        <item>Новости</item>
+        <item>Избранное</item>
+    </string-array>
+
+    <string-array name="pref_notification_type_entries">
+        <item>Всегда отображать</item>
+        <item>Отображать только уведомления</item>
+    </string-array>
+
+    <string-array name="pref_notification_type_values">
+        <item>foreground</item>
+        <item>update</item>
+    </string-array>
+</resources>

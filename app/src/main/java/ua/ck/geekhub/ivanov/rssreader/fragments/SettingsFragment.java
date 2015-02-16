@@ -1,5 +1,6 @@
 package ua.ck.geekhub.ivanov.rssreader.fragments;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -16,6 +17,7 @@ public class SettingsFragment extends PreferenceFragment
         implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     public static final String KEY_PREF_NOTIFICATION_ON = "pref_key_notification_on";
+    public static final String KEY_PREF_NOTIFICATION_TYPE = "pref_key_notification_type";
     public static final String KEY_PREF_CACHE_ON_DISK = "pref_key_cache_on_disk";
     public static final String KEY_PREF_CACHE_IN_MEMORY = "pref_key_cache_in_memory";
 
@@ -49,6 +51,13 @@ public class SettingsFragment extends PreferenceFragment
             } else {
                 getActivity().stopService(updateServiceIntent);
             }
+            return;
+        }
+        if (key.equals(KEY_PREF_NOTIFICATION_TYPE)) {
+            Activity activity = getActivity();
+            Intent intent = new Intent(activity, UpdateFeedService.class);
+            activity.stopService(intent);
+            activity.startService(intent);
             return;
         }
         if (key.equals(KEY_PREF_CACHE_ON_DISK)) {
