@@ -41,7 +41,7 @@ import java.util.List;
 
 import ua.ck.geekhub.ivanov.rssreader.R;
 import ua.ck.geekhub.ivanov.rssreader.activities.DetailsActivity;
-import ua.ck.geekhub.ivanov.rssreader.heplers.SharedPreferenceHelper;
+import ua.ck.geekhub.ivanov.rssreader.heplers.PreferenceHelper;
 import ua.ck.geekhub.ivanov.rssreader.models.Feed;
 import ua.ck.geekhub.ivanov.rssreader.tools.Constants;
 import ua.ck.geekhub.ivanov.rssreader.heplers.DatabaseHelper;
@@ -123,7 +123,7 @@ public class DetailsFragment extends Fragment {
             view.findViewById(R.id.gradient).setVisibility(View.GONE);
         }
 
-        SharedPreferenceHelper helper = SharedPreferenceHelper.getInstance(getActivity());
+        PreferenceHelper helper = PreferenceHelper.getInstance(getActivity());
         DisplayImageOptions options = new DisplayImageOptions.Builder()
                 .showImageOnFail(R.drawable.no_image)
                 .showImageForEmptyUri(R.drawable.no_image)

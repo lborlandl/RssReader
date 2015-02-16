@@ -4,9 +4,9 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
-public class SharedPreferenceHelper {
+public class PreferenceHelper {
 
-    private static SharedPreferenceHelper mInstance;
+    private static PreferenceHelper mInstance;
 
     private SharedPreferences mSharedPreferences;
 
@@ -26,13 +26,13 @@ public class SharedPreferenceHelper {
     public static final String RUNNING_LIST_FRAGMENT = "running_list_fragment";
     public static final String ATTEMPT_TO_UPDATE = "attempt_to_update";
 
-    private SharedPreferenceHelper(Context context) {
+    private PreferenceHelper(Context context) {
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
-    public static SharedPreferenceHelper getInstance(Context context) {
+    public static PreferenceHelper getInstance(Context context) {
         if (mInstance == null) {
-            mInstance = new SharedPreferenceHelper(context);
+            mInstance = new PreferenceHelper(context);
         }
         return mInstance;
     }

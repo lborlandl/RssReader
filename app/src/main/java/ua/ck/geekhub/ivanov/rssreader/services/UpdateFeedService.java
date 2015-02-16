@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 import ua.ck.geekhub.ivanov.rssreader.R;
 import ua.ck.geekhub.ivanov.rssreader.activities.ListActivity;
 import ua.ck.geekhub.ivanov.rssreader.tools.Constants;
-import ua.ck.geekhub.ivanov.rssreader.heplers.SharedPreferenceHelper;
+import ua.ck.geekhub.ivanov.rssreader.heplers.PreferenceHelper;
 import ua.ck.geekhub.ivanov.rssreader.tools.Utils;
 
 public class UpdateFeedService extends Service {
@@ -33,14 +33,14 @@ public class UpdateFeedService extends Service {
     private final static int ID = 1;
     private final static int DAY = 24 * 60 * 60;
 
-    private SharedPreferenceHelper mSPHelper;
+    private PreferenceHelper mPreferenceHelper;
     private int mCounter = 0;
 
     @Override
     public void onCreate() {
         super.onCreate();
 
-        mSPHelper = SharedPreferenceHelper.getInstance(getApplicationContext());
+        mPreferenceHelper = PreferenceHelper.getInstance(getApplicationContext());
 
         new Thread(new Runnable() {
             @Override
@@ -49,11 +49,11 @@ public class UpdateFeedService extends Service {
                     new CheckUpdateTask().execute(Constants.URL_NEWS);
                     try {
                         int delay;
-                        if (mCounter > mSPHelper.getCountAttempt()) {
+                        if (mCounter > mPreferenceHelper.getCountAttempt()) {
                             mCounter = 0;
                             delay = DAY;
                         } else {
-                            delay = mSPHelper.getDelay() * 60;
+                            delay = mPreferenceHelper.getDelay() * 60;
                         }
                         TimeUnit.SECONDS.sleep(delay);
                     } catch (InterruptedException e) {
@@ -96,13 +96,13 @@ public class UpdateFeedService extends Service {
                 .setContentIntent(resultPendingIntent);
 
         Notification notification = builder.build();
-        if (mSPHelper.isVibration()) {
+        if (mPreferenceHelper.isVibration()) {
             notification.defaults |= Notification.DEFAULT_VIBRATE;
         }
-        if (mSPHelper.isLed()) {
+        if (mPreferenceHelper.isLed()) {
             notification.defaults |= Notification.DEFAULT_LIGHTS;
         }
-        if (mSPHelper.isSound()) {
+        if (mPreferenceHelper.isSound()) {
             notification.defaults |= Notification.DEFAULT_SOUND;
         }
 
@@ -148,13 +148,13 @@ public class UpdateFeedService extends Service {
                 e.printStackTrace();
                 s = null;
             }
-            String link = mSPHelper.getLastNewsLink();
+            String link = mPreferenceHelper.getLastNewsLink();
             if (link == null || (s != null && !link.equals(s))) {
-                if (!mSPHelper.isListRunning()) {
+                if (!mPreferenceHelper.isListRunning()) {
                     buildNotification();
                     mCounter++;
                 }
-                mSPHelper.putLastNewsLink(s);
+                mPreferenceHelper.putLastNewsLink(s);
             }
         }
     }

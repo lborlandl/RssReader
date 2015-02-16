@@ -46,7 +46,7 @@ import ua.ck.geekhub.ivanov.rssreader.activities.DetailsActivity;
 import ua.ck.geekhub.ivanov.rssreader.activities.LoginActivity;
 import ua.ck.geekhub.ivanov.rssreader.activities.SettingsActivity;
 import ua.ck.geekhub.ivanov.rssreader.heplers.DatabaseHelper;
-import ua.ck.geekhub.ivanov.rssreader.heplers.SharedPreferenceHelper;
+import ua.ck.geekhub.ivanov.rssreader.heplers.PreferenceHelper;
 import ua.ck.geekhub.ivanov.rssreader.models.Feed;
 import ua.ck.geekhub.ivanov.rssreader.services.UpdateFeedService;
 import ua.ck.geekhub.ivanov.rssreader.tools.Constants;
@@ -65,7 +65,7 @@ public class ListFragment extends android.support.v4.app.ListFragment {
 
     private int mCurrentFeedIndex;
 
-    private SharedPreferenceHelper mSPHelper;
+    private PreferenceHelper mPreferenceHelper;
     private boolean mIsTableLand, mIsAnimations, mIsResult = false;
     private int mSpinnerSelected;
     private FeedAdapter mAdapter;
@@ -95,14 +95,14 @@ public class ListFragment extends android.support.v4.app.ListFragment {
     public void onResume() {
         super.onResume();
         mActivity = (ActionBarActivity) getActivity();
-        mSPHelper.putListRunning(true);
-        mIsAnimations = mSPHelper.isAnimation();
+        mPreferenceHelper.putListRunning(true);
+        mIsAnimations = mPreferenceHelper.isAnimation();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        mSPHelper.putListRunning(false);
+        mPreferenceHelper.putListRunning(false);
     }
 
     @Override
@@ -112,9 +112,9 @@ public class ListFragment extends android.support.v4.app.ListFragment {
             mSpinnerSelected = savedInstanceState.getInt(Constants.EXTRA_SPINNER);
         }
         mActivity = (ActionBarActivity) getActivity();
-        mSPHelper = SharedPreferenceHelper.getInstance(mActivity);
+        mPreferenceHelper = PreferenceHelper.getInstance(mActivity);
 
-        if (mSPHelper.isNotification()) {
+        if (mPreferenceHelper.isNotification()) {
             Intent updateServiceIntent = new Intent(mActivity, UpdateFeedService.class);
             mActivity.startService(updateServiceIntent);
         }
@@ -167,7 +167,7 @@ public class ListFragment extends android.support.v4.app.ListFragment {
             @Override
             public boolean onNavigationItemSelected(int position, long id) {
                 mSpinnerSelected = position;
-                mSPHelper.putSpinnerPosition(position);
+                mPreferenceHelper.putSpinnerPosition(position);
                 setEmptyViewChanges();
                 switch (position) {
                     case Constants.NEWS:
@@ -257,7 +257,7 @@ public class ListFragment extends android.support.v4.app.ListFragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        mSpinnerSelected = mSPHelper.getSpinnerPosition();
+        mSpinnerSelected = mPreferenceHelper.getSpinnerPosition();
         mActionBar.setSelectedNavigationItem(mSpinnerSelected);
         if (requestCode == Constants.REQUEST_FEED && data != null) {
             mIsResult = true;
