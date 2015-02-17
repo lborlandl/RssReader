@@ -42,7 +42,9 @@ public class UpdateFeedService extends Service {
             public void run() {
                 while (flag) {
                     try {
-                        TimeUnit.MINUTES.sleep(mPreferenceHelper.getDelay());
+                        for (int i = 0; i < mPreferenceHelper.getDelay(); i++) {
+                            TimeUnit.MINUTES.sleep(1);
+                        }
                     } catch (InterruptedException e) {
                         flag = false;
                         e.printStackTrace();
