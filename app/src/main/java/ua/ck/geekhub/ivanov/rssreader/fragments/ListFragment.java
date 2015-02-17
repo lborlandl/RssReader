@@ -80,6 +80,9 @@ public class ListFragment extends android.support.v4.app.ListFragment {
     private View mButtonTryAgain;
     private Button mButtonGoToOther;
 
+    private static final int NEWS = 0;
+    private static final int FAVOURITE = 1;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -131,10 +134,10 @@ public class ListFragment extends android.support.v4.app.ListFragment {
             @Override
             public void onRefresh() {
                 switch (mSpinnerSelected) {
-                    case Constants.NEWS:
+                    case NEWS:
                         startDownloadData(Constants.URL_NEWS);
                         break;
-                    case Constants.FAVOURITE:
+                    case FAVOURITE:
                         DatabaseHelper db = DatabaseHelper.getInstance(getActivity());
                         mFeedList = db.getAllFeed();
                         updateList();
@@ -173,7 +176,7 @@ public class ListFragment extends android.support.v4.app.ListFragment {
                 mPreferenceHelper.putSpinnerPosition(position);
                 setEmptyViewChanges();
                 switch (position) {
-                    case Constants.NEWS:
+                    case NEWS:
                         if (Utils.isOnline(mActivity)) {
                             showProgressBar();
                             startDownloadData(Constants.URL_NEWS);
@@ -182,7 +185,7 @@ public class ListFragment extends android.support.v4.app.ListFragment {
                             updateList();
                         }
                         break;
-                    case Constants.FAVOURITE:
+                    case FAVOURITE:
                         DatabaseHelper db = DatabaseHelper.getInstance(getActivity());
                         mFeedList = db.getAllFeed();
                         updateList();
@@ -208,7 +211,7 @@ public class ListFragment extends android.support.v4.app.ListFragment {
                     }
                 } else {
                     Intent intent = new Intent(mActivity, DetailsActivity.class);
-                    intent.putExtra(Constants.EXTRA_FEEDS, mFeedList);
+                    intent.putExtra(Constants.EXTRA_FEED_ARRAY, mFeedList);
                     intent.putExtra(Constants.EXTRA_POSITION, position);
                     intent.putExtra(Constants.EXTRA_STATE, mSpinnerSelected);
                     intent.putExtra(Constants.EXTRA_FEEDS_COUNT, mFeedList.size());
@@ -235,17 +238,17 @@ public class ListFragment extends android.support.v4.app.ListFragment {
         mButtonGoToOther.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mSpinnerSelected == Constants.FAVOURITE) {
-                    mActionBar.setSelectedNavigationItem(Constants.NEWS);
+                if (mSpinnerSelected == FAVOURITE) {
+                    mActionBar.setSelectedNavigationItem(NEWS);
                 } else {
-                    mActionBar.setSelectedNavigationItem(Constants.FAVOURITE);
+                    mActionBar.setSelectedNavigationItem(FAVOURITE);
                 }
             }
         });
     }
 
     private void setEmptyViewChanges() {
-        boolean isFavourite = mSpinnerSelected == Constants.FAVOURITE;
+        boolean isFavourite = mSpinnerSelected == FAVOURITE;
 
         int text = isFavourite ? R.string.warning_favourite : R.string.warning_news;
         mTextViewEmpty.setText(text);
@@ -292,7 +295,7 @@ public class ListFragment extends android.support.v4.app.ListFragment {
 
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
-        boolean visibility = (mSpinnerSelected == Constants.FAVOURITE) && !mFeedList.isEmpty();
+        boolean visibility = (mSpinnerSelected == FAVOURITE) && !mFeedList.isEmpty();
         menu.findItem(R.id.menu_delete_all_favourite).setVisible(visibility);
     }
 

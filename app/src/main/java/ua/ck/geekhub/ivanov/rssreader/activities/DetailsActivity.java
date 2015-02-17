@@ -40,7 +40,7 @@ public class DetailsActivity extends ActionBarActivity {
         } else {
             mCurrentFeed = intExtra;
         }
-        mFeeds = getIntent().getParcelableArrayListExtra(Constants.EXTRA_FEEDS);
+        mFeeds = getIntent().getParcelableArrayListExtra(Constants.EXTRA_FEED_ARRAY);
         if (mFeeds == null) {
             mFeeds = new ArrayList<>();
         }
