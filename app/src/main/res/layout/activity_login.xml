@@ -11,20 +11,18 @@
     tools:context="ua.ck.geekhub.ivanov.rssreader.activities.LoginActivity">
 
     <ImageView
-        android:id="@+id/google_photo"
+        android:id="@+id/img_google_photo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginTop="5dp"
-        android:contentDescription="" />
+        android:layout_marginTop="5dp" />
 
     <TextView
         android:id="@+id/google_name"
+        style="@style/text_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text=""
-        style="@style/text_title" />
+        android:gravity="center" />
 
     <com.google.android.gms.common.SignInButton
         android:id="@+id/sign_in_button"

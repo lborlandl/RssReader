@@ -3,39 +3,39 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="5dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="5dp"
+        android:layout_marginBottom="@dimen/item_list_margin_vertical"
+        android:layout_marginLeft="@dimen/item_list_margin_horizontal"
+        android:layout_marginRight="@dimen/item_list_margin_horizontal"
+        android:layout_marginTop="@dimen/item_list_margin_vertical"
         android:background="@drawable/list_selector"
         android:orientation="vertical"
-        android:padding="5dp">
+        android:padding="@dimen/item_list_padding">
 
         <TextView
-            android:id="@+id/feed_title"
+            android:id="@+id/txt_item_title"
             style="@style/text_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/txt_item_date"
+            style="@style/text_subtitle"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/txt_item_title" />
 
-            <TextView
-                android:id="@+id/feed_date"
-                style="@style/text_subtitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-            <TextView
-                android:id="@+id/feed_author"
-                style="@style/text_subtitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-        </LinearLayout>
-    </LinearLayout>
+        <TextView
+            android:id="@+id/txt_item_author"
+            style="@style/text_subtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txt_item_title"
+            android:layout_toEndOf="@+id/txt_item_date"
+            android:layout_toRightOf="@+id/txt_item_date" />
+    </RelativeLayout>
 </FrameLayout>

@@ -125,7 +125,7 @@ public class ListFragment extends android.support.v4.app.ListFragment {
             mActivity.startService(updateServiceIntent);
         }
 
-        mProgressBar = view.findViewById(R.id.loading_indicator);
+        mProgressBar = view.findViewById(R.id.progress_list);
 
         setActionBarSetting();
 
@@ -224,8 +224,8 @@ public class ListFragment extends android.support.v4.app.ListFragment {
 
         mListContainer = view.findViewById(R.id.list_container);
 
-        mTextViewEmpty = (TextView) view.findViewById(R.id.text_view_empty);
-        mButtonTryAgain = view.findViewById(R.id.button_empty_try_again);
+        mTextViewEmpty = (TextView) view.findViewById(R.id.txt_empty);
+        mButtonTryAgain = view.findViewById(R.id.btn_empty_try_again);
         mButtonTryAgain.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -234,7 +234,7 @@ public class ListFragment extends android.support.v4.app.ListFragment {
             }
         });
 
-        mButtonGoToOther = (Button) view.findViewById(R.id.button_empty_go_to_other);
+        mButtonGoToOther = (Button) view.findViewById(R.id.btn_empty_go_to_other);
         mButtonGoToOther.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -516,9 +516,9 @@ public class ListFragment extends android.support.v4.app.ListFragment {
                 convertView = mLayoutInflater.inflate(R.layout.feed_item, parent, false);
 
                 viewHolder = new ViewHolder();
-                viewHolder.mTextViewDate = (TextView) convertView.findViewById(R.id.feed_date);
-                viewHolder.mTextViewTitle = (TextView) convertView.findViewById(R.id.feed_title);
-                viewHolder.mTextViewAuthor = (TextView) convertView.findViewById(R.id.feed_author);
+                viewHolder.mTextViewDate = (TextView) convertView.findViewById(R.id.txt_item_date);
+                viewHolder.mTextViewTitle = (TextView) convertView.findViewById(R.id.txt_item_title);
+                viewHolder.mTextViewAuthor = (TextView) convertView.findViewById(R.id.txt_item_author);
 
                 convertView.setTag(viewHolder);
             } else {

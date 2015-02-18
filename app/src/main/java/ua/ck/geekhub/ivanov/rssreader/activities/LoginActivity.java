@@ -21,9 +21,9 @@ import java.io.InputStream;
 
 import ua.ck.geekhub.ivanov.rssreader.R;
 
-public class LoginActivity extends ActionBarActivity  implements
-        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener ,
-        View.OnClickListener{
+public class LoginActivity extends ActionBarActivity implements
+        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
+        View.OnClickListener {
 
     private static final int RC_SIGN_IN = 0;
     private GoogleApiClient mGoogleApiClient;
@@ -85,7 +85,7 @@ public class LoginActivity extends ActionBarActivity  implements
         findViewById(R.id.sign_in_button).setVisibility(View.GONE);
         mSignInClicked = false;
 
-        new AsyncTask<Void, Void, Void>(){
+        new AsyncTask<Void, Void, Void>() {
             String personName;
             Bitmap personPhoto;
 
@@ -112,7 +112,7 @@ public class LoginActivity extends ActionBarActivity  implements
             protected void onPostExecute(Void aVoid) {
                 super.onPostExecute(aVoid);
                 ((TextView) findViewById(R.id.google_name)).setText(personName);
-                ((ImageView) findViewById(R.id.google_photo)).setImageBitmap(personPhoto);
+                ((ImageView) findViewById(R.id.img_google_photo)).setImageBitmap(personPhoto);
             }
         }.execute();
     }
@@ -142,7 +142,6 @@ public class LoginActivity extends ActionBarActivity  implements
             }
         }
     }
-
 
 
     @Override

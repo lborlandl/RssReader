@@ -5,11 +5,11 @@
     android:orientation="horizontal">
 
     <FrameLayout
-        android:layout_width="320dp"
+        android:layout_width="@dimen/list_width"
         android:layout_height="match_parent">
 
         <ProgressBar
-            android:id="@+id/loading_indicator"
+            android:id="@+id/progress_list"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center" />
@@ -43,11 +43,6 @@
                 android:layout="@layout/empty_list_view" />
         </FrameLayout>
     </FrameLayout>
-
-    <ImageView
-        android:layout_width="1dp"
-        android:layout_height="match_parent"
-        android:background="@android:color/darker_gray" />
 
     <FrameLayout
         android:id="@+id/table_content_container"

@@ -120,7 +120,7 @@ public class DetailsFragment extends Fragment {
                         }
                     });
         } else {
-            view.findViewById(R.id.gradient).setVisibility(View.GONE);
+            view.findViewById(R.id.view_gradient).setVisibility(View.GONE);
         }
 
         PreferenceHelper helper = PreferenceHelper.getInstance(getActivity());
@@ -132,22 +132,22 @@ public class DetailsFragment extends Fragment {
                 .considerExifParams(true)
                 .build();
 
-        ImageView mImageViewFeed = (ImageView) view.findViewById(R.id.image_view_feed);
+        ImageView mImageViewFeed = (ImageView) view.findViewById(R.id.img_details_main);
 
         final ImageLoader imageLoader = ImageLoader.getInstance();
         imageLoader.init(ImageLoaderConfiguration.createDefault(mActivity.getBaseContext()));
         imageLoader.displayImage(mFeed.getImage(), mImageViewFeed, options,
-                new AnimateFirstDisplayListener(view.findViewById(R.id.image_progress_bar)));
+                new AnimateFirstDisplayListener(view.findViewById(R.id.progress_image)));
 
-        TextView textViewTitle = (TextView) view.findViewById(R.id.text_view_title);
+        TextView textViewTitle = (TextView) view.findViewById(R.id.txt_details_title);
         textViewTitle.setText(Html.fromHtml(mFeed.getTitle()));
 
-        TextView textViewDescription = (TextView) view.findViewById(R.id.text_view_description);
+        TextView textViewDescription = (TextView) view.findViewById(R.id.txt_details_description);
         Spanned spanned = Html.fromHtml(mFeed.getDescription(),
                 new UILImageGetter(textViewDescription, mActivity), new ListHandler());
         textViewDescription.setText(spanned);
 
-        view.findViewById(R.id.button_link).setOnClickListener(new View.OnClickListener() {
+        view.findViewById(R.id.btn_details_link).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(mFeed.getLink()));

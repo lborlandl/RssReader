@@ -17,23 +17,23 @@
         <FrameLayout
             android:id="@+id/image_container"
             android:layout_width="match_parent"
-            android:layout_height="250dp">
+            android:layout_height="@dimen/main_image_height">
 
             <ProgressBar
-                android:id="@+id/image_progress_bar"
+                android:id="@+id/progress_image"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:visibility="gone" />
 
             <ImageView
-                android:id="@+id/image_view_feed"
+                android:id="@+id/img_details_main"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop" />
 
             <View
-                android:id="@+id/gradient"
+                android:id="@+id/view_gradient"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@drawable/gradient" />
@@ -44,26 +44,26 @@
             android:layout_height="wrap_content"
             android:background="@android:color/white"
             android:orientation="vertical"
-            android:padding="15dp">
+            android:padding="@dimen/content_padding">
 
             <TextView
-                android:id="@+id/text_view_title"
+                android:id="@+id/txt_details_title"
                 style="@style/text_title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingBottom="10dp" />
-
-            <TextView
-                android:id="@+id/text_view_description"
-                style="@style/text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
-            <Button
-                android:id="@+id/button_link"
+            <TextView
+                android:id="@+id/txt_details_description"
+                style="@style/text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
+                android:layout_marginBottom="@dimen/description_margin_top_bottom"
+                android:layout_marginTop="@dimen/description_margin_top_bottom" />
+
+            <Button
+                android:id="@+id/btn_details_link"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:text="@string/read_on_site" />
         </LinearLayout>
     </LinearLayout>
