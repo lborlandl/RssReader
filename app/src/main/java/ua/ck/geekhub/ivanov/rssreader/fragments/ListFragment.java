@@ -262,15 +262,12 @@ public class ListFragment extends android.support.v4.app.ListFragment {
 
     private void updateNotification() {
         boolean result = mActivity.getIntent().getBooleanExtra(Constants.EXTRA_NOTIFICATION, false);
+        NotificationManager manager = (NotificationManager)
+                mActivity.getSystemService(Context.NOTIFICATION_SERVICE);
+        manager.cancel(NotificationHelper.NOTIFY_ID);
         if (mPreferenceHelper.isNotification() && result && mPreferenceHelper.isForeground()) {
             NotificationHelper helper = NotificationHelper.getInstance(getActivity());
             helper.showNotification(NotificationHelper.FOREGROUND);
-        } else {
-            if (result) {
-                NotificationManager manager = (NotificationManager)
-                        mActivity.getSystemService(Context.NOTIFICATION_SERVICE);
-                manager.cancel(NotificationHelper.NOTIFY_ID);
-            }
         }
     }
 
@@ -394,9 +391,10 @@ public class ListFragment extends android.support.v4.app.ListFragment {
 
                 list.add(rssItem);
             }
+            mPreferenceHelper.putLastNewsLink(list.get(0).getLink());
             return list;
         } catch (JSONException e) {
-//            Toast.makeText(mActivity, R.string.error_download, Toast.LENGTH_LONG).show();
+            Toast.makeText(mActivity, R.string.error_download, Toast.LENGTH_LONG).show();
             e.printStackTrace();
             return new ArrayList<>();
         }

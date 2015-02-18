@@ -40,10 +40,14 @@ public class UpdateFeedService extends Service {
         new Thread(new Runnable() {
             @Override
             public void run() {
+                main:
                 while (flag) {
                     try {
                         for (int i = 0; i < mPreferenceHelper.getDelay(); i++) {
                             TimeUnit.MINUTES.sleep(1);
+                            if (!flag) {
+                                break main;
+                            }
                         }
                     } catch (InterruptedException e) {
                         flag = false;

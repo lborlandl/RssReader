@@ -31,7 +31,7 @@
             android:title="@string/pref_notification_sound" />
 
         <ListPreference
-            android:defaultValue="foreground"
+            android:defaultValue="update"
             android:dependency="pref_key_notification_on"
             android:entries="@array/pref_notification_type_entries"
             android:entryValues="@array/pref_notification_type_values"
@@ -40,6 +40,7 @@
             android:title="@string/pref_notification_type" />
 
         <ua.ck.geekhub.ivanov.rssreader.views.NumberPickerPreference
+            android:defaultValue="3"
             android:dependency="pref_key_notification_on"
             android:key="pref_key_notification_delay"
             android:title="@string/pref_notification_delay" />
