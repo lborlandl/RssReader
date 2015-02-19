@@ -41,6 +41,7 @@ import java.util.List;
 
 import ua.ck.geekhub.ivanov.rssreader.R;
 import ua.ck.geekhub.ivanov.rssreader.activities.DetailsActivity;
+import ua.ck.geekhub.ivanov.rssreader.activities.ListActivity;
 import ua.ck.geekhub.ivanov.rssreader.heplers.PreferenceHelper;
 import ua.ck.geekhub.ivanov.rssreader.models.Feed;
 import ua.ck.geekhub.ivanov.rssreader.tools.Constants;
@@ -83,6 +84,9 @@ public class DetailsFragment extends Fragment {
         super.onCreate(savedInstanceState);
         mActivity = (ActionBarActivity) getActivity();
         mIsTableLand = getResources().getBoolean(R.bool.tablet_land);
+        if (mActivity instanceof ListActivity && !mIsTableLand) {
+            //TODO: destroy fragment here
+        }
         mFeed = getArguments().getParcelable(Constants.EXTRA_FEED);
         mUiHelper = new UiLifecycleHelper(mActivity, null);
         mUiHelper.onCreate(savedInstanceState);
@@ -164,10 +168,14 @@ public class DetailsFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.details, menu);
-        MenuItem menuItem = menu.findItem(R.id.action_share);
+        MenuItem share = menu.findItem(R.id.action_share);
         ShareActionProvider shareActionProvider =
-                (ShareActionProvider) MenuItemCompat.getActionProvider(menuItem);
+                (ShareActionProvider) MenuItemCompat.getActionProvider(share);
         shareActionProvider.setShareIntent(buildShareIntent());
+        MenuItem shareViaFacebook = menu.findItem(R.id.menu_share_facebook);
+        boolean visible = FacebookDialog.canPresentShareDialog(mActivity.getApplicationContext(),
+                FacebookDialog.ShareDialogFeature.SHARE_DIALOG);
+        shareViaFacebook.setVisible(!visible);
     }
 
     @Override
@@ -200,6 +208,7 @@ public class DetailsFragment extends Fragment {
             case R.id.menu_share_facebook:
                 if (FacebookDialog.canPresentShareDialog(mActivity.getApplicationContext(),
                         FacebookDialog.ShareDialogFeature.SHARE_DIALOG)) {
+                    //This code not used, but I don`t want to delete it:
                     FacebookDialog shareDialog = new FacebookDialog.ShareDialogBuilder(mActivity)
                             .setName(Html.fromHtml(mFeed.getTitle()).toString())
                             .setLink(mFeed.getLink())
@@ -208,7 +217,6 @@ public class DetailsFragment extends Fragment {
                             .setApplicationName(getString(R.string.app_name))
                             .build();
                     mUiHelper.trackPendingDialogCall(shareDialog.present());
-
                 } else {
                     login();
                 }
