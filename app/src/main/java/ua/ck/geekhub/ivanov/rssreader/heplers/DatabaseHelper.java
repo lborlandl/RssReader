@@ -26,7 +26,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public final static String COLUMN_DATE = "pubDate";
 
     private DatabaseHelper(Context context, String name, SQLiteDatabase.CursorFactory factory,
-                          int version) {
+                           int version) {
         super(context, name, factory, version);
     }
 
@@ -36,6 +36,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         return mInstance;
     }
+
     @Override
     public void onCreate(SQLiteDatabase db) {
         String createFeedTable = "CREATE TABLE " + TABLE_NAME + " (" +
@@ -107,12 +108,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public boolean deleteFeed(Feed feed) {
         SQLiteDatabase db = this.getWritableDatabase();
-        return db.delete(TABLE_NAME, COLUMN_LINK + "=?" , new String[] { feed.getLink() }) == 1;
+        return db.delete(TABLE_NAME, COLUMN_LINK + "=?", new String[]{feed.getLink()}) == 1;
     }
 
     public boolean isFeed(Feed feed) {
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM " + TABLE_NAME + " WHERE " +
+        Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM " +
+                TABLE_NAME + " WHERE " +
                 COLUMN_LINK + " = \"" + feed.getLink() + "\"", null);
         cursor.moveToFirst();
         boolean result = !(cursor.getInt(0) == 0);

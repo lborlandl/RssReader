@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
@@ -200,6 +201,9 @@ public class ListFragment extends android.support.v4.app.ListFragment {
 
     private void setListViewSetting(View view) {
         mList = (ListView) view.findViewById(android.R.id.list);
+        if (mIsTableLand) {
+            mList.setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
+        }
         mList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {

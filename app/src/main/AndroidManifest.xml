@@ -49,8 +49,6 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
-        <service
-            android:name=".services.UpdateFeedService"
-            android:enabled="true" />
+        <service android:name=".services.UpdateFeedService" />
     </application>
 </manifest>
