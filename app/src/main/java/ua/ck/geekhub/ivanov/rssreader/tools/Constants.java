@@ -10,4 +10,5 @@ public class Constants {
     public static final String EXTRA_FEED_ARRAY = "feed_array";
     public static final String EXTRA_POSITION = "position";
     public static final int REQUEST_FEED = 1;
+    public static final int REQUEST_IS_CHANGED = 2;
 }

@@ -200,6 +200,7 @@ public class DetailsFragment extends Fragment {
                     mDb.addFeed(mFeed);
                 }
                 mIsFavourite = !mIsFavourite;
+                mActivity.setResult(Constants.REQUEST_IS_CHANGED);
                 return true;
             case R.id.menu_share_facebook:
                 if (FacebookDialog.canPresentShareDialog(mActivity.getApplicationContext(),

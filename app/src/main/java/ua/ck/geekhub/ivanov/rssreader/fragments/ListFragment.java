@@ -280,11 +280,16 @@ public class ListFragment extends android.support.v4.app.ListFragment {
         super.onActivityResult(requestCode, resultCode, data);
         mSpinnerSelected = mPreferenceHelper.getSpinnerPosition();
         mActionBar.setSelectedNavigationItem(mSpinnerSelected);
-        if (requestCode == Constants.REQUEST_FEED && data != null) {
+        if (resultCode == Constants.REQUEST_FEED && data != null) {
             mIsResult = true;
             mCurrentFeed = data.getParcelableExtra(Constants.EXTRA_FEED);
         } else {
             mIsResult = false;
+        }
+        if (resultCode == Constants.REQUEST_IS_CHANGED && mSpinnerSelected == FAVOURITE) {
+            DatabaseHelper db = DatabaseHelper.getInstance(getActivity());
+            mFeedList = db.getAllFeed();
+            updateList();
         }
     }
 
@@ -305,7 +310,8 @@ public class ListFragment extends android.support.v4.app.ListFragment {
         int id = item.getItemId();
         switch (id) {
             case R.id.action_settings:
-                startActivity(new Intent(getActivity(), SettingsActivity.class));
+                Intent detailsActivityIntent = new Intent(getActivity(), SettingsActivity.class);
+                startActivityForResult(detailsActivityIntent, Constants.REQUEST_IS_CHANGED);
                 return true;
             case R.id.action_login:
                 startActivity(new Intent(getActivity(), LoginActivity.class));
