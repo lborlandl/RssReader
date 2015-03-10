@@ -41,14 +41,13 @@ import java.util.List;
 
 import ua.ck.geekhub.ivanov.rssreader.R;
 import ua.ck.geekhub.ivanov.rssreader.activities.DetailsActivity;
-import ua.ck.geekhub.ivanov.rssreader.activities.ListActivity;
+import ua.ck.geekhub.ivanov.rssreader.heplers.DatabaseHelper;
 import ua.ck.geekhub.ivanov.rssreader.heplers.PreferenceHelper;
 import ua.ck.geekhub.ivanov.rssreader.models.Feed;
 import ua.ck.geekhub.ivanov.rssreader.tools.Constants;
-import ua.ck.geekhub.ivanov.rssreader.heplers.DatabaseHelper;
 import ua.ck.geekhub.ivanov.rssreader.tools.ListHandler;
-import ua.ck.geekhub.ivanov.rssreader.views.NotifyingScrollView;
 import ua.ck.geekhub.ivanov.rssreader.tools.UILImageGetter;
+import ua.ck.geekhub.ivanov.rssreader.views.NotifyingScrollView;
 
 public class DetailsFragment extends Fragment {
 
@@ -84,9 +83,6 @@ public class DetailsFragment extends Fragment {
         super.onCreate(savedInstanceState);
         mActivity = (ActionBarActivity) getActivity();
         mIsTableLand = getResources().getBoolean(R.bool.tablet_land);
-        if (mActivity instanceof ListActivity && !mIsTableLand) {
-            //TODO: destroy fragment here
-        }
         mFeed = getArguments().getParcelable(Constants.EXTRA_FEED);
         mUiHelper = new UiLifecycleHelper(mActivity, null);
         mUiHelper.onCreate(savedInstanceState);
