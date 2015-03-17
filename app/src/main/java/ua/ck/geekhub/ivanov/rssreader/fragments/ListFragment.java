@@ -9,19 +9,15 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
-import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -37,16 +33,13 @@ import org.json.XML;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Locale;
 
 import ua.ck.geekhub.ivanov.rssreader.R;
 import ua.ck.geekhub.ivanov.rssreader.activities.DetailsActivity;
 import ua.ck.geekhub.ivanov.rssreader.activities.LoginActivity;
 import ua.ck.geekhub.ivanov.rssreader.activities.SettingsActivity;
+import ua.ck.geekhub.ivanov.rssreader.adapters.FeedAdapter;
 import ua.ck.geekhub.ivanov.rssreader.heplers.DatabaseHelper;
 import ua.ck.geekhub.ivanov.rssreader.heplers.NotificationHelper;
 import ua.ck.geekhub.ivanov.rssreader.heplers.PreferenceHelper;
@@ -63,13 +56,13 @@ public class ListFragment extends android.support.v4.app.ListFragment {
     private View mProgressBar;
 
     private ActionBar mActionBar;
-    private ArrayList<Feed> mFeedList = new ArrayList<>();
+    //    private ArrayList<Feed> mFeedList = new ArrayList<>();
     private Feed mCurrentFeed;
 
     private int mCurrentFeedIndex;
 
     private PreferenceHelper mPreferenceHelper;
-    private boolean mIsTableLand, mIsAnimations, mIsResult = false;
+    private boolean mIsTableLand, mIsResult = false;
     private int mSpinnerSelected;
     private FeedAdapter mAdapter;
 
@@ -102,7 +95,7 @@ public class ListFragment extends android.support.v4.app.ListFragment {
         super.onResume();
         mActivity = (ActionBarActivity) getActivity();
         mPreferenceHelper.putListRunning(true);
-        mIsAnimations = mPreferenceHelper.isAnimation();
+        mAdapter.updateAnimation(mPreferenceHelper.isAnimation());
         updateNotification();
     }
 
@@ -140,7 +133,7 @@ public class ListFragment extends android.support.v4.app.ListFragment {
                         break;
                     case FAVOURITE:
                         DatabaseHelper db = DatabaseHelper.getInstance(getActivity());
-                        mFeedList = db.getAllFeed();
+                        mAdapter.addAll(db.getAllFeed());
                         updateList();
                         break;
                 }
@@ -182,13 +175,13 @@ public class ListFragment extends android.support.v4.app.ListFragment {
                             showProgressBar();
                             startDownloadData(Constants.URL_NEWS);
                         } else {
-                            mFeedList = new ArrayList<>();
+                            mAdapter.clear();
                             updateList();
                         }
                         break;
                     case FAVOURITE:
                         DatabaseHelper db = DatabaseHelper.getInstance(getActivity());
-                        mFeedList = db.getAllFeed();
+                        mAdapter.addAll(db.getAllFeed());
                         updateList();
                         mActivity.supportInvalidateOptionsMenu();
                         break;
@@ -208,17 +201,16 @@ public class ListFragment extends android.support.v4.app.ListFragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if (mIsTableLand) {
-                    if (mFeedList.indexOf(mCurrentFeed) != position) {
-                        mCurrentFeed = mFeedList.get(position);
+                    if (mAdapter.indexOf(mCurrentFeed) != position) {
+                        mCurrentFeed = mAdapter.getFeed(position);
                         setCurrentFeed();
                         mCurrentFeedIndex = position;
                     }
                 } else {
                     Intent intent = new Intent(mActivity, DetailsActivity.class);
-                    intent.putExtra(Constants.EXTRA_FEED_ARRAY, mFeedList);
+                    intent.putExtra(Constants.EXTRA_FEED_ARRAY, mAdapter.getList());
                     intent.putExtra(Constants.EXTRA_POSITION, position);
                     intent.putExtra(Constants.EXTRA_STATE, mSpinnerSelected);
-                    intent.putExtra(Constants.EXTRA_FEEDS_COUNT, mFeedList.size());
                     startActivityForResult(intent, Constants.REQUEST_FEED);
                 }
             }
@@ -288,7 +280,7 @@ public class ListFragment extends android.support.v4.app.ListFragment {
         }
         if (resultCode == Constants.REQUEST_IS_CHANGED && mSpinnerSelected == FAVOURITE) {
             DatabaseHelper db = DatabaseHelper.getInstance(getActivity());
-            mFeedList = db.getAllFeed();
+            mAdapter.addAll(db.getAllFeed());
             updateList();
         }
     }
@@ -301,7 +293,7 @@ public class ListFragment extends android.support.v4.app.ListFragment {
 
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
-        boolean visibility = (mSpinnerSelected == FAVOURITE) && !mFeedList.isEmpty();
+        boolean visibility = (mSpinnerSelected == FAVOURITE) && !mAdapter.isEmpty();
         menu.findItem(R.id.menu_delete_all_favourite).setVisible(visibility);
     }
 
@@ -327,7 +319,7 @@ public class ListFragment extends android.support.v4.app.ListFragment {
                             public void onPositive(MaterialDialog dialog) {
                                 DatabaseHelper db = DatabaseHelper.getInstance(getActivity());
                                 db.deleteAll();
-                                mFeedList = new ArrayList<>();
+                                mAdapter.clear();
                                 updateList();
                             }
                         })
@@ -410,6 +402,52 @@ public class ListFragment extends android.support.v4.app.ListFragment {
         }
     }
 
+    private ArrayList<Feed> parseXML(String data) {
+
+        try {
+            JSONObject rssJSONObject = XML.toJSONObject(data);
+            JSONObject rss = rssJSONObject.getJSONObject("rss");
+            JSONObject channel = rss.getJSONObject("channel");
+            JSONArray items = channel.getJSONArray("item");
+
+            ArrayList<Feed> list = new ArrayList<>();
+            for (int i = 0; i < items.length(); i++) {
+                JSONObject item = items.getJSONObject(i);
+                JSONObject author = item.getJSONObject("atom:author");
+                Object enclosureObject = item.opt("enclosure");
+                JSONObject enclosure = null;
+                if (enclosureObject != null) {
+                    if (enclosureObject instanceof JSONArray) {
+                        enclosure = ((JSONArray) enclosureObject).getJSONObject(0);
+                    } else {
+                        enclosure = (JSONObject) enclosureObject;
+                    }
+                }
+
+                Feed rssItem = new Feed();
+                rssItem
+                        .setTitle(item.optString("title"))
+                        .setLink(item.optString("link"))
+                        .setDescription(item.optString("description"))
+                        .setAuthorName(author.optString("name"))
+                        .setAuthorLink(author.optString("uri"))
+                        .setPubDate(item.optString("pubDate"));
+
+                if (enclosureObject != null) {
+                    rssItem.setImage(enclosure.optString("url"));
+                }
+
+                list.add(rssItem);
+            }
+            mPreferenceHelper.putLastNewsLink(list.get(0).getLink());
+            return list;
+        } catch (JSONException e) {
+            Toast.makeText(mActivity, R.string.error_download, Toast.LENGTH_LONG).show();
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
+    }
+
     private void updateList() {
         mAdapter.notifyDataSetChanged();
         mSwipeLayout.setRefreshing(false);
@@ -420,13 +458,13 @@ public class ListFragment extends android.support.v4.app.ListFragment {
                     mIsResult = false;
                     mTask = 0;
                 }
-                int selected = mFeedList.indexOf(mCurrentFeed);
+                int selected = mAdapter.indexOf(mCurrentFeed);
                 if (selected != -1) {
                     mCurrentFeedIndex = selected;
                 }
             } else {
-                if (!mFeedList.isEmpty()) {
-                    mCurrentFeed = mFeedList.get(0);
+                if (!mAdapter.isEmpty()) {
+                    mCurrentFeed = mAdapter.getFeed(0);
                     mCurrentFeedIndex = 0;
                 }
             }
@@ -452,7 +490,7 @@ public class ListFragment extends android.support.v4.app.ListFragment {
         }
     }
 
-    class DownloadStringTask extends AsyncTask<String, String, String> {
+    class DownloadStringTask extends AsyncTask<String, Void, String> {
         @Override
         protected String doInBackground(String... params) {
             StringBuilder stringBuilder = new StringBuilder();
@@ -474,98 +512,8 @@ public class ListFragment extends android.support.v4.app.ListFragment {
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-            mFeedList = parseJSON(s);
+            mAdapter.addAll(parseJSON(s));
             updateList();
         }
-    }
-
-    class FeedAdapter extends BaseAdapter {
-        private int lastPosition = -1;
-
-        private LayoutInflater mLayoutInflater;
-
-        public FeedAdapter(Context context) {
-            mLayoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        }
-
-        @Override
-        public int getCount() {
-            return mFeedList.size();
-        }
-
-        @Override
-        public Object getItem(int position) {
-            return mFeedList.get(position);
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
-
-        public Feed getFeed(int position) {
-            return (Feed) getItem(position);
-        }
-
-        @Override
-        public boolean isEmpty() {
-            return mFeedList.isEmpty();
-        }
-
-        @Override
-        public void notifyDataSetChanged() {
-            super.notifyDataSetChanged();
-            lastPosition = -1;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            ViewHolder viewHolder;
-
-            if (convertView == null) {
-                convertView = mLayoutInflater.inflate(R.layout.feed_item, parent, false);
-
-                viewHolder = new ViewHolder();
-                viewHolder.mTextViewDate = (TextView) convertView.findViewById(R.id.txt_item_date);
-                viewHolder.mTextViewTitle = (TextView) convertView.findViewById(R.id.txt_item_title);
-                viewHolder.mTextViewAuthor = (TextView) convertView.findViewById(R.id.txt_item_author);
-
-                convertView.setTag(viewHolder);
-            } else {
-                viewHolder = (ViewHolder) convertView.getTag();
-            }
-
-            Feed feed = getFeed(position);
-
-            Date date = new Date();
-            try {
-                SimpleDateFormat incomingDate =
-                        new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss Z", Locale.ENGLISH);
-                date = incomingDate.parse(feed.getPubDate());
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM HH:mm");
-
-            viewHolder.mTextViewDate.setText(convertView.getResources()
-                    .getString(R.string.published) + " " + dateFormat.format(date));
-            viewHolder.mTextViewTitle.setText(Html.fromHtml(feed.getTitle()));
-            viewHolder.mTextViewAuthor.setText(", " + feed.getAuthorName());
-
-            if (mIsAnimations) {
-                int id = (position > lastPosition) ?
-                        R.anim.abc_slide_in_bottom : R.anim.abc_slide_in_top;
-                Animation animation = AnimationUtils.loadAnimation(getActivity(), id);
-                convertView.startAnimation(animation);
-            }
-            lastPosition = position;
-
-            return convertView;
-        }
-    }
-
-    static class ViewHolder {
-        TextView mTextViewTitle, mTextViewDate, mTextViewAuthor;
     }
 }

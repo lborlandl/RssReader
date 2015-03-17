@@ -31,7 +31,11 @@ public class DetailsActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mAlpha = new int[getIntent().getIntExtra(Constants.EXTRA_FEEDS_COUNT, 10)];
+        mFeeds = getIntent().getParcelableArrayListExtra(Constants.EXTRA_FEED_ARRAY);
+        if (mFeeds == null) {
+            mFeeds = new ArrayList<>();
+        }
+        mAlpha = new int[mFeeds.size()];
 
         int intExtra = getIntent().getIntExtra(Constants.EXTRA_POSITION, 0);
         if (savedInstanceState != null) {
@@ -40,11 +44,6 @@ public class DetailsActivity extends ActionBarActivity {
         } else {
             mCurrentFeed = intExtra;
         }
-        mFeeds = getIntent().getParcelableArrayListExtra(Constants.EXTRA_FEED_ARRAY);
-        if (mFeeds == null) {
-            mFeeds = new ArrayList<>();
-        }
-
         boolean isTable = getResources().getBoolean(R.bool.tablet);
         boolean isTableLand = getResources().getBoolean(R.bool.tablet_land);
 
