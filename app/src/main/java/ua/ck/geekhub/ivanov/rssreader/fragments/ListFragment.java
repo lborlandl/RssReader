@@ -25,14 +25,9 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
-import org.xmlpull.v1.XmlPullParserFactory;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.StringReader;
 import java.util.ArrayList;
 
 import ua.ck.geekhub.ivanov.rssreader.R;
@@ -47,6 +42,7 @@ import ua.ck.geekhub.ivanov.rssreader.models.Feed;
 import ua.ck.geekhub.ivanov.rssreader.services.UpdateFeedService;
 import ua.ck.geekhub.ivanov.rssreader.tools.Constants;
 import ua.ck.geekhub.ivanov.rssreader.tools.Utils;
+import ua.ck.geekhub.ivanov.rssreader.tools.XmlParser;
 
 public class ListFragment extends android.support.v4.app.ListFragment {
 
@@ -357,86 +353,9 @@ public class ListFragment extends android.support.v4.app.ListFragment {
         mProgressBar.setVisibility(View.GONE);
     }
 
-    private XmlPullParser prepareXpp(String data) throws XmlPullParserException {
-        XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
-        factory.setNamespaceAware(true);
-        XmlPullParser xpp = factory.newPullParser();
-        xpp.setInput(new StringReader(data));
-        return xpp;
-    }
 
     private ArrayList<Feed> parseXML(String data) {
-        ArrayList<Feed> list = new ArrayList<>();
-        Feed feed = new Feed();
-
-        final String ITEM = "item";
-        final String TITLE = "title";
-        final String LINK = "link";
-        final String DESCRIPTION = "description";
-        final String ENCLOSURE = "enclosure";
-        final String NAME = "name";
-        final String URI = "uri";
-        final String URL = "url";
-        final String PUB_DATE = "pubDate";
-
-        try {
-            XmlPullParser xpp = prepareXpp(data);
-            String tagName = "";
-
-            while (xpp.getEventType() != XmlPullParser.END_DOCUMENT) {
-                switch (xpp.getEventType()) {
-                    case XmlPullParser.START_TAG:
-                        tagName = xpp.getName();
-                        if (tagName.equals(ITEM)) {
-                            feed = new Feed();
-                            break;
-                        }
-                        if (tagName.equals(ENCLOSURE)) {
-                            feed.setImage(xpp.getAttributeValue(null, URL));
-                        }
-                        break;
-                    case XmlPullParser.TEXT:
-                        String text = xpp.getText();
-                        switch (tagName) {
-                            case TITLE:
-                                feed.setTitle(text);
-                                break;
-                            case LINK:
-                                feed.setLink(text);
-                                break;
-                            case DESCRIPTION:
-                                feed.setDescription(text);
-                                break;
-                            case NAME:
-                                feed.setAuthorName(text);
-                                break;
-                            case URI:
-                                feed.setAuthorLink(text);
-                                break;
-                            case PUB_DATE:
-                                feed.setPubDate(text);
-                                break;
-                            default:
-                                break;
-                        }
-                        break;
-                    case XmlPullParser.END_TAG:
-                        tagName = "";
-                        if (xpp.getName().equals(ITEM)) {
-                            list.add(feed);
-                        }
-                        break;
-                    default:
-                        break;
-                }
-                xpp.next();
-            }
-
-        } catch (XmlPullParserException | IOException e) {
-            e.printStackTrace();
-        }
-
-        return list;
+        return new XmlParser().getList(data);
     }
 
     private void updateList() {

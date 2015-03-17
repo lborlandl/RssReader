@@ -6,10 +6,6 @@ import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.IBinder;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.XML;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -19,6 +15,7 @@ import ua.ck.geekhub.ivanov.rssreader.heplers.NotificationHelper;
 import ua.ck.geekhub.ivanov.rssreader.heplers.PreferenceHelper;
 import ua.ck.geekhub.ivanov.rssreader.tools.Constants;
 import ua.ck.geekhub.ivanov.rssreader.tools.Utils;
+import ua.ck.geekhub.ivanov.rssreader.tools.XmlParser;
 
 public class UpdateFeedService extends Service {
 
@@ -101,23 +98,13 @@ public class UpdateFeedService extends Service {
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-            try {
-                JSONArray items = XML
-                        .toJSONObject(s)
-                        .getJSONObject("rss")
-                        .getJSONObject("channel")
-                        .getJSONArray("item");
-                s = items.getJSONObject(0).optString("link");
-            } catch (JSONException | NullPointerException e) {
-                e.printStackTrace();
-                s = null;
-            }
-            String last = mPreferenceHelper.getLastNewsLink();
-            if (last == null || (s != null && !last.equals(s))) {
+            String newLastLink = new XmlParser().getLastLink(s);
+            String savedLastLink = mPreferenceHelper.getLastNewsLink();
+            if (savedLastLink == null || (newLastLink != null && !savedLastLink.equals(newLastLink))) {
                 if (!mPreferenceHelper.isListRunning() && flag) {
                     mNotificationHelper.showNotification(NotificationHelper.UPDATE);
                 }
-                mPreferenceHelper.putLastNewsLink(s);
+                mPreferenceHelper.putLastNewsLink(newLastLink);
             }
         }
     }
