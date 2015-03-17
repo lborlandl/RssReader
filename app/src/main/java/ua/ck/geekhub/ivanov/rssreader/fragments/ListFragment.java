@@ -25,14 +25,14 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.XML;
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
+import org.xmlpull.v1.XmlPullParserFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.util.ArrayList;
 
 import ua.ck.geekhub.ivanov.rssreader.R;
@@ -357,95 +357,86 @@ public class ListFragment extends android.support.v4.app.ListFragment {
         mProgressBar.setVisibility(View.GONE);
     }
 
-    private ArrayList<Feed> parseJSON(String data) {
-        try {
-            JSONObject rssJSONObject = XML.toJSONObject(data);
-            JSONObject rss = rssJSONObject.getJSONObject("rss");
-            JSONObject channel = rss.getJSONObject("channel");
-            JSONArray items = channel.getJSONArray("item");
-
-            ArrayList<Feed> list = new ArrayList<>();
-            for (int i = 0; i < items.length(); i++) {
-                JSONObject item = items.getJSONObject(i);
-                JSONObject author = item.getJSONObject("atom:author");
-                Object enclosureObject = item.opt("enclosure");
-                JSONObject enclosure = null;
-                if (enclosureObject != null) {
-                    if (enclosureObject instanceof JSONArray) {
-                        enclosure = ((JSONArray) enclosureObject).getJSONObject(0);
-                    } else {
-                        enclosure = (JSONObject) enclosureObject;
-                    }
-                }
-
-                Feed rssItem = new Feed();
-                rssItem
-                        .setTitle(item.optString("title"))
-                        .setLink(item.optString("link"))
-                        .setDescription(item.optString("description"))
-                        .setAuthorName(author.optString("name"))
-                        .setAuthorLink(author.optString("uri"))
-                        .setPubDate(item.optString("pubDate"));
-
-                if (enclosureObject != null) {
-                    rssItem.setImage(enclosure.optString("url"));
-                }
-
-                list.add(rssItem);
-            }
-            mPreferenceHelper.putLastNewsLink(list.get(0).getLink());
-            return list;
-        } catch (JSONException e) {
-            Toast.makeText(mActivity, R.string.error_download, Toast.LENGTH_LONG).show();
-            e.printStackTrace();
-            return new ArrayList<>();
-        }
+    private XmlPullParser prepareXpp(String data) throws XmlPullParserException {
+        XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
+        factory.setNamespaceAware(true);
+        XmlPullParser xpp = factory.newPullParser();
+        xpp.setInput(new StringReader(data));
+        return xpp;
     }
 
     private ArrayList<Feed> parseXML(String data) {
+        ArrayList<Feed> list = new ArrayList<>();
+        Feed feed = new Feed();
+
+        final String ITEM = "item";
+        final String TITLE = "title";
+        final String LINK = "link";
+        final String DESCRIPTION = "description";
+        final String ENCLOSURE = "enclosure";
+        final String NAME = "name";
+        final String URI = "uri";
+        final String URL = "url";
+        final String PUB_DATE = "pubDate";
 
         try {
-            JSONObject rssJSONObject = XML.toJSONObject(data);
-            JSONObject rss = rssJSONObject.getJSONObject("rss");
-            JSONObject channel = rss.getJSONObject("channel");
-            JSONArray items = channel.getJSONArray("item");
+            XmlPullParser xpp = prepareXpp(data);
+            String tagName = "";
 
-            ArrayList<Feed> list = new ArrayList<>();
-            for (int i = 0; i < items.length(); i++) {
-                JSONObject item = items.getJSONObject(i);
-                JSONObject author = item.getJSONObject("atom:author");
-                Object enclosureObject = item.opt("enclosure");
-                JSONObject enclosure = null;
-                if (enclosureObject != null) {
-                    if (enclosureObject instanceof JSONArray) {
-                        enclosure = ((JSONArray) enclosureObject).getJSONObject(0);
-                    } else {
-                        enclosure = (JSONObject) enclosureObject;
-                    }
+            while (xpp.getEventType() != XmlPullParser.END_DOCUMENT) {
+                switch (xpp.getEventType()) {
+                    case XmlPullParser.START_TAG:
+                        tagName = xpp.getName();
+                        if (tagName.equals(ITEM)) {
+                            feed = new Feed();
+                            break;
+                        }
+                        if (tagName.equals(ENCLOSURE)) {
+                            feed.setImage(xpp.getAttributeValue(null, URL));
+                        }
+                        break;
+                    case XmlPullParser.TEXT:
+                        String text = xpp.getText();
+                        switch (tagName) {
+                            case TITLE:
+                                feed.setTitle(text);
+                                break;
+                            case LINK:
+                                feed.setLink(text);
+                                break;
+                            case DESCRIPTION:
+                                feed.setDescription(text);
+                                break;
+                            case NAME:
+                                feed.setAuthorName(text);
+                                break;
+                            case URI:
+                                feed.setAuthorLink(text);
+                                break;
+                            case PUB_DATE:
+                                feed.setPubDate(text);
+                                break;
+                            default:
+                                break;
+                        }
+                        break;
+                    case XmlPullParser.END_TAG:
+                        tagName = "";
+                        if (xpp.getName().equals(ITEM)) {
+                            list.add(feed);
+                        }
+                        break;
+                    default:
+                        break;
                 }
-
-                Feed rssItem = new Feed();
-                rssItem
-                        .setTitle(item.optString("title"))
-                        .setLink(item.optString("link"))
-                        .setDescription(item.optString("description"))
-                        .setAuthorName(author.optString("name"))
-                        .setAuthorLink(author.optString("uri"))
-                        .setPubDate(item.optString("pubDate"));
-
-                if (enclosureObject != null) {
-                    rssItem.setImage(enclosure.optString("url"));
-                }
-
-                list.add(rssItem);
+                xpp.next();
             }
-            mPreferenceHelper.putLastNewsLink(list.get(0).getLink());
-            return list;
-        } catch (JSONException e) {
-            Toast.makeText(mActivity, R.string.error_download, Toast.LENGTH_LONG).show();
+
+        } catch (XmlPullParserException | IOException e) {
             e.printStackTrace();
-            return new ArrayList<>();
         }
+
+        return list;
     }
 
     private void updateList() {
@@ -512,8 +503,54 @@ public class ListFragment extends android.support.v4.app.ListFragment {
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-            mAdapter.addAll(parseJSON(s));
+            mAdapter.addAll(parseXML(s));
             updateList();
         }
     }
 }
+
+
+//    private ArrayList<Feed> parseJSON(String data) {
+//        try {
+//            JSONObject rssJSONObject = XML.toJSONObject(data);
+//            JSONObject rss = rssJSONObject.getJSONObject("rss");
+//            JSONObject channel = rss.getJSONObject("channel");
+//            JSONArray items = channel.getJSONArray("item");
+//
+//            ArrayList<Feed> list = new ArrayList<>();
+//            for (int i = 0; i < items.length(); i++) {
+//                JSONObject item = items.getJSONObject(i);
+//                JSONObject author = item.getJSONObject("atom:author");
+//                Object enclosureObject = item.opt("enclosure");
+//                JSONObject enclosure = null;
+//                if (enclosureObject != null) {
+//                    if (enclosureObject instanceof JSONArray) {
+//                        enclosure = ((JSONArray) enclosureObject).getJSONObject(0);
+//                    } else {
+//                        enclosure = (JSONObject) enclosureObject;
+//                    }
+//                }
+//
+//                Feed rssItem = new Feed();
+//                rssItem
+//                        .setTitle(item.optString("title"))
+//                        .setLink(item.optString("link"))
+//                        .setDescription(item.optString("description"))
+//                        .setAuthorName(author.optString("name"))
+//                        .setAuthorLink(author.optString("uri"))
+//                        .setPubDate(item.optString("pubDate"));
+//
+//                if (enclosureObject != null) {
+//                    rssItem.setImage(enclosure.optString("url"));
+//                }
+//
+//                list.add(rssItem);
+//            }
+//            mPreferenceHelper.putLastNewsLink(list.get(0).getLink());
+//            return list;
+//        } catch (JSONException e) {
+//            Toast.makeText(mActivity, R.string.error_download, Toast.LENGTH_LONG).show();
+//            e.printStackTrace();
+//            return new ArrayList<>();
+//        }
+//    }
