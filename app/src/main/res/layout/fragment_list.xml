@@ -25,10 +25,7 @@
                 android:id="@android:id/list"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@color/background_material_light"
-                android:divider="@null"
-                android:dividerHeight="0dp"
-                android:listSelector="@color/background_material_light" />
+                android:drawSelectorOnTop="true" />
         </android.support.v4.widget.SwipeRefreshLayout>
 
         <ViewStub

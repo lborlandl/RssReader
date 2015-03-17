@@ -8,4 +8,7 @@
 
     <color name="btn_pressed">#551fb6f2</color>
     <color name="btn_transparent">#00ffffff</color>
+
+    <color name="test_mask_green">#833bff00</color>
+    <color name="test_purple">#7eff24df</color>
 </resources>
