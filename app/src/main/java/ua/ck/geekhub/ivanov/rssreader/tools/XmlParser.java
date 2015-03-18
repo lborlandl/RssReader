@@ -12,15 +12,15 @@ import ua.ck.geekhub.ivanov.rssreader.models.Feed;
 
 public class XmlParser {
 
-    static final String ITEM = "item";
-    static final String TITLE = "title";
-    static final String LINK = "link";
-    static final String DESCRIPTION = "description";
-    static final String ENCLOSURE = "enclosure";
-    static final String NAME = "name";
-    static final String URI = "uri";
-    static final String URL = "url";
-    static final String PUB_DATE = "pubDate";
+    private static final String ITEM = "item";
+    private static final String TITLE = "title";
+    private static final String LINK = "link";
+    private static final String DESCRIPTION = "description";
+    private static final String ENCLOSURE = "enclosure";
+    private static final String NAME = "name";
+    private static final String URI = "uri";
+    private static final String URL = "url";
+    private static final String PUB_DATE = "pubDate";
 
     public ArrayList<Feed> getList(String data) {
         ArrayList<Feed> list = new ArrayList<>();
