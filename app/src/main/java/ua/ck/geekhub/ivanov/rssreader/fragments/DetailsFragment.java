@@ -44,10 +44,11 @@ import ua.ck.geekhub.ivanov.rssreader.activities.DetailsActivity;
 import ua.ck.geekhub.ivanov.rssreader.heplers.DatabaseHelper;
 import ua.ck.geekhub.ivanov.rssreader.heplers.PreferenceHelper;
 import ua.ck.geekhub.ivanov.rssreader.models.Feed;
-import ua.ck.geekhub.ivanov.rssreader.tools.Constants;
 import ua.ck.geekhub.ivanov.rssreader.tools.ListHandler;
 import ua.ck.geekhub.ivanov.rssreader.tools.UILImageGetter;
 import ua.ck.geekhub.ivanov.rssreader.views.NotifyingScrollView;
+
+import static ua.ck.geekhub.ivanov.rssreader.tools.Constants.*;
 
 public class DetailsFragment extends Fragment {
 
@@ -63,7 +64,7 @@ public class DetailsFragment extends Fragment {
 
     public static DetailsFragment newInstance(Feed feed) {
         Bundle args = new Bundle();
-        args.putParcelable(Constants.EXTRA_FEED, feed);
+        args.putParcelable(EXTRA_FEED, feed);
         DetailsFragment fragment = new DetailsFragment();
         fragment.setArguments(args);
         return fragment;
@@ -71,7 +72,7 @@ public class DetailsFragment extends Fragment {
 
     public static DetailsFragment newInstance(Feed feed, int position) {
         Bundle args = new Bundle();
-        args.putParcelable(Constants.EXTRA_FEED, feed);
+        args.putParcelable(EXTRA_FEED, feed);
         args.putInt(EXTRA_POSITION, position);
         DetailsFragment fragment = new DetailsFragment();
         fragment.setArguments(args);
@@ -83,7 +84,7 @@ public class DetailsFragment extends Fragment {
         super.onCreate(savedInstanceState);
         mActivity = (ActionBarActivity) getActivity();
         mIsTableLand = getResources().getBoolean(R.bool.tablet_land);
-        mFeed = getArguments().getParcelable(Constants.EXTRA_FEED);
+        mFeed = getArguments().getParcelable(EXTRA_FEED);
         mUiHelper = new UiLifecycleHelper(mActivity, null);
         mUiHelper.onCreate(savedInstanceState);
         mDb = DatabaseHelper.getInstance(mActivity);
@@ -200,7 +201,7 @@ public class DetailsFragment extends Fragment {
                     mDb.addFeed(mFeed);
                 }
                 mIsFavourite = !mIsFavourite;
-                mActivity.setResult(Constants.REQUEST_IS_CHANGED);
+                mActivity.setResult(REQUEST_IS_CHANGED);
                 return true;
             case R.id.menu_share_facebook:
                 if (FacebookDialog.canPresentShareDialog(mActivity.getApplicationContext(),

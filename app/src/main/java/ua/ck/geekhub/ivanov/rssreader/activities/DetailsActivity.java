@@ -15,7 +15,8 @@ import java.util.ArrayList;
 import ua.ck.geekhub.ivanov.rssreader.R;
 import ua.ck.geekhub.ivanov.rssreader.models.Feed;
 import ua.ck.geekhub.ivanov.rssreader.fragments.DetailsFragment;
-import ua.ck.geekhub.ivanov.rssreader.tools.Constants;
+
+import static ua.ck.geekhub.ivanov.rssreader.tools.Constants.*;
 
 public class DetailsActivity extends ActionBarActivity {
 
@@ -31,13 +32,13 @@ public class DetailsActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mFeeds = getIntent().getParcelableArrayListExtra(Constants.EXTRA_FEED_ARRAY);
+        mFeeds = getIntent().getParcelableArrayListExtra(EXTRA_FEED_ARRAY);
         if (mFeeds == null) {
             mFeeds = new ArrayList<>();
         }
         mAlpha = new int[mFeeds.size()];
 
-        int intExtra = getIntent().getIntExtra(Constants.EXTRA_POSITION, 0);
+        int intExtra = getIntent().getIntExtra(EXTRA_POSITION, 0);
         if (savedInstanceState != null) {
             mAlpha = savedInstanceState.getIntArray(INT_ARRAY);
             mCurrentFeed = savedInstanceState.getInt(FEED_SELECTED, intExtra);
@@ -49,8 +50,8 @@ public class DetailsActivity extends ActionBarActivity {
 
         if (isTable && isTableLand) {
             Intent data = new Intent();
-            data.putExtra(Constants.EXTRA_FEED, mFeeds.get(mCurrentFeed));
-            setResult(Constants.REQUEST_FEED, data);
+            data.putExtra(EXTRA_FEED, mFeeds.get(mCurrentFeed));
+            setResult(REQUEST_FEED, data);
             finish();
         }
 

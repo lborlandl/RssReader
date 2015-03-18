@@ -39,9 +39,10 @@ import ua.ck.geekhub.ivanov.rssreader.heplers.PreferenceHelper;
 import ua.ck.geekhub.ivanov.rssreader.models.Feed;
 import ua.ck.geekhub.ivanov.rssreader.services.FeedLoader;
 import ua.ck.geekhub.ivanov.rssreader.services.UpdateFeedService;
-import ua.ck.geekhub.ivanov.rssreader.tools.Constants;
 import ua.ck.geekhub.ivanov.rssreader.tools.Utils;
 import ua.ck.geekhub.ivanov.rssreader.tools.XmlParser;
+
+import static ua.ck.geekhub.ivanov.rssreader.tools.Constants.*;
 
 public class ListFragment extends android.support.v4.app.ListFragment
         implements LoaderManager.LoaderCallbacks<String> {
@@ -107,7 +108,7 @@ public class ListFragment extends android.support.v4.app.ListFragment
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         if (savedInstanceState != null) {
-            mSpinnerSelected = savedInstanceState.getInt(Constants.EXTRA_SPINNER);
+            mSpinnerSelected = savedInstanceState.getInt(EXTRA_SPINNER);
         }
         mActivity = (ActionBarActivity) getActivity();
         mPreferenceHelper = PreferenceHelper.getInstance(mActivity);
@@ -148,7 +149,7 @@ public class ListFragment extends android.support.v4.app.ListFragment
         setListViewSetting(view);
 
         Bundle data = new Bundle();
-        data.putString(FeedLoader.URL_EXTRA, Constants.URL_NEWS);
+        data.putString(FeedLoader.URL_EXTRA, URL_NEWS);
         getLoaderManager().initLoader(FEED_LOADER_ID, data, this);
     }
 
@@ -208,10 +209,10 @@ public class ListFragment extends android.support.v4.app.ListFragment
                     }
                 } else {
                     Intent intent = new Intent(mActivity, DetailsActivity.class);
-                    intent.putExtra(Constants.EXTRA_FEED_ARRAY, mAdapter.getList());
-                    intent.putExtra(Constants.EXTRA_POSITION, position);
-                    intent.putExtra(Constants.EXTRA_STATE, mSpinnerSelected);
-                    startActivityForResult(intent, Constants.REQUEST_FEED);
+                    intent.putExtra(EXTRA_FEED_ARRAY, mAdapter.getList());
+                    intent.putExtra(EXTRA_POSITION, position);
+                    intent.putExtra(EXTRA_STATE, mSpinnerSelected);
+                    startActivityForResult(intent, REQUEST_FEED);
                 }
             }
         });
@@ -257,7 +258,7 @@ public class ListFragment extends android.support.v4.app.ListFragment
     }
 
     private void updateNotification() {
-        boolean result = mActivity.getIntent().getBooleanExtra(Constants.EXTRA_NOTIFICATION, false);
+        boolean result = mActivity.getIntent().getBooleanExtra(EXTRA_NOTIFICATION, false);
         NotificationManager manager = (NotificationManager)
                 mActivity.getSystemService(Context.NOTIFICATION_SERVICE);
         manager.cancel(NotificationHelper.NOTIFY_ID);
@@ -272,13 +273,13 @@ public class ListFragment extends android.support.v4.app.ListFragment
         super.onActivityResult(requestCode, resultCode, data);
         mSpinnerSelected = mPreferenceHelper.getSpinnerPosition();
         mActionBar.setSelectedNavigationItem(mSpinnerSelected);
-        if (resultCode == Constants.REQUEST_FEED && data != null) {
+        if (resultCode == REQUEST_FEED && data != null) {
             mIsResult = true;
-            mCurrentFeed = data.getParcelableExtra(Constants.EXTRA_FEED);
+            mCurrentFeed = data.getParcelableExtra(EXTRA_FEED);
         } else {
             mIsResult = false;
         }
-        if (resultCode == Constants.REQUEST_IS_CHANGED && mSpinnerSelected == FAVOURITE) {
+        if (resultCode == REQUEST_IS_CHANGED && mSpinnerSelected == FAVOURITE) {
             DatabaseHelper db = DatabaseHelper.getInstance(getActivity());
             updateList(db.getAllFeed());
         }
@@ -302,7 +303,7 @@ public class ListFragment extends android.support.v4.app.ListFragment
         switch (id) {
             case R.id.action_settings:
                 Intent detailsActivityIntent = new Intent(getActivity(), SettingsActivity.class);
-                startActivityForResult(detailsActivityIntent, Constants.REQUEST_IS_CHANGED);
+                startActivityForResult(detailsActivityIntent, REQUEST_IS_CHANGED);
                 return true;
             case R.id.action_login:
                 startActivity(new Intent(getActivity(), LoginActivity.class));
@@ -331,7 +332,7 @@ public class ListFragment extends android.support.v4.app.ListFragment
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt(Constants.EXTRA_SPINNER, mSpinnerSelected);
+        outState.putInt(EXTRA_SPINNER, mSpinnerSelected);
     }
 
 
