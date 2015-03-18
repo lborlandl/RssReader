@@ -3,9 +3,10 @@ package ua.ck.geekhub.ivanov.rssreader.fragments;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -25,9 +26,6 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 import ua.ck.geekhub.ivanov.rssreader.R;
@@ -39,12 +37,14 @@ import ua.ck.geekhub.ivanov.rssreader.heplers.DatabaseHelper;
 import ua.ck.geekhub.ivanov.rssreader.heplers.NotificationHelper;
 import ua.ck.geekhub.ivanov.rssreader.heplers.PreferenceHelper;
 import ua.ck.geekhub.ivanov.rssreader.models.Feed;
+import ua.ck.geekhub.ivanov.rssreader.services.FeedLoader;
 import ua.ck.geekhub.ivanov.rssreader.services.UpdateFeedService;
 import ua.ck.geekhub.ivanov.rssreader.tools.Constants;
 import ua.ck.geekhub.ivanov.rssreader.tools.Utils;
 import ua.ck.geekhub.ivanov.rssreader.tools.XmlParser;
 
-public class ListFragment extends android.support.v4.app.ListFragment {
+public class ListFragment extends android.support.v4.app.ListFragment
+        implements LoaderManager.LoaderCallbacks<String> {
 
     private ListView mList;
     private View mListContainer;
@@ -52,7 +52,6 @@ public class ListFragment extends android.support.v4.app.ListFragment {
     private View mProgressBar;
 
     private ActionBar mActionBar;
-    //    private ArrayList<Feed> mFeedList = new ArrayList<>();
     private Feed mCurrentFeed;
 
     private int mCurrentFeedIndex;
@@ -72,6 +71,9 @@ public class ListFragment extends android.support.v4.app.ListFragment {
 
     private static final int NEWS = 0;
     private static final int FAVOURITE = 1;
+
+    private static final int FEED_LOADER_ID = 1;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -125,12 +127,11 @@ public class ListFragment extends android.support.v4.app.ListFragment {
             public void onRefresh() {
                 switch (mSpinnerSelected) {
                     case NEWS:
-                        startDownloadData(Constants.URL_NEWS);
+                        startDownloadData();
                         break;
                     case FAVOURITE:
                         DatabaseHelper db = DatabaseHelper.getInstance(getActivity());
-                        mAdapter.addAll(db.getAllFeed());
-                        updateList();
+                        updateList(db.getAllFeed());
                         break;
                 }
                 if (mIsTableLand) {
@@ -145,6 +146,10 @@ public class ListFragment extends android.support.v4.app.ListFragment {
                 android.R.color.holo_red_light);
 
         setListViewSetting(view);
+
+        Bundle data = new Bundle();
+        data.putString(FeedLoader.URL_EXTRA, Constants.URL_NEWS);
+        getLoaderManager().initLoader(FEED_LOADER_ID, data, this);
     }
 
     private void setActionBarSetting() {
@@ -169,7 +174,7 @@ public class ListFragment extends android.support.v4.app.ListFragment {
                     case NEWS:
                         if (Utils.isOnline(mActivity)) {
                             showProgressBar();
-                            startDownloadData(Constants.URL_NEWS);
+                            startDownloadData();
                         } else {
                             mAdapter.clear();
                             updateList();
@@ -177,8 +182,7 @@ public class ListFragment extends android.support.v4.app.ListFragment {
                         break;
                     case FAVOURITE:
                         DatabaseHelper db = DatabaseHelper.getInstance(getActivity());
-                        mAdapter.addAll(db.getAllFeed());
-                        updateList();
+                        updateList(db.getAllFeed());
                         mActivity.supportInvalidateOptionsMenu();
                         break;
                 }
@@ -222,7 +226,7 @@ public class ListFragment extends android.support.v4.app.ListFragment {
             @Override
             public void onClick(View v) {
                 showProgressBar();
-                startDownloadData(Constants.URL_NEWS);
+                startDownloadData();
             }
         });
 
@@ -276,8 +280,7 @@ public class ListFragment extends android.support.v4.app.ListFragment {
         }
         if (resultCode == Constants.REQUEST_IS_CHANGED && mSpinnerSelected == FAVOURITE) {
             DatabaseHelper db = DatabaseHelper.getInstance(getActivity());
-            mAdapter.addAll(db.getAllFeed());
-            updateList();
+            updateList(db.getAllFeed());
         }
     }
 
@@ -332,10 +335,10 @@ public class ListFragment extends android.support.v4.app.ListFragment {
     }
 
 
-    private void startDownloadData(String url) {
+    private void startDownloadData() {
         if (Utils.isOnline(mActivity)) {
             mSwipeLayout.setRefreshing(true);
-            new DownloadStringTask().execute(url);
+            getLoaderManager().getLoader(FEED_LOADER_ID).forceLoad();
         } else {
             Toast.makeText(mActivity, R.string.warning_news, Toast.LENGTH_SHORT).show();
             mSwipeLayout.setRefreshing(false);
@@ -353,13 +356,12 @@ public class ListFragment extends android.support.v4.app.ListFragment {
         mProgressBar.setVisibility(View.GONE);
     }
 
-
-    private ArrayList<Feed> parseXML(String data) {
-        return new XmlParser().getList(data);
+    private void updateList(ArrayList<Feed> data) {
+        mAdapter.addAll(data);
+        updateList();
     }
 
     private void updateList() {
-        mAdapter.notifyDataSetChanged();
         mSwipeLayout.setRefreshing(false);
         hideProgressBar();
         if (mIsTableLand) {
@@ -400,34 +402,25 @@ public class ListFragment extends android.support.v4.app.ListFragment {
         }
     }
 
-    class DownloadStringTask extends AsyncTask<String, Void, String> {
-        @Override
-        protected String doInBackground(String... params) {
-            StringBuilder stringBuilder = new StringBuilder();
-            try {
-                java.net.URL url = new java.net.URL(params[0]);
-                BufferedReader bufferedReader =
-                        new BufferedReader(new InputStreamReader(url.openStream()));
-                String buffString;
-                while ((buffString = bufferedReader.readLine()) != null) {
-                    stringBuilder.append(buffString);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            return stringBuilder.toString();
+    @Override
+    public Loader<String> onCreateLoader(int id, Bundle args) {
+        Loader<String> loader = null;
+        if (id == FEED_LOADER_ID) {
+            loader = new FeedLoader(getActivity(), args);
         }
+        return loader;
+    }
 
-        @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
-            mAdapter.addAll(parseXML(s));
-            updateList();
-        }
+    @Override
+    public void onLoadFinished(Loader<String> loader, String data) {
+        updateList(new XmlParser().parseIntoList(data));
+    }
+
+    @Override
+    public void onLoaderReset(Loader<String> loader) {
+
     }
 }
-
 
 //    private ArrayList<Feed> parseJSON(String data) {
 //        try {

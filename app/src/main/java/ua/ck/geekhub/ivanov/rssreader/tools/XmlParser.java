@@ -22,7 +22,7 @@ public class XmlParser {
     private static final String URL = "url";
     private static final String PUB_DATE = "pubDate";
 
-    public ArrayList<Feed> getList(String data) {
+    public ArrayList<Feed> parseIntoList(String data) {
         ArrayList<Feed> list = new ArrayList<>();
         Feed feed = new Feed();
 
@@ -86,7 +86,7 @@ public class XmlParser {
         return list;
     }
 
-    public String getLastLink(String data) {
+    public String parseLastLink(String data) {
         try {
             XmlPullParser xpp = prepareXpp(data);
             String tagName = "";

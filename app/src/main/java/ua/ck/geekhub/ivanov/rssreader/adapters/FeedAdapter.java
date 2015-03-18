@@ -69,6 +69,7 @@ public class FeedAdapter extends BaseAdapter {
     public void addAll(Collection<? extends Feed> items) {
         clear();
         mFeedList.addAll(items);
+        notifyDataSetChanged();
     }
 
     public int indexOf(Feed feed) {

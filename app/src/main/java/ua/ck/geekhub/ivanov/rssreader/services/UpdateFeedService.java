@@ -98,7 +98,7 @@ public class UpdateFeedService extends Service {
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-            String newLastLink = new XmlParser().getLastLink(s);
+            String newLastLink = new XmlParser().parseLastLink(s);
             String savedLastLink = mPreferenceHelper.getLastNewsLink();
             if (savedLastLink == null || (newLastLink != null && !savedLastLink.equals(newLastLink))) {
                 if (!mPreferenceHelper.isListRunning() && flag) {
